@@ -1,0 +1,158 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Customer {
+  id             String     @id @default(cuid())
+  name           String
+  phone          String?
+  line_id        String?
+  customer_type  String?
+  traveler_count Int?
+  age_range      String?
+  note           String?
+  created_at     DateTime   @default(now())
+  updated_at     DateTime   @updatedAt
+  TourPlans      TourPlan[]
+
+  @@map("customers")
+}
+
+model TourPlan {
+  id                       String     @id @default(cuid())
+  tour_code                String?
+  customer_id              String?
+  customer                 Customer?  @relation(fields: [customer_id], references: [id])
+  title                    String?
+  country                  String?
+  main_city                String?
+  secondary_city           String?
+  start_date               DateTime?
+  end_date                 DateTime?
+  duration                 Int?
+  trip_type                String?
+  theme                    String?
+  traveler_count           Int?
+  age_range                String?
+  airline                  String?
+  flight_route             String?
+  outbound_flight          String?
+  outbound_time            String?
+  return_flight            String?
+  return_time              String?
+  hotel_level              String?
+  budget_per_person        Float?
+  total_budget             Float?
+  internal_cost            Float?
+  selling_price_per_person Float?
+  total_selling_price      Float?
+  profit_amount            Float?
+  profit_percent           Float?
+  status                   String     @default("Draft")
+  hero_image_url           String?
+  internal_note            String?
+  customer_note            String?
+  created_by               String?
+  created_at               DateTime   @default(now())
+  updated_at               DateTime   @updatedAt
+
+  TourDays     TourDay[]
+  Hotels       Hotel[]
+  Inclusions   Inclusion[]
+  Exclusions   Exclusion[]
+  TourVersions TourVersion[]
+
+  @@map("tour_plans")
+}
+
+model TourDay {
+  id                 String   @id @default(cuid())
+  tour_plan_id       String
+  tour_plan          TourPlan @relation(fields: [tour_plan_id], references: [id], onDelete: Cascade)
+  day_number         Int
+  actual_date        DateTime?
+  day_title          String?
+  city               String?
+  hotel_name         String?
+  breakfast_included Boolean  @default(false)
+  lunch_included     Boolean  @default(false)
+  dinner_included    Boolean  @default(false)
+  customer_note      String?
+  internal_note      String?
+  sort_order         Int      @default(0)
+  created_at         DateTime @default(now())
+  updated_at         DateTime @updatedAt
+
+  TourActivities TourActivity[]
+
+  @@map("tour_days")
+}
+
+model TourActivity {
+  id                   String   @id @default(cuid())
+  tour_day_id          String
+  tour_day             TourDay  @relation(fields: [tour_day_id], references: [id], onDelete: Cascade)
+  time_text            String?
+  activity_title       String?
+  activity_description String?
+  location_name        String?
+  image_url            String?
+  sort_order           Int      @default(0)
+  created_at           DateTime @default(now())
+  updated_at           DateTime @updatedAt
+
+  @@map("tour_activities")
+}
+
+model Hotel {
+  id           String   @id @default(cuid())
+  tour_plan_id String
+  tour_plan    TourPlan @relation(fields: [tour_plan_id], references: [id], onDelete: Cascade)
+  night_text   String?
+  hotel_name   String?
+  hotel_level  String?
+  room_type    String?
+  area         String?
+  image_url    String?
+  note         String?
+
+  @@map("hotels")
+}
+
+model Inclusion {
+  id           String   @id @default(cuid())
+  tour_plan_id String
+  tour_plan    TourPlan @relation(fields: [tour_plan_id], references: [id], onDelete: Cascade)
+  item_text    String
+  sort_order   Int      @default(0)
+
+  @@map("inclusions")
+}
+
+model Exclusion {
+  id           String   @id @default(cuid())
+  tour_plan_id String
+  tour_plan    TourPlan @relation(fields: [tour_plan_id], references: [id], onDelete: Cascade)
+  item_text    String
+  sort_order   Int      @default(0)
+
+  @@map("exclusions")
+}
+
+model TourVersion {
+  id            String   @id @default(cuid())
+  tour_plan_id  String
+  tour_plan     TourPlan @relation(fields: [tour_plan_id], references: [id], onDelete: Cascade)
+  version_no    Int
+  snapshot_json String // Stores JSON string
+  edit_note     String?
+  edited_by     String?
+  created_at    DateTime @default(now())
+
+  @@map("tour_versions")
+}
