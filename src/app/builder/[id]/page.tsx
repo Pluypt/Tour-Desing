@@ -1,8 +1,6 @@
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/lib/prisma";
 import TourBuilderClient from "./TourBuilderClient";
 import { notFound } from "next/navigation";
-
-const prisma = new PrismaClient();
 
 export default async function TourBuilderPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;

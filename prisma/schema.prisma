@@ -8,17 +8,23 @@ datasource db {
 }
 
 model Customer {
-  id             String     @id @default(cuid())
-  name           String
-  phone          String?
-  line_id        String?
-  customer_type  String?
-  traveler_count Int?
-  age_range      String?
-  note           String?
-  created_at     DateTime   @default(now())
-  updated_at     DateTime   @updatedAt
-  TourPlans      TourPlan[]
+  id                  String     @id @default(cuid())
+  name                String
+  phone               String?
+  line_id             String?
+  email               String?
+  customer_type       String?
+  traveler_count      Int?
+  age_range           String?
+  note                String?
+  // CRM fields
+  average_budget      Float?
+  interested_countries String?
+  latest_status       String?
+  internal_note       String?
+  created_at          DateTime   @default(now())
+  updated_at          DateTime   @updatedAt
+  TourPlans           TourPlan[]
 
   @@map("customers")
 }
@@ -61,13 +67,77 @@ model TourPlan {
   created_at               DateTime   @default(now())
   updated_at               DateTime   @updatedAt
 
+  // Pricing fields
+  cost_currency             String?  @default("THB")
+  exchange_rate             Float?   @default(1)
+  total_fixed_cost          Float?   @default(0)
+  total_variable_cost       Float?   @default(0)
+  total_cost                Float?   @default(0)
+  cost_per_person           Float?   @default(0)
+  pricing_method            String?
+  target_profit_percent     Float?   @default(0)
+  target_profit_per_person  Float?   @default(0)
+  deposit_amount            Float?   @default(0)
+  remaining_amount          Float?   @default(0)
+
   TourDays     TourDay[]
   Hotels       Hotel[]
   Inclusions   Inclusion[]
   Exclusions   Exclusion[]
   TourVersions TourVersion[]
+  CostItems    TourCostItem[]
+  CoverDesigns TourCoverDesign[]
 
   @@map("tour_plans")
+}
+
+model TourCoverDesign {
+  id               String   @id @default(cuid())
+  tour_plan_id     String
+  tour_plan        TourPlan @relation(fields: [tour_plan_id], references: [id], onDelete: Cascade)
+
+  template_name    String?
+  background_url   String?
+  logo_url         String?
+
+  headline         String?
+  subheadline      String?
+  travel_date_text String?
+  price_text       String?
+  badge_text       String?
+  highlight_text   String?
+
+  theme_color      String?  @default("#D32F2F")
+  text_color       String?  @default("#FFFFFF")
+  overlay_style    String?  @default("dark")
+
+  export_url       String?
+  created_at       DateTime @default(now())
+  updated_at       DateTime @updatedAt
+
+  @@map("tour_cover_designs")
+}
+
+model TourCostItem {
+  id           String   @id @default(cuid())
+  tour_plan_id String
+  tour_plan    TourPlan @relation(fields: [tour_plan_id], references: [id], onDelete: Cascade)
+
+  category     String
+  item_name    String
+  cost_type    String
+  quantity     Float    @default(1)
+  unit_cost    Float    @default(0)
+  total_cost   Float    @default(0)
+
+  is_internal  Boolean  @default(true)
+  note         String?
+  sort_order   Int      @default(0)
+
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+
+  @@map("tour_cost_items")
 }
 
 model TourDay {
@@ -89,8 +159,35 @@ model TourDay {
   updated_at         DateTime @updatedAt
 
   TourActivities TourActivity[]
+  TourDayImages  TourDayImage[]
 
   @@map("tour_days")
+}
+
+model TourDayImage {
+  id             String   @id @default(cuid())
+  tour_day_id    String
+  tour_day       TourDay  @relation(fields: [tour_day_id], references: [id], onDelete: Cascade)
+
+  image_url      String
+  thumbnail_url  String?
+  source_url     String?
+  source_title   String?
+  photographer   String?
+  provider       String?
+
+  location_name  String?
+  search_keyword String?
+  alt_text       String?
+  caption        String?
+
+  is_selected    Boolean  @default(true)
+  sort_order     Int      @default(0)
+
+  created_at     DateTime @default(now())
+  updated_at     DateTime @updatedAt
+
+  @@map("tour_day_images")
 }
 
 model TourActivity {

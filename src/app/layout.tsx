@@ -55,6 +55,11 @@ export default function RootLayout({
                   </Link>
                 </li>
                 <li>
+                  <Link href="/pipeline" className="sidebar-link">
+                    Sales Pipeline
+                  </Link>
+                </li>
+                <li>
                   <Link href="/crm" className="sidebar-link">
                     ข้อมูลลูกค้า (CRM)
                   </Link>

@@ -6,13 +6,14 @@ export default function ExportButtons({ title }: { title: string }) {
     try {
       const html2pdf = (await import('html2pdf.js')).default;
       const element = document.getElementById('proposal-document');
+      if (!element) { alert("ไม่พบเอกสาร"); return; }
       
       const opt = {
         margin:       0,
         filename:     `${title || 'Tour_Proposal'}.pdf`,
-        image:        { type: 'jpeg', quality: 0.98 },
+        image:        { type: 'jpeg' as const, quality: 0.98 },
         html2canvas:  { scale: 2, useCORS: true },
-        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' as const }
       };
 
       html2pdf().set(opt).from(element).save();

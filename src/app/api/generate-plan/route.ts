@@ -1,11 +1,6 @@
 import { NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
-import { GoogleGenAI } from "@google/genai";
-
-const prisma = new PrismaClient();
-
-// Initialize the Gemini client
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+import { prisma } from "@/lib/prisma";
+import { ai, safeJsonParse, validateAIPlan, buildFallbackPlan } from "@/lib/ai";
 
 export async function POST(req: Request) {
   try {
@@ -98,7 +93,36 @@ export async function POST(req: Request) {
     });
 
     const jsonText = response.text || "{}";
-    const aiPlan = JSON.parse(jsonText);
+    const parsedPlan = safeJsonParse(jsonText);
+
+    const aiPlan = validateAIPlan(parsedPlan)
+      ? parsedPlan
+      : buildFallbackPlan(data.mainCity, data.country, duration, data.startDate);
+
+    if (!validateAIPlan(parsedPlan)) {
+      console.error("AI returned invalid plan structure, using fallback");
+    }
+
+    // 2.5 Generate Hero Image using Gemini Imagen
+    let heroImageUrl: string | null = null;
+    try {
+      const imagePrompt = `A stunning travel photography hero image for a tour to ${data.mainCity}, ${data.country}. Beautiful landscape or iconic landmark, golden hour lighting, vibrant colors, professional travel photography style, wide angle shot, no text, no people.`;
+      const imageResponse = await ai.models.generateImages({
+        model: 'imagen-3.0-generate-002',
+        prompt: imagePrompt,
+        config: {
+          numberOfImages: 1,
+          aspectRatio: '16:9',
+          outputMimeType: 'image/jpeg',
+        },
+      });
+      const imageBytes = imageResponse.generatedImages?.[0]?.image?.imageBytes;
+      if (imageBytes) {
+        heroImageUrl = `data:image/jpeg;base64,${imageBytes}`;
+      }
+    } catch (imgError) {
+      console.error("Image generation failed (non-critical):", imgError);
+    }
 
     // 3. Save Plan to Database
     const plan = await prisma.tourPlan.create({
@@ -119,6 +143,7 @@ export async function POST(req: Request) {
         budget_per_person: parseFloat(data.budgetPerPerson) || 0,
         status: "Draft",
         customer_note: data.customerNote,
+        hero_image_url: heroImageUrl,
       }
     });
 

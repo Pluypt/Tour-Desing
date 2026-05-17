@@ -1,8 +1,6 @@
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import LibraryActions from "./LibraryActions";
-
-const prisma = new PrismaClient();
 
 export default async function TourLibraryPage() {
   const plans = await prisma.tourPlan.findMany({
