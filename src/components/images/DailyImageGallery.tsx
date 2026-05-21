@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 
 type DayImage = {
   id: string;
@@ -32,6 +32,8 @@ export default function DailyImageGallery({
 }) {
   const [images, setImages] = useState<DayImage[]>([]);
   const [searching, setSearching] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const fetchImages = useCallback(async () => {
     const res = await fetch(`/api/tour-days/${dayId}/images`);
@@ -64,6 +66,49 @@ export default function DailyImageGallery({
     }
   };
 
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      alert("ไฟล์มีขนาดใหญ่เกินไป (สูงสุด 5MB)");
+      if (fileInputRef.current) fileInputRef.current.value = "";
+      return;
+    }
+
+    setUploading(true);
+    try {
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        const base64 = e.target?.result as string;
+        const res = await fetch(`/api/tour-days/${dayId}/images`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            image_url: base64,
+            provider: "manual_upload",
+            alt_text: file.name,
+            location_name: "อัพโหลดเอง",
+            sort_order: images.length,
+          }),
+        });
+        const data = await res.json();
+        if (data.success) {
+          setImages(prev => [...prev, data.image]);
+        } else {
+          alert("อัพโหลดรูปไม่สำเร็จ: " + (data.error || "unknown error"));
+        }
+        setUploading(false);
+        if (fileInputRef.current) fileInputRef.current.value = "";
+      };
+      reader.readAsDataURL(file);
+    } catch (error) {
+      alert("เกิดข้อผิดพลาดในการอ่านไฟล์");
+      setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
+
   const handleDelete = async (imageId: string) => {
     await fetch(`/api/tour-days/${dayId}/images/${imageId}`, { method: "DELETE" });
     setImages(prev => prev.filter(img => img.id !== imageId));
@@ -76,14 +121,31 @@ export default function DailyImageGallery({
           <span style={{ fontWeight: 700, fontSize: "0.9rem" }}>DAY {dayNumber}</span>
           <span style={{ color: "var(--pr-text-muted)", fontSize: "0.85rem", marginLeft: "8px" }}>{dayTitle || ""}</span>
         </div>
-        <button
-          className="btn-secondary"
-          onClick={handleSearch}
-          disabled={searching}
-          style={{ padding: "5px 12px", fontSize: "0.8rem" }}
-        >
-          {searching ? "กำลังค้นหา..." : "🔍 ค้นหารูปภาพ"}
-        </button>
+        <div style={{ display: "flex", gap: "8px" }}>
+          <input 
+            type="file" 
+            accept="image/png, image/jpeg, image/webp" 
+            ref={fileInputRef} 
+            onChange={handleFileUpload} 
+            style={{ display: "none" }} 
+          />
+          <button
+            className="btn-secondary"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={uploading || searching}
+            style={{ padding: "5px 12px", fontSize: "0.8rem", backgroundColor: "var(--pr-gray-200)" }}
+          >
+            {uploading ? "กำลังอัพโหลด..." : "📤 อัพโหลดรูปภาพ"}
+          </button>
+          <button
+            className="btn-secondary"
+            onClick={handleSearch}
+            disabled={searching || uploading}
+            style={{ padding: "5px 12px", fontSize: "0.8rem" }}
+          >
+            {searching ? "กำลังค้นหา..." : "🔍 ค้นหารูปภาพ"}
+          </button>
+        </div>
       </div>
 
       {images.length === 0 ? (
