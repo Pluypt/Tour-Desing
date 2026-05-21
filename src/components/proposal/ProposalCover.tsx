@@ -49,8 +49,7 @@ export default function ProposalCover({
     : "-";
 
   return (
-    <div style={{ marginBottom: "40px", pageBreakAfter: "always" }}>
-      {/* Company Header */}
+    <div style={{ marginBottom: "40px", pageBreakAfter: "always" }}>      {/* Company Header */}
       <div style={{ textAlign: "center", marginBottom: "20px" }}>
         <div style={{ fontSize: "10px", color: "#aaa", letterSpacing: "3px", marginBottom: "4px" }}>PR GLOBAL TRAVEL GROUP CO., LTD.</div>
         <h1 style={{ color: accentColor, fontSize: "26px", fontWeight: 800, margin: "0 0 4px" }}>FINAL ITINERARY</h1>

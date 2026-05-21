@@ -31,9 +31,9 @@ type TourDay = {
   TourDayImages?: DayImage[];
 };
 
-export default function DailyItinerarySection({ days }: { days: TourDay[] }) {
+export default function DailyItinerarySection({ days, hotelLevel }: { days: TourDay[]; hotelLevel?: string | null }) {
   return (
-    <div>
+    <div style={{ pageBreakBefore: "always" }}>
       <h2 style={{ color: PR_RED, fontSize: "16px", fontWeight: 700, borderBottom: `2px solid ${PR_RED}`, paddingBottom: "8px", marginBottom: "24px" }}>
         รายละเอียดโปรแกรมรายวัน
       </h2>
@@ -84,7 +84,13 @@ export default function DailyItinerarySection({ days }: { days: TourDay[] }) {
 
             {/* Hotel & Meals */}
             <div style={{ backgroundColor: "#fff5f5", border: "1px solid #ffebeb", borderRadius: "6px", padding: "10px 14px", fontSize: "12px", display: "flex", gap: "20px", flexWrap: "wrap" }}>
-              <span><strong style={{ color: PR_RED }}>ที่พัก:</strong> {day.hotel_name || "ไม่ระบุ"}</span>
+              <span>
+                <strong style={{ color: PR_RED }}>ที่พัก:</strong>{" "}
+                {day.hotel_name || "ไม่ระบุ"}
+                {day.hotel_name && hotelLevel && (
+                  <span style={{ color: "#888" }}> (หรือเทียบเท่า {hotelLevel})</span>
+                )}
+              </span>
               <span><strong style={{ color: PR_RED }}>อาหาร:</strong> {meals}</span>
             </div>
 

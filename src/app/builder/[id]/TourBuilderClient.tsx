@@ -65,9 +65,22 @@ export default function TourBuilderClient({ initialPlan }: { initialPlan: any })
   return (
     <>
       {/* Header */}
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
-        <div>
-          <h1 className="page-title" style={{ margin: 0 }}>{plan.title}</h1>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "20px" }}>
+        <div style={{ flex: 1, marginRight: "20px" }}>
+          <input
+            type="text"
+            value={plan.title || ""}
+            onChange={e => setPlan({ ...plan, title: e.target.value })}
+            style={{
+              fontSize: "1.3rem", fontWeight: 700, color: "var(--pr-text-main)",
+              border: "none", borderBottom: "2px solid transparent", background: "transparent",
+              width: "100%", padding: "2px 0", outline: "none",
+              transition: "border-color 0.2s",
+            }}
+            onFocus={e => (e.target.style.borderBottomColor = "var(--pr-red)")}
+            onBlur={e => (e.target.style.borderBottomColor = "transparent")}
+            placeholder="ชื่อทริป"
+          />
           <div style={{ display: "flex", alignItems: "center", gap: "12px", marginTop: "4px" }}>
             <p style={{ color: "var(--pr-text-muted)", margin: 0, fontSize: "0.85rem" }}>{plan.tour_code} • ลูกค้า: {plan.customer?.name}</p>
             <StatusSelector planId={plan.id} currentStatus={plan.status || "Draft"} />
@@ -109,7 +122,46 @@ export default function TourBuilderClient({ initialPlan }: { initialPlan: any })
         <div style={{ display: "flex", gap: "20px", height: "calc(100vh - 220px)" }}>
           {/* Day List */}
           <div className="card" style={{ width: "280px", display: "flex", flexDirection: "column", overflowY: "auto", margin: 0 }}>
-            <h3 style={{ marginBottom: "15px", paddingBottom: "10px", borderBottom: "1px solid var(--border-color)", fontSize: "1rem" }}>แผนการเดินทาง</h3>
+            <h3 style={{ marginBottom: "10px", paddingBottom: "10px", borderBottom: "1px solid var(--border-color)", fontSize: "1rem" }}>แผนการเดินทาง</h3>
+
+            {/* Hero Image URL */}
+            <div style={{ marginBottom: "12px", paddingBottom: "12px", borderBottom: "1px solid var(--border-color)" }}>
+              <label style={{ fontSize: "0.78rem", color: "var(--pr-text-muted)", display: "block", marginBottom: "4px" }}>รูปหน้าปก (URL)</label>
+              <input
+                type="text"
+                className="form-control"
+                value={plan.hero_image_url || ""}
+                onChange={e => setPlan({ ...plan, hero_image_url: e.target.value })}
+                placeholder="https://... หรือวาง URL รูปภาพ"
+                style={{ fontSize: "0.78rem", padding: "6px 8px" }}
+              />
+              {plan.hero_image_url && (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={plan.hero_image_url} alt="cover preview" style={{ width: "100%", height: "80px", objectFit: "cover", borderRadius: "4px", marginTop: "6px" }} onError={e => { (e.target as HTMLImageElement).style.display = "none"; }} />
+              )}
+            </div>
+
+            {/* Selling Price */}
+            <div style={{ marginBottom: "12px", paddingBottom: "12px", borderBottom: "1px solid var(--border-color)" }}>
+              <label style={{ fontSize: "0.78rem", color: "var(--pr-text-muted)", display: "block", marginBottom: "4px" }}>ราคาขายต่อท่าน (บาท)</label>
+              <input
+                type="number"
+                className="form-control"
+                value={plan.selling_price_per_person || ""}
+                onChange={e => {
+                  const price = parseFloat(e.target.value) || 0;
+                  const total = price * (plan.traveler_count || 1);
+                  setPlan({ ...plan, selling_price_per_person: price, total_selling_price: total });
+                }}
+                placeholder="0"
+                style={{ fontSize: "0.85rem", padding: "6px 8px" }}
+              />
+              {plan.selling_price_per_person > 0 && (
+                <div style={{ fontSize: "0.75rem", color: "var(--pr-red)", marginTop: "4px", fontWeight: 600 }}>
+                  รวม {plan.traveler_count} ท่าน = {((plan.selling_price_per_person || 0) * (plan.traveler_count || 1)).toLocaleString()} บาท
+                </div>
+              )}
+            </div>
             <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
               {plan.TourDays.map((day: any) => (
                 <div

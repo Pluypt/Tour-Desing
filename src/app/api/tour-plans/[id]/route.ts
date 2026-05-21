@@ -15,6 +15,9 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
       where: { id },
       data: {
         title: body.title,
+        hero_image_url: body.hero_image_url ?? undefined,
+        selling_price_per_person: body.selling_price_per_person ?? undefined,
+        total_selling_price: body.total_selling_price ?? undefined,
         status: "Draft",
         updated_at: new Date()
       }

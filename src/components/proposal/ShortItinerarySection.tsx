@@ -12,8 +12,7 @@ export default function ShortItinerarySection({ days }: { days: TourDay[] }) {
     <div style={{ marginBottom: "32px" }}>
       <h2 style={{ color: PR_RED, fontSize: "16px", fontWeight: 700, borderBottom: `2px solid ${PR_RED}`, paddingBottom: "8px", marginBottom: "16px" }}>
         แผนทัวร์แบบย่อ
-      </h2>
-      <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+      </h2>      <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
         {days.map(day => {
           const highlights = day.TourActivities
             .slice(0, 3)

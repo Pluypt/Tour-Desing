@@ -19,26 +19,27 @@ export default async function ProposalPreviewPage({ params }: { params: Promise<
         orderBy: { sort_order: "asc" },
         include: {
           TourActivities: { orderBy: { sort_order: "asc" } },
-          TourDayImages: { where: { is_selected: true }, orderBy: { sort_order: "asc" } },
         },
       },
       Inclusions: { orderBy: { sort_order: "asc" } },
       Exclusions: { orderBy: { sort_order: "asc" } },
-      CoverDesigns: { orderBy: { created_at: "desc" }, take: 1 },
     },
   });
 
   if (!plan) return notFound();
 
-  const cover = plan.CoverDesigns[0] ?? null;
-  // Use cover background if available, otherwise fall back to hero_image_url
-  const heroImageUrl = cover?.background_url || plan.hero_image_url;
-
-  // SECURITY: never expose internal cost fields to this page
-  // Only selling_price_per_person, total_selling_price, deposit_amount are shown
+  const heroImageUrl = plan.hero_image_url;
 
   return (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center" }}>
+      <style>{`
+        @media print {
+          @page { size: A4; margin: 0; }
+          body { margin: 0; }
+          #proposal-document { box-shadow: none !important; width: 100% !important; }
+        }
+      `}</style>
+
       {/* Toolbar */}
       <div style={{ width: "100%", maxWidth: "820px", display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
         <h1 className="page-title" style={{ margin: 0 }}>พรีวิวเอกสาร</h1>
@@ -53,19 +54,19 @@ export default async function ProposalPreviewPage({ params }: { params: Promise<
         id="proposal-document"
         style={{
           width: "210mm",
-          minHeight: "297mm",
           backgroundColor: "white",
           boxShadow: "0 0 20px rgba(0,0,0,0.1)",
-          padding: "18mm 20mm",
+          padding: "20mm 18mm",
           color: "#333",
           fontFamily: "'Inter', 'Sarabun', sans-serif",
           fontSize: "13px",
           lineHeight: "1.6",
+          marginBottom: "40px",
         }}
       >
         {/* 1. Cover Page */}
         <ProposalCover
-          title={cover?.headline || plan.title}
+          title={plan.title}
           tourCode={plan.tour_code}
           startDate={plan.start_date}
           endDate={plan.end_date}
@@ -76,21 +77,14 @@ export default async function ProposalPreviewPage({ params }: { params: Promise<
           flightRoute={plan.flight_route}
           customerName={plan.customer?.name}
           heroImageUrl={heroImageUrl}
-          subheadline={cover?.subheadline}
-          badgeText={cover?.badge_text}
-          highlightText={cover?.highlight_text}
-          priceText={cover?.price_text}
-          travelDateText={cover?.travel_date_text}
-          themeColor={cover?.theme_color}
-          overlayStyle={cover?.overlay_style}
         />
 
-        {/* 2. Package & Price (customer-facing only — no internal cost) */}
+        {/* 2. Package & Price */}
         <PackagePriceSection
           sellingPricePerPerson={plan.selling_price_per_person}
           totalSellingPrice={plan.total_selling_price}
           travelerCount={plan.traveler_count}
-          depositAmount={plan.deposit_amount}
+          depositAmount={null}
         />
 
         {/* 3. Short Itinerary */}
@@ -100,11 +94,10 @@ export default async function ProposalPreviewPage({ params }: { params: Promise<
         <InclusionExclusionSection
           inclusions={plan.Inclusions}
           exclusions={plan.Exclusions}
-          notes={plan.customer_note}
         />
 
         {/* 5. Daily Itinerary */}
-        <DailyItinerarySection days={plan.TourDays} />
+        <DailyItinerarySection days={plan.TourDays} hotelLevel={plan.hotel_level} />
 
         {/* Footer */}
         <div style={{ marginTop: "40px", paddingTop: "16px", borderTop: "1px solid #eee", textAlign: "center", fontSize: "11px", color: "#aaa" }}>

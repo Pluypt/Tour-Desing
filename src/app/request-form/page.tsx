@@ -171,7 +171,12 @@ export default function TourRequestForm() {
           <div className="form-group">
             <label className="form-label">งบรวมทั้งกรุ๊ป (Auto Calculate)</label>
             <input type="text" className="form-control" value={
-              (parseFloat(formData.budgetPerPerson || "0") * parseInt(formData.travelerCount || "0")).toLocaleString()
+              (() => {
+                const budget = parseFloat(formData.budgetPerPerson || "0");
+                const count = parseInt(formData.travelerCount || "0");
+                if (!budget || !count || isNaN(budget) || isNaN(count)) return "0";
+                return (budget * count).toLocaleString();
+              })()
             } readOnly />
           </div>
         </div>

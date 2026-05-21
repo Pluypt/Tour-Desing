@@ -24,11 +24,9 @@ type Item = { item_text: string };
 export default function InclusionExclusionSection({
   inclusions,
   exclusions,
-  notes,
 }: {
   inclusions: Item[];
   exclusions: Item[];
-  notes?: string | null;
 }) {
   const incList = inclusions.length > 0 ? inclusions.map(i => i.item_text) : DEFAULT_INCLUSIONS;
   const excList = exclusions.length > 0 ? exclusions.map(e => e.item_text) : DEFAULT_EXCLUSIONS;
@@ -58,11 +56,7 @@ export default function InclusionExclusionSection({
       </div>
 
       {/* Notes */}
-      {notes && (
-        <div style={{ backgroundColor: "#fffde7", border: "1px solid #fff176", borderRadius: "6px", padding: "12px 16px", fontSize: "12px", color: "#555" }}>
-          <strong style={{ color: "#f57f17" }}>หมายเหตุ:</strong> {notes}
-        </div>
-      )}
+      
     </div>
   );
 }
