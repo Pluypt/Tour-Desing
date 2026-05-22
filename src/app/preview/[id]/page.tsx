@@ -19,6 +19,10 @@ export default async function ProposalPreviewPage({ params }: { params: Promise<
         orderBy: { sort_order: "asc" },
         include: {
           TourActivities: { orderBy: { sort_order: "asc" } },
+          TourDayImages: {
+            where: { is_selected: true },
+            orderBy: { sort_order: "asc" }
+          },
         },
       },
       Inclusions: { orderBy: { sort_order: "asc" } },
