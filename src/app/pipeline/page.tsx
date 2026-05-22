@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import Link from "next/link";
+import PipelineCard from "./PipelineCard";
 
 const PIPELINE_STAGES = [
   { status: "Draft", color: "#9e9e9e", label: "ฉบับร่าง" },
@@ -65,26 +65,16 @@ export default async function PipelinePage() {
             </div>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "10px" }}>
               {group.plans.map(plan => (
-                <Link key={plan.id} href={`/builder/${plan.id}`} style={{ textDecoration: "none" }}>
-                  <div style={{ border: "1px solid var(--border-color)", borderRadius: "8px", padding: "12px 14px", backgroundColor: "#fafafa", transition: "box-shadow 0.15s" }}
-                    onMouseEnter={e => (e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.12)")}
-                    onMouseLeave={e => (e.currentTarget.style.boxShadow = "none")}
-                  >
-                    <div style={{ fontWeight: 600, fontSize: "0.9rem", color: "var(--pr-red)", marginBottom: "4px" }}>
-                      {plan.title || "Untitled"}
-                    </div>
-                    <div style={{ fontSize: "0.78rem", color: "var(--pr-text-muted)", marginBottom: "6px" }}>
-                      {plan.tour_code} • {plan.customer?.name || "-"}
-                    </div>
-                    <div style={{ display: "flex", gap: "10px", fontSize: "0.78rem", color: "#555", flexWrap: "wrap" }}>
-                      <span>🌏 {plan.country || "-"}</span>
-                      <span>👥 {plan.traveler_count} ท่าน</span>
-                      {plan.selling_price_per_person && (
-                        <span>💰 {plan.selling_price_per_person.toLocaleString()}/ท่าน</span>
-                      )}
-                    </div>
-                  </div>
-                </Link>
+                <PipelineCard
+                  key={plan.id}
+                  id={plan.id}
+                  title={plan.title}
+                  tour_code={plan.tour_code}
+                  customerName={plan.customer?.name ?? null}
+                  country={plan.country}
+                  traveler_count={plan.traveler_count}
+                  selling_price_per_person={plan.selling_price_per_person}
+                />
               ))}
             </div>
           </div>
