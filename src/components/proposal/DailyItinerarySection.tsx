@@ -96,9 +96,9 @@ export default function DailyItinerarySection({ days, hotelLevel }: { days: Tour
 
             {/* Day Images Grid */}
             {day.TourDayImages && day.TourDayImages.filter(img => img.is_selected).length > 0 && (
-              <div style={{ marginTop: "14px", display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "6px" }}>
+              <div style={{ marginTop: "14px", display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "10px" }}>
                 {day.TourDayImages.filter(img => img.is_selected).slice(0, 4).map(img => (
-                  <div key={img.id} style={{ borderRadius: "5px", overflow: "hidden", aspectRatio: "4/3", backgroundColor: "#eee" }}>
+                  <div key={img.id} style={{ borderRadius: "8px", overflow: "hidden", aspectRatio: "16/9", backgroundColor: "#eee" }}>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={img.image_url}
