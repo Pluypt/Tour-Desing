@@ -57,36 +57,48 @@ export default function ProposalCover({
         <p style={{ color: "#999", fontSize: "11px", margin: 0 }}>บริการแพ็กเกจทัวร์ต่างประเทศครบวงจร</p>
       </div>
 
-      {/* Hero / Cover Image — portrait 3:4 */}
+      {/* Hero / Cover Image — portrait 3:4, use <img> so it prints in PDF */}
       <div style={{
         width: "60%", aspectRatio: "3 / 4", margin: "0 auto 24px",
         borderRadius: "10px", overflow: "hidden",
         position: "relative", backgroundColor: "#ddd",
-        backgroundImage: heroImageUrl ? `url(${heroImageUrl})` : undefined,
-        backgroundSize: "cover", backgroundPosition: "center",
       }}>
-        {heroImageUrl && hasCustomCover && (
+        {heroImageUrl ? (
           <>
-            <div style={{ position: "absolute", inset: 0, background: overlay }} />
-            <div style={{ position: "absolute", inset: 0, padding: "20px 24px", display: "flex", flexDirection: "column", justifyContent: "flex-end", color: textOnImage }}>
-              {badgeText && (
-                <div style={{ backgroundColor: accentColor, color: "white", padding: "2px 10px", borderRadius: "12px", fontSize: "10px", fontWeight: 700, width: "fit-content", marginBottom: "8px" }}>
-                  {badgeText}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={heroImageUrl}
+              alt="cover"
+              style={{
+                position: "absolute", inset: 0,
+                width: "100%", height: "100%",
+                objectFit: "cover", objectPosition: "center",
+                display: "block",
+              }}
+            />
+            {hasCustomCover && (
+              <>
+                <div style={{ position: "absolute", inset: 0, background: overlay }} />
+                <div style={{ position: "absolute", inset: 0, padding: "20px 24px", display: "flex", flexDirection: "column", justifyContent: "flex-end", color: textOnImage }}>
+                  {badgeText && (
+                    <div style={{ backgroundColor: accentColor, color: "white", padding: "2px 10px", borderRadius: "12px", fontSize: "10px", fontWeight: 700, width: "fit-content", marginBottom: "8px" }}>
+                      {badgeText}
+                    </div>
+                  )}
+                  {title && <div style={{ fontSize: "20px", fontWeight: 800, lineHeight: 1.2, marginBottom: "4px", textShadow: "0 1px 4px rgba(0,0,0,0.4)" }}>{title}</div>}
+                  {subheadline && <div style={{ fontSize: "12px", opacity: 0.9, marginBottom: "8px" }}>{subheadline}</div>}
+                  <div style={{ display: "flex", gap: "14px", fontSize: "11px", opacity: 0.85 }}>
+                    {travelDateText && <span>📅 {travelDateText}</span>}
+                    {priceText && <span style={{ color: "#FFD700", fontWeight: 700 }}>฿ {priceText}</span>}
+                  </div>
                 </div>
-              )}
-              {title && <div style={{ fontSize: "20px", fontWeight: 800, lineHeight: 1.2, marginBottom: "4px", textShadow: "0 1px 4px rgba(0,0,0,0.4)" }}>{title}</div>}
-              {subheadline && <div style={{ fontSize: "12px", opacity: 0.9, marginBottom: "8px" }}>{subheadline}</div>}
-              <div style={{ display: "flex", gap: "14px", fontSize: "11px", opacity: 0.85 }}>
-                {travelDateText && <span>📅 {travelDateText}</span>}
-                {priceText && <span style={{ color: "#FFD700", fontWeight: 700 }}>฿ {priceText}</span>}
-              </div>
-            </div>
-            <div style={{ position: "absolute", top: "12px", left: "16px", color: textOnImage, fontSize: "10px", fontWeight: 700, opacity: 0.9, textShadow: "0 1px 3px rgba(0,0,0,0.5)" }}>
-              PR TRAVEL GROUP
-            </div>
+                <div style={{ position: "absolute", top: "12px", left: "16px", color: textOnImage, fontSize: "10px", fontWeight: 700, opacity: 0.9, textShadow: "0 1px 3px rgba(0,0,0,0.5)" }}>
+                  PR TRAVEL GROUP
+                </div>
+              </>
+            )}
           </>
-        )}
-        {!heroImageUrl && (
+        ) : (
           <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%", color: "#bbb", fontSize: "13px" }}>
             ไม่มีรูปหน้าปก
           </div>
