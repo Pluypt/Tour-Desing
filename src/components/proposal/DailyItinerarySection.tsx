@@ -103,24 +103,23 @@ export default function DailyItinerarySection({ days, hotelLevel }: { days: Tour
 
             {/* Day Images Grid */}
             {day.TourDayImages && day.TourDayImages.filter(img => img.is_selected).length > 0 && (
-              <div style={{ marginTop: "14px", display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "10px", pageBreakInside: "avoid" }}>
-                {day.TourDayImages.filter(img => img.is_selected).slice(0, 4).map(img => (
-                  <div key={img.id} style={{ backgroundColor: "#eee", borderRadius: "8px" }}>
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={img.image_url}
-                      alt={img.alt_text || ""}
-                      style={{ 
-                        width: "100%", 
-                        height: "48mm", /* ล็อคความสูงตายตัวสำหรับ 16:9 บนตาราง 2 คอลัมน์ของ A4 (กว้าง ~85mm) */
-                        objectFit: "cover", /* ตัดส่วนเกินออกแทนการบีบ */
-                        objectPosition: "center",
-                        display: "block",
+              <div style={{ pageBreakInside: "avoid", breakInside: "avoid" }}>
+                <div style={{ marginTop: "14px", display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "10px" }}>
+                  {day.TourDayImages.filter(img => img.is_selected).slice(0, 4).map(img => (
+                    <div
+                      key={img.id}
+                      style={{
+                        width: "100%",
+                        height: "48mm", /* ล็อคความสูงตายตัวสำหรับ 16:9 บนตาราง 2 คอลัมน์ของ A4 */
+                        backgroundImage: `url(${img.image_url})`,
+                        backgroundSize: "cover", /* ตัดส่วนเกินออกแทนการบีบ */
+                        backgroundPosition: "center",
+                        backgroundColor: "#eee",
                         borderRadius: "8px"
                       }}
                     />
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
             )}
           </div>

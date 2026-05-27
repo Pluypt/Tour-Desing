@@ -57,21 +57,18 @@ export default function ProposalCover({
         <p style={{ color: "#999", fontSize: "11px", margin: 0 }}>บริการแพ็กเกจทัวร์ต่างประเทศครบวงจร</p>
       </div>
 
-      {/* Hero / Cover Image — natural aspect ratio, most reliable for PDF print */}
+      {/* Hero / Cover Image — use background-image for most reliable cover cropping in PDF engine */}
       {heroImageUrl ? (
         <div style={{ textAlign: "center", marginBottom: "24px" }}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={heroImageUrl}
-            alt="cover"
+          <div
             style={{
               width: "60%",
               height: "140mm",         /* ความกว้าง 60% ของ A4 คือ ~105mm ดังนั้นความสูง 3:4 คือ ~140mm */
-              objectFit: "cover",      /* ตัดส่วนที่เกินออก ไม่บีบสัดส่วนรูป */
-              objectPosition: "center",
+              backgroundImage: `url(${heroImageUrl})`,
+              backgroundSize: "cover", /* ตัดส่วนที่เกินออก ไม่บีบสัดส่วนรูป */
+              backgroundPosition: "center",
               display: "inline-block",
               borderRadius: "10px",
-              maxWidth: "100%",
             }}
           />
         </div>
