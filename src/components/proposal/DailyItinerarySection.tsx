@@ -105,12 +105,19 @@ export default function DailyItinerarySection({ days, hotelLevel }: { days: Tour
             {day.TourDayImages && day.TourDayImages.filter(img => img.is_selected).length > 0 && (
               <div style={{ marginTop: "14px", display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "10px", pageBreakInside: "avoid" }}>
                 {day.TourDayImages.filter(img => img.is_selected).slice(0, 4).map(img => (
-                  <div key={img.id} style={{ borderRadius: "8px", overflow: "hidden", aspectRatio: "16/9", backgroundColor: "#eee" }}>
+                  <div key={img.id} style={{ backgroundColor: "#eee", borderRadius: "8px" }}>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={img.image_url}
                       alt={img.alt_text || ""}
-                      style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                      style={{ 
+                        width: "100%", 
+                        height: "48mm", /* ล็อคความสูงตายตัวสำหรับ 16:9 บนตาราง 2 คอลัมน์ของ A4 (กว้าง ~85mm) */
+                        objectFit: "cover", /* ตัดส่วนเกินออกแทนการบีบ */
+                        objectPosition: "center",
+                        display: "block",
+                        borderRadius: "8px"
+                      }}
                     />
                   </div>
                 ))}
