@@ -57,55 +57,33 @@ export default function ProposalCover({
         <p style={{ color: "#999", fontSize: "11px", margin: 0 }}>บริการแพ็กเกจทัวร์ต่างประเทศครบวงจร</p>
       </div>
 
-      {/* Hero / Cover Image — portrait 3:4, use <img> so it prints in PDF */}
-      {/* Use padding-top 133.33% trick (4/3*100) instead of aspectRatio for reliable print rendering */}
-      <div style={{
-        width: "60%", margin: "0 auto 24px",
-        borderRadius: "10px", overflow: "hidden",
-        position: "relative", backgroundColor: "#ddd",
-        paddingTop: "80%",  /* 3:4 → height = width * 4/3 → paddingTop = 133.33% of width, but container is 60% of page → 60% * 133% ≈ 80% of page */
-      }}>
-        {heroImageUrl ? (
-          <>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={heroImageUrl}
-              alt="cover"
-              style={{
-                position: "absolute", inset: 0,
-                width: "100%", height: "100%",
-                objectFit: "cover", objectPosition: "center",
-                display: "block",
-              }}
-            />
-            {hasCustomCover && (
-              <>
-                <div style={{ position: "absolute", inset: 0, background: overlay }} />
-                <div style={{ position: "absolute", inset: 0, padding: "20px 24px", display: "flex", flexDirection: "column", justifyContent: "flex-end", color: textOnImage }}>
-                  {badgeText && (
-                    <div style={{ backgroundColor: accentColor, color: "white", padding: "2px 10px", borderRadius: "12px", fontSize: "10px", fontWeight: 700, width: "fit-content", marginBottom: "8px" }}>
-                      {badgeText}
-                    </div>
-                  )}
-                  {title && <div style={{ fontSize: "20px", fontWeight: 800, lineHeight: 1.2, marginBottom: "4px", textShadow: "0 1px 4px rgba(0,0,0,0.4)" }}>{title}</div>}
-                  {subheadline && <div style={{ fontSize: "12px", opacity: 0.9, marginBottom: "8px" }}>{subheadline}</div>}
-                  <div style={{ display: "flex", gap: "14px", fontSize: "11px", opacity: 0.85 }}>
-                    {travelDateText && <span>📅 {travelDateText}</span>}
-                    {priceText && <span style={{ color: "#FFD700", fontWeight: 700 }}>฿ {priceText}</span>}
-                  </div>
-                </div>
-                <div style={{ position: "absolute", top: "12px", left: "16px", color: textOnImage, fontSize: "10px", fontWeight: 700, opacity: 0.9, textShadow: "0 1px 3px rgba(0,0,0,0.5)" }}>
-                  PR TRAVEL GROUP
-                </div>
-              </>
-            )}
-          </>
-        ) : (
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%", color: "#bbb", fontSize: "13px" }}>
-            ไม่มีรูปหน้าปก
-          </div>
-        )}
-      </div>
+      {/* Hero / Cover Image — natural aspect ratio, most reliable for PDF print */}
+      {heroImageUrl ? (
+        <div style={{ textAlign: "center", marginBottom: "24px" }}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={heroImageUrl}
+            alt="cover"
+            style={{
+              width: "60%",
+              height: "auto",          /* ให้สูงตามสัดส่วนจริงของรูป ไม่บีบ */
+              display: "inline-block",
+              borderRadius: "10px",
+              maxWidth: "100%",
+            }}
+          />
+        </div>
+      ) : (
+        <div style={{
+          width: "60%", margin: "0 auto 24px",
+          borderRadius: "10px", backgroundColor: "#ddd",
+          height: "200px", display: "flex",
+          alignItems: "center", justifyContent: "center",
+          color: "#bbb", fontSize: "13px",
+        }}>
+          ไม่มีรูปหน้าปก
+        </div>
+      )}
 
       {/* Tour Title */}
       <div style={{ textAlign: "center", marginBottom: "24px" }}>
