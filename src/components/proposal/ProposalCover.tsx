@@ -66,7 +66,9 @@ export default function ProposalCover({
             alt="cover"
             style={{
               width: "60%",
-              height: "auto",          /* ให้สูงตามสัดส่วนจริงของรูป ไม่บีบ */
+              height: "140mm",         /* ความกว้าง 60% ของ A4 คือ ~105mm ดังนั้นความสูง 3:4 คือ ~140mm */
+              objectFit: "cover",      /* ตัดส่วนที่เกินออก ไม่บีบสัดส่วนรูป */
+              objectPosition: "center",
               display: "inline-block",
               borderRadius: "10px",
               maxWidth: "100%",
