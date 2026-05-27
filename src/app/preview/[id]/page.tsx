@@ -41,6 +41,15 @@ export default async function ProposalPreviewPage({ params }: { params: Promise<
           @page { size: A4; margin: 0; }
           body { margin: 0; }
           #proposal-document { box-shadow: none !important; width: 100% !important; }
+          * {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+            color-adjust: exact !important;
+          }
+          img {
+            max-width: 100% !important;
+            page-break-inside: avoid;
+          }
         }
       `}</style>
 
