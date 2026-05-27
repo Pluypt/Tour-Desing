@@ -7,6 +7,7 @@ import CostPlannerTab from "@/components/builder/CostPlannerTab";
 import CoverDesignerTab from "@/components/builder/CoverDesignerTab";
 import DailyImageGallery from "@/components/images/DailyImageGallery";
 import StatusSelector from "@/components/builder/StatusSelector";
+import HeroCoverUploader from "@/components/builder/HeroCoverUploader";
 
 const TABS = [
   { id: "itinerary", label: "แผนรายวัน" },
@@ -124,22 +125,12 @@ export default function TourBuilderClient({ initialPlan }: { initialPlan: any })
           <div className="card" style={{ width: "280px", display: "flex", flexDirection: "column", overflowY: "auto", margin: 0 }}>
             <h3 style={{ marginBottom: "10px", paddingBottom: "10px", borderBottom: "1px solid var(--border-color)", fontSize: "1rem" }}>แผนการเดินทาง</h3>
 
-            {/* Hero Image URL */}
-            <div style={{ marginBottom: "12px", paddingBottom: "12px", borderBottom: "1px solid var(--border-color)" }}>
-              <label style={{ fontSize: "0.78rem", color: "var(--pr-text-muted)", display: "block", marginBottom: "4px" }}>รูปหน้าปก (URL)</label>
-              <input
-                type="text"
-                className="form-control"
-                value={plan.hero_image_url || ""}
-                onChange={e => setPlan({ ...plan, hero_image_url: e.target.value })}
-                placeholder="https://... หรือวาง URL รูปภาพ"
-                style={{ fontSize: "0.78rem", padding: "6px 8px" }}
-              />
-              {plan.hero_image_url && (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={plan.hero_image_url} alt="cover preview" style={{ width: "100%", height: "80px", objectFit: "cover", borderRadius: "4px", marginTop: "6px" }} onError={e => { (e.target as HTMLImageElement).style.display = "none"; }} />
-              )}
-            </div>
+            {/* Hero Cover Uploader */}
+            <HeroCoverUploader
+              planId={plan.id}
+              heroImageUrl={plan.hero_image_url || null}
+              onUpdate={(url) => setPlan({ ...plan, hero_image_url: url })}
+            />
 
             {/* Selling Price */}
             <div style={{ marginBottom: "12px", paddingBottom: "12px", borderBottom: "1px solid var(--border-color)" }}>

@@ -57,10 +57,11 @@ export default function ProposalCover({
         <p style={{ color: "#999", fontSize: "11px", margin: 0 }}>บริการแพ็กเกจทัวร์ต่างประเทศครบวงจร</p>
       </div>
 
-      {/* Hero / Cover Image */}
+      {/* Hero / Cover Image — portrait 3:4 */}
       <div style={{
-        width: "100%", height: "240px", borderRadius: "10px", overflow: "hidden",
-        marginBottom: "24px", position: "relative", backgroundColor: "#ddd",
+        width: "60%", aspectRatio: "3 / 4", margin: "0 auto 24px",
+        borderRadius: "10px", overflow: "hidden",
+        position: "relative", backgroundColor: "#ddd",
         backgroundImage: heroImageUrl ? `url(${heroImageUrl})` : undefined,
         backgroundSize: "cover", backgroundPosition: "center",
       }}>
