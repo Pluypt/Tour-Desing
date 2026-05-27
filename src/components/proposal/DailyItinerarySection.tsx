@@ -55,7 +55,7 @@ export default function DailyItinerarySection({ days, hotelLevel }: { days: Tour
             style={{
               marginBottom: "36px",
               pageBreakBefore: day.day_number > 1 ? "always" : "auto",
-              pageBreakInside: "avoid",
+              /* เอา pageBreakInside: "avoid" ออกจากตรงนี้เพื่อให้วันยาวๆ ข้ามหน้าได้ */
             }}
           >
             {/* Day Header */}
@@ -72,7 +72,7 @@ export default function DailyItinerarySection({ days, hotelLevel }: { days: Tour
             {/* Activities Timeline */}
             <div style={{ paddingLeft: "18px", borderLeft: "2px solid #f0f0f0", marginLeft: "14px", marginBottom: "14px" }}>
               {day.TourActivities.map(activity => (
-                <div key={activity.id} style={{ marginBottom: "16px", position: "relative" }}>
+                <div key={activity.id} style={{ marginBottom: "16px", position: "relative", pageBreakInside: "avoid" }}>
                   <div style={{ position: "absolute", left: "-24px", top: "4px", width: "10px", height: "10px", borderRadius: "50%", backgroundColor: PR_RED, border: "2px solid white", boxShadow: "0 0 0 1px #D32F2F" }} />
                   <div style={{ display: "flex", gap: "10px", alignItems: "baseline" }}>
                     {activity.time_text && (
@@ -90,7 +90,7 @@ export default function DailyItinerarySection({ days, hotelLevel }: { days: Tour
             </div>
 
             {/* Hotel & Meals */}
-            <div style={{ backgroundColor: "#fff5f5", border: "1px solid #ffebeb", borderRadius: "6px", padding: "10px 14px", fontSize: "12px", display: "flex", gap: "20px", flexWrap: "wrap" }}>
+            <div style={{ backgroundColor: "#fff5f5", border: "1px solid #ffebeb", borderRadius: "6px", padding: "10px 14px", fontSize: "12px", display: "flex", gap: "20px", flexWrap: "wrap", pageBreakInside: "avoid" }}>
               <span>
                 <strong style={{ color: PR_RED }}>ที่พัก:</strong>{" "}
                 {day.hotel_name || "ไม่ระบุ"}
@@ -103,7 +103,7 @@ export default function DailyItinerarySection({ days, hotelLevel }: { days: Tour
 
             {/* Day Images Grid */}
             {day.TourDayImages && day.TourDayImages.filter(img => img.is_selected).length > 0 && (
-              <div style={{ marginTop: "14px", display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "10px" }}>
+              <div style={{ marginTop: "14px", display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "10px", pageBreakInside: "avoid" }}>
                 {day.TourDayImages.filter(img => img.is_selected).slice(0, 4).map(img => (
                   <div key={img.id} style={{ borderRadius: "8px", overflow: "hidden", aspectRatio: "16/9", backgroundColor: "#eee" }}>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
