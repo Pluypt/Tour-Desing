@@ -50,7 +50,14 @@ export default function DailyItinerarySection({ days, hotelLevel }: { days: Tour
           : "";
 
         return (
-          <div key={day.id} style={{ marginBottom: "36px", pageBreakInside: "avoid" }}>
+          <div
+            key={day.id}
+            style={{
+              marginBottom: "36px",
+              pageBreakBefore: day.day_number > 1 ? "always" : "auto",
+              pageBreakInside: "avoid",
+            }}
+          >
             {/* Day Header */}
             <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "16px", backgroundColor: "#fafafa", padding: "10px 14px", borderRadius: "6px", borderLeft: `4px solid ${PR_RED}` }}>
               <div style={{ backgroundColor: PR_RED, color: "white", padding: "4px 14px", borderRadius: "4px", fontWeight: 700, fontSize: "13px", whiteSpace: "nowrap" }}>

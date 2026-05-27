@@ -58,10 +58,12 @@ export default function ProposalCover({
       </div>
 
       {/* Hero / Cover Image — portrait 3:4, use <img> so it prints in PDF */}
+      {/* Use padding-top 133.33% trick (4/3*100) instead of aspectRatio for reliable print rendering */}
       <div style={{
-        width: "60%", aspectRatio: "3 / 4", margin: "0 auto 24px",
+        width: "60%", margin: "0 auto 24px",
         borderRadius: "10px", overflow: "hidden",
         position: "relative", backgroundColor: "#ddd",
+        paddingTop: "80%",  /* 3:4 → height = width * 4/3 → paddingTop = 133.33% of width, but container is 60% of page → 60% * 133% ≈ 80% of page */
       }}>
         {heroImageUrl ? (
           <>
