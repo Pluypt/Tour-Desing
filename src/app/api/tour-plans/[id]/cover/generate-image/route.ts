@@ -15,17 +15,17 @@ Trip theme: ${plan.theme || "general travel"}
 Customer type: ${plan.trip_type || "Private Tour"}
 Mood: premium, clean, professional, warm, trustworthy
 Style: luxury travel photography, cinematic lighting, high resolution, wide composition
-Composition: leave empty space on the left side for Thai text and logo
+Composition: leave empty space at the bottom for Thai text and logo
 Do not include text, logo, watermark, people faces, or random letters.
 Use realistic landmark or atmosphere related to the destination.
-Aspect ratio: 16:9`;
+Aspect ratio: 3:4`;
 
     const imageResponse = await ai.models.generateImages({
       model: "imagen-3.0-generate-002",
       prompt,
       config: {
         numberOfImages: 1,
-        aspectRatio: "16:9",
+        aspectRatio: "3:4",
         outputMimeType: "image/jpeg",
       },
     });
