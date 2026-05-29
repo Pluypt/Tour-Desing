@@ -34,6 +34,13 @@ type TourDay = {
 export default function DailyItinerarySection({ days, hotelLevel }: { days: TourDay[]; hotelLevel?: string | null }) {
   return (
     <div style={{ pageBreakBefore: "always" }}>
+      <style>{`
+        @media print {
+          .day-container {
+            margin-bottom: 0 !important;
+          }
+        }
+      `}</style>
       <h2 style={{ color: PR_RED, fontSize: "16px", fontWeight: 700, borderBottom: `2px solid ${PR_RED}`, paddingBottom: "8px", marginBottom: "24px" }}>
         รายละเอียดโปรแกรมรายวัน
       </h2>
@@ -50,14 +57,18 @@ export default function DailyItinerarySection({ days, hotelLevel }: { days: Tour
           : "";
 
         return (
-          <div
-            key={day.id}
-            style={{
-              marginBottom: "36px",
-              pageBreakBefore: day.day_number > 1 ? "always" : "auto",
-              /* เอา pageBreakInside: "avoid" ออกจากตรงนี้เพื่อให้วันยาวๆ ข้ามหน้าได้ */
-            }}
-          >
+          <div key={day.id}>
+            {/* ตัวคั่นหน้า (แยกออกจากเนื้อหาเพื่อแก้ปัญหา Browser วาดหน้าเปล่า) */}
+            {day.day_number > 1 && (
+              <div style={{ pageBreakBefore: "always", breakBefore: "page", height: "0px", margin: 0, padding: 0, border: "none" }} />
+            )}
+            
+            <div
+              className="day-container"
+              style={{
+                marginBottom: "36px",
+              }}
+            >
             {/* Day Header */}
             <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "16px", backgroundColor: "#fafafa", padding: "10px 14px", borderRadius: "6px", borderLeft: `4px solid ${PR_RED}` }}>
               <div style={{ backgroundColor: PR_RED, color: "white", padding: "4px 14px", borderRadius: "4px", fontWeight: 700, fontSize: "13px", whiteSpace: "nowrap" }}>
@@ -122,6 +133,7 @@ export default function DailyItinerarySection({ days, hotelLevel }: { days: Tour
                 </div>
               </div>
             )}
+          </div>
           </div>
         );
       })}
