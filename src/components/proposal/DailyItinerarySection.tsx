@@ -37,7 +37,7 @@ export default function DailyItinerarySection({ days, hotelLevel }: { days: Tour
       <style>{`
         @media print {
           .day-container {
-            margin-bottom: 0 !important;
+            margin-bottom: -10px !important;
             padding-bottom: 0 !important;
           }
         }
