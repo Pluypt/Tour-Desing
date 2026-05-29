@@ -65,7 +65,7 @@ export default function TourRequestForm() {
       if (data.success && data.planId) {
         router.push(`/builder/${data.planId}`);
       } else {
-        alert("Failed to generate plan");
+        alert(data.error || "Failed to generate plan");
       }
     } catch (error) {
       console.error(error);
@@ -146,28 +146,55 @@ export default function TourRequestForm() {
               type="file" 
               className="form-control" 
               accept=".pdf,image/*" 
-              onChange={(e) => {
+              onChange={async (e) => {
                 const file = e.target.files?.[0];
                 if (!file) {
                   setOriginalPlanFile(null);
                   return;
                 }
                 
-                // Vercel Serverless Limit is 4.5MB for the entire payload.
-                // Base64 encoding adds ~33% overhead. So limit file to ~3MB.
-                if (file.size > 3 * 1024 * 1024) {
-                  alert("ไฟล์มีขนาดใหญ่เกินไป (สูงสุด 3MB) กรุณาลดขนาดไฟล์ก่อนอัปโหลด");
-                  e.target.value = "";
-                  setOriginalPlanFile(null);
-                  return;
+                if (file.type === "application/pdf") {
+                  try {
+                    // Load pdfjs-dist dynamically to avoid SSR issues
+                    const pdfjsLib = await import('pdfjs-dist');
+                    pdfjsLib.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.js`;
+                    
+                    const arrayBuffer = await file.arrayBuffer();
+                    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+                    
+                    let fullText = "";
+                    for (let i = 1; i <= pdf.numPages; i++) {
+                      const page = await pdf.getPage(i);
+                      const textContent = await page.getTextContent();
+                      const pageText = textContent.items.map((item: any) => item.str).join(" ");
+                      fullText += `--- Page ${i} ---\n${pageText}\n`;
+                    }
+                    
+                    // Safe UTF-8 to Base64 encoding in browser
+                    const base64 = btoa(unescape(encodeURIComponent(fullText)));
+                    setOriginalPlanFile({ mimeType: "text/plain", data: base64 });
+                    alert(`✅ สกัดข้อความจาก PDF สำเร็จ! (ลดขนาดไฟล์พร้อมส่งให้ AI แล้ว)`);
+                  } catch (err) {
+                    console.error("PDF Parsing error:", err);
+                    alert("เกิดข้อผิดพลาดในการอ่านไฟล์ PDF โปรดลองไฟล์อื่น");
+                    e.target.value = "";
+                    setOriginalPlanFile(null);
+                  }
+                } else {
+                  // For images, keep the 3MB limit
+                  if (file.size > 3 * 1024 * 1024) {
+                    alert("ไฟล์รูปภาพมีขนาดใหญ่เกินไป (สูงสุด 3MB) กรุณาลดขนาดไฟล์ก่อนอัปโหลด");
+                    e.target.value = "";
+                    setOriginalPlanFile(null);
+                    return;
+                  }
+                  const reader = new FileReader();
+                  reader.onload = () => {
+                    const base64 = (reader.result as string).split(',')[1];
+                    setOriginalPlanFile({ mimeType: file.type, data: base64 });
+                  };
+                  reader.readAsDataURL(file);
                 }
-
-                const reader = new FileReader();
-                reader.onload = () => {
-                  const base64 = (reader.result as string).split(',')[1];
-                  setOriginalPlanFile({ mimeType: file.type, data: base64 });
-                };
-                reader.readAsDataURL(file);
               }} 
             />
           </div>
