@@ -101,7 +101,9 @@ export async function POST(req: Request) {
 
     const response = await ai.models.generateContent({
       model: 'gemini-2.5-flash',
-      contents: promptParts,
+      contents: Array.isArray(promptParts) 
+        ? [{ role: 'user', parts: promptParts }] 
+        : promptParts,
       config: {
         responseMimeType: "application/json",
       }
@@ -199,8 +201,8 @@ export async function POST(req: Request) {
     }
 
     return NextResponse.json({ success: true, planId: plan.id });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error generating plan:", error);
-    return NextResponse.json({ success: false, error: "Failed to generate plan" }, { status: 500 });
+    return NextResponse.json({ success: false, error: "Failed to generate plan: " + (error.message || String(error)) }, { status: 500 });
   }
 }
