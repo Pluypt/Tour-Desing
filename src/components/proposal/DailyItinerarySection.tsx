@@ -58,19 +58,18 @@ export default function DailyItinerarySection({ days, hotelLevel }: { days: Tour
 
         return (
           <div key={day.id}>
-            {/* ตัวคั่นหน้า (แยกออกจากเนื้อหาเพื่อแก้ปัญหา Browser วาดหน้าเปล่า) */}
-            {day.day_number > 1 && (
-              <div style={{ pageBreakBefore: "always", breakBefore: "page", height: "0px", margin: 0, padding: 0, border: "none" }} />
-            )}
-            
             <div
               className="day-container"
               style={{
-                marginBottom: "36px",
+                marginBottom: "0px", /* บังคับเป็น 0 เสมอเพื่อตัดปัญหาตอนพิมพ์ */
+                paddingBottom: "36px", /* ใช้ padding แทน margin สำหรับแสดงผลบนจอ */
               }}
             >
             {/* Day Header */}
-            <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "16px", backgroundColor: "#fafafa", padding: "10px 14px", borderRadius: "6px", borderLeft: `4px solid ${PR_RED}` }}>
+            <div style={{ 
+              display: "flex", alignItems: "center", gap: "12px", marginBottom: "16px", backgroundColor: "#fafafa", padding: "10px 14px", borderRadius: "6px", borderLeft: `4px solid ${PR_RED}`,
+              pageBreakBefore: day.day_number > 1 ? "always" : "auto", breakBefore: day.day_number > 1 ? "page" : "auto" 
+            }}>
               <div style={{ backgroundColor: PR_RED, color: "white", padding: "4px 14px", borderRadius: "4px", fontWeight: 700, fontSize: "13px", whiteSpace: "nowrap" }}>
                 DAY {day.day_number}
               </div>
