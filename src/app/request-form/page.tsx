@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 export default function TourRequestForm() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [originalPlanFile, setOriginalPlanFile] = useState<{mimeType: string, data: string} | null>(null);
   const [formData, setFormData] = useState({
     // Section A
     customerName: "",
@@ -57,7 +58,7 @@ export default function TourRequestForm() {
       const res = await fetch("/api/generate-plan", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData)
+        body: JSON.stringify({ ...formData, originalPlanFile })
       });
       
       const data = await res.json();
@@ -138,6 +139,27 @@ export default function TourRequestForm() {
               <option value="Join Tour">Join Tour</option>
               <option value="Business Trip">Business Trip</option>
             </select>
+          </div>
+          <div className="form-group" style={{ gridColumn: "1 / -1" }}>
+            <label className="form-label">แนบไฟล์แพลนต้นแบบ (PDF หรือรูปภาพ เพื่อให้ AI ดึงสถานที่จากแพลนนี้)</label>
+            <input 
+              type="file" 
+              className="form-control" 
+              accept=".pdf,image/*" 
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (!file) {
+                  setOriginalPlanFile(null);
+                  return;
+                }
+                const reader = new FileReader();
+                reader.onload = () => {
+                  const base64 = (reader.result as string).split(',')[1];
+                  setOriginalPlanFile({ mimeType: file.type, data: base64 });
+                };
+                reader.readAsDataURL(file);
+              }} 
+            />
           </div>
         </div>
       </div>
