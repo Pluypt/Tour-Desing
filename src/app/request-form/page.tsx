@@ -152,6 +152,16 @@ export default function TourRequestForm() {
                   setOriginalPlanFile(null);
                   return;
                 }
+                
+                // Vercel Serverless Limit is 4.5MB for the entire payload.
+                // Base64 encoding adds ~33% overhead. So limit file to ~3MB.
+                if (file.size > 3 * 1024 * 1024) {
+                  alert("ไฟล์มีขนาดใหญ่เกินไป (สูงสุด 3MB) กรุณาลดขนาดไฟล์ก่อนอัปโหลด");
+                  e.target.value = "";
+                  setOriginalPlanFile(null);
+                  return;
+                }
+
                 const reader = new FileReader();
                 reader.onload = () => {
                   const base64 = (reader.result as string).split(',')[1];

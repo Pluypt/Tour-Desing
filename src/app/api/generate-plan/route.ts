@@ -89,7 +89,7 @@ export async function POST(req: Request) {
     if (data.originalPlanFile && data.originalPlanFile.data) {
       const enhancedPrompt = systemPrompt + "\n\n[ข้อบังคับเพิ่มเติม] ผู้ใช้ได้แนบไฟล์แพลนต้นแบบมาด้วย (เป็นเอกสารหรือรูปภาพที่แนบมานี้) กรุณาสกัดข้อมูลสถานที่ท่องเที่ยว ลำดับวัน และกิจกรรม จากไฟล์แนบนี้เป็นหลัก (ถ้าอ่านออก) เพื่อสร้างแผนการเดินทางให้ตรงกับต้นฉบับมากที่สุด";
       promptParts = [
-        enhancedPrompt,
+        { text: enhancedPrompt },
         {
           inlineData: {
             data: data.originalPlanFile.data,
