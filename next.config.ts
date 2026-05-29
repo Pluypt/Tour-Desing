@@ -4,6 +4,7 @@ import path from "path";
 const nextConfig: NextConfig = {
   serverExternalPackages: ["canvas", "pdfjs-dist"],
   turbopack: {
+    root: __dirname,
     resolveAlias: {
       canvas: { browser: "./src/lib/canvas-mock.js" },
     },

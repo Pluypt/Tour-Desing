@@ -20,35 +20,82 @@ export default function HeroCoverUploader({ planId, heroImageUrl, onUpdate }: He
       alert("กรุณาเลือกไฟล์รูปภาพเท่านั้น (JPG, PNG, WEBP)");
       return;
     }
-    if (file.size > 10 * 1024 * 1024) {
-      alert("ไฟล์ใหญ่เกินไป (สูงสุด 10MB)");
-      return;
-    }
 
     setUploading(true);
+    
     try {
-      const reader = new FileReader();
-      reader.onload = async (e) => {
-        const base64 = e.target?.result as string;
-
-        const res = await fetch(`/api/tour-plans/${planId}/upload-cover`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ imageBase64: base64 }),
-        });
-        const data = await res.json();
-
-        if (data.success) {
-          onUpdate(data.heroImageUrl);
-        } else {
-          alert("อัพโหลดไม่สำเร็จ: " + (data.error || "unknown error"));
+      const img = new Image();
+      const objectUrl = URL.createObjectURL(file);
+      
+      img.onload = async () => {
+        try {
+          URL.revokeObjectURL(objectUrl);
+          
+          // Canvas compression
+          const canvas = document.createElement("canvas");
+          let { width, height } = img;
+          const maxDim = 1200;
+          
+          if (width > maxDim || height > maxDim) {
+            if (width > height) {
+              height = Math.round((height * maxDim) / width);
+              width = maxDim;
+            } else {
+              width = Math.round((width * maxDim) / height);
+              height = maxDim;
+            }
+          }
+          
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext("2d");
+          if (!ctx) throw new Error("ไม่สามารถใช้งานระบบบีบอัดภาพได้");
+          
+          ctx.drawImage(img, 0, 0, width, height);
+          
+          // Compress to JPEG 80% to save bandwidth and DB storage
+          const base64 = canvas.toDataURL("image/jpeg", 0.8);
+          
+          const res = await fetch(`/api/tour-plans/${planId}/upload-cover`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ imageBase64: base64 }),
+          });
+          
+          if (!res.ok) {
+            let errMsg = `Server responded with status ${res.status}`;
+            try { 
+              const errData = await res.json(); 
+              if (errData.error) errMsg = errData.error; 
+            } catch(e) {}
+            throw new Error(errMsg);
+          }
+          
+          const data = await res.json();
+          if (data.success) {
+            onUpdate(data.heroImageUrl);
+          } else {
+            alert("อัพโหลดไม่สำเร็จ: " + (data.error || "unknown error"));
+          }
+        } catch (error: any) {
+          console.error("Upload error:", error);
+          alert("เกิดข้อผิดพลาดในการอัพโหลด: " + (error.message || "Unknown error"));
+        } finally {
+          setUploading(false);
+          if (fileInputRef.current) fileInputRef.current.value = "";
         }
-        setUploading(false);
-        if (fileInputRef.current) fileInputRef.current.value = "";
       };
-      reader.readAsDataURL(file);
-    } catch {
-      alert("เกิดข้อผิดพลาดในการอ่านไฟล์");
+      
+      img.onerror = () => {
+        URL.revokeObjectURL(objectUrl);
+        alert("ไฟล์รูปภาพเสียหาย หรือไม่สามารถอ่านได้");
+        setUploading(false);
+      };
+      
+      img.src = objectUrl;
+    } catch (error) {
+      console.error(error);
+      alert("เกิดข้อผิดพลาดในการเตรียมไฟล์");
       setUploading(false);
     }
   };
