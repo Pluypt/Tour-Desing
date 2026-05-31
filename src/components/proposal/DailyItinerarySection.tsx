@@ -118,13 +118,14 @@ export default function DailyItinerarySection({ days, hotelLevel }: { days: Tour
               <span><strong style={{ color: PR_RED }}>อาหาร:</strong> {meals}</span>
             </div>
 
-            {/* Day Images Grid (Flexbox allowing page break between rows) */}
+            {/* Day Images Grid (Float layout allowing page break between rows without cutting images in half) */}
             {day.TourDayImages && day.TourDayImages.filter(img => img.is_selected).length > 0 && (
-              <div style={{ marginTop: "14px", display: "flex", flexWrap: "wrap", gap: "10px" }}>
-                {day.TourDayImages.filter(img => img.is_selected).slice(0, 4).map(img => (
+              <div style={{ marginTop: "14px", overflow: "hidden" }}>
+                {day.TourDayImages.filter(img => img.is_selected).slice(0, 4).map((img, index) => (
                   <div
                     key={img.id}
                     style={{
+                      float: "left",
                       width: "calc(50% - 5px)", /* กว้าง 50% หักลบช่องว่าง 10px */
                       height: "48mm", /* ล็อคความสูงตายตัวสำหรับ 16:9 บนตาราง 2 คอลัมน์ของ A4 */
                       backgroundImage: `url(${img.image_url})`,
@@ -133,7 +134,9 @@ export default function DailyItinerarySection({ days, hotelLevel }: { days: Tour
                       backgroundColor: "#eee",
                       borderRadius: "8px",
                       pageBreakInside: "avoid", /* ห้ามตัดครึ่งรูปภาพรูปใดรูปหนึ่ง */
-                      breakInside: "avoid"
+                      breakInside: "avoid",
+                      marginRight: index % 2 === 0 ? "10px" : "0", /* เพิ่มช่องว่างด้านขวาให้รูปแรกของแถว */
+                      marginBottom: "10px", /* เพิ่มช่องว่างด้านล่าง */
                     }}
                   />
                 ))}
