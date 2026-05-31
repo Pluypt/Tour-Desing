@@ -44,8 +44,14 @@ export default function ProposalCover({
   const overlay = getOverlay(overlayStyle, accentColor);
   const textOnImage = overlayStyle === "light" ? "#222" : "#fff";
 
+  const formatThaiDate = (date: Date) => {
+    const d = new Date(date);
+    if (d.getFullYear() > 2500) d.setFullYear(d.getFullYear() - 543);
+    return d.toLocaleDateString("th-TH", { day: "numeric", month: "long", year: "numeric" });
+  };
+
   const dateRange = startDate && endDate
-    ? `${startDate.toLocaleDateString("th-TH", { day: "numeric", month: "long", year: "numeric" })} – ${endDate.toLocaleDateString("th-TH", { day: "numeric", month: "long", year: "numeric" })}`
+    ? `${formatThaiDate(startDate)} – ${formatThaiDate(endDate)}`
     : "-";
 
   return (

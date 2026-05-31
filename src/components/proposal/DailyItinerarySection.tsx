@@ -54,7 +54,11 @@ export default function DailyItinerarySection({ days, hotelLevel }: { days: Tour
         ].filter(Boolean).join(" | ") || "ไม่รวมอาหาร";
 
         const dateStr = day.actual_date
-          ? new Date(day.actual_date).toLocaleDateString("th-TH", { weekday: "long", day: "numeric", month: "long", year: "numeric" })
+          ? (() => {
+              const d = new Date(day.actual_date);
+              if (d.getFullYear() > 2500) d.setFullYear(d.getFullYear() - 543);
+              return d.toLocaleDateString("th-TH", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+            })()
           : "";
 
         return (
