@@ -293,7 +293,7 @@ export default function TourBuilderClient({ initialPlan }: { initialPlan: any })
                   {selectedDay.TourActivities.map((activity: any) => (
                     <div key={activity.id} style={{ border: "1px solid var(--border-color)", padding: "12px", borderRadius: "var(--radius-sm)", display: "flex", gap: "12px" }}>
                       <div style={{ width: "90px" }}>
-                        <input type="text" className="form-control" value={activity.time_text || ""} onChange={e => handleActivityChange(activity.id, "time_text", e.target.value)} placeholder="เวลา" style={{ fontSize: "0.85rem" }} />
+                        <input type="text" className="form-control" value={activity.time_text || ""} onChange={e => handleActivityChange(activity.id, "time_text", e.target.value)} placeholder="ช่วงเวลา" style={{ fontSize: "0.85rem" }} />
                       </div>
                       <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: "8px" }}>
                         <input type="text" className="form-control" value={activity.activity_title || ""} onChange={e => handleActivityChange(activity.id, "activity_title", e.target.value)} placeholder="ชื่อกิจกรรม" style={{ fontWeight: "bold", fontSize: "0.9rem" }} />

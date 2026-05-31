@@ -30,8 +30,9 @@ export type AIPlan = {
     daily_theme: string;
     hotel_name_suggestion?: string;
     activities: Array<{
-      time_start: string;
-      time_end?: string;
+      time_period?: string;
+      time_start?: string; // รองรับข้อมูลเก่า
+      time_end?: string; // รองรับข้อมูลเก่า
       location_name: string;
       description: string;
     }>;
@@ -68,8 +69,7 @@ export function buildFallbackPlan(
       hotel_name_suggestion: "",
       activities: [
         {
-          time_start: "09:00",
-          time_end: "12:00",
+          time_period: "เช้า",
           location_name: mainCity,
           description: "กรุณาเพิ่มรายละเอียดกิจกรรม",
         },

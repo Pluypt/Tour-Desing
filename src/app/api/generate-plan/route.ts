@@ -72,8 +72,7 @@ export async function POST(req: Request) {
       "hotel_name_suggestion": "ชื่อโรงแรมที่แนะนำซึ่งตรงกับระดับที่ต้องการ",
       "activities": [
         {
-          "time_start": "HH:MM",
-          "time_end": "HH:MM",
+          "time_period": "เช้า | กลางวัน | บ่าย | เย็น | ค่ำ",
           "activity_type": "Flight | Transport | Attraction | Dining | Leisure",
           "location_name": "ชื่อสถานที่หรือชื่อร้านอาหารแบบเจาะจง",
           "description": "คำอธิบายสั้นๆ ดึงดูดใจ และปรับเนื้อหาให้เข้ากับประเภทลูกค้า",
@@ -188,7 +187,7 @@ export async function POST(req: Request) {
             await prisma.tourActivity.create({
               data: {
                 tour_day_id: day.id,
-                time_text: activity.time_start,
+                time_text: activity.time_period || activity.time_start || "",
                 activity_title: activity.location_name,
                 activity_description: activity.description,
                 location_name: activity.location_name,
