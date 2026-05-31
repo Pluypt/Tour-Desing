@@ -124,7 +124,13 @@ export default function DailyItinerarySection({ days, hotelLevel }: { days: Tour
                 {Array.from({ length: Math.ceil(day.TourDayImages.filter(img => img.is_selected).slice(0, 4).length / 2) }).map((_, rowIndex) => {
                   const rowImages = day.TourDayImages!.filter(img => img.is_selected).slice(0, 4).slice(rowIndex * 2, rowIndex * 2 + 2);
                   return (
-                    <div key={rowIndex} style={{ display: "flex", gap: "10px", marginBottom: "10px", pageBreakInside: "avoid", breakInside: "avoid" }}>
+                    <div key={rowIndex} style={{ 
+                      display: "flex", 
+                      gap: "10px", 
+                      paddingTop: "14px", /* ใช้ padding-top แทน margin เพื่อบังคับรักษาระยะขอบไว้เมื่อขึ้นหน้าใหม่ */
+                      pageBreakInside: "avoid", 
+                      breakInside: "avoid" 
+                    }}>
                       {rowImages.map(img => (
                         <div
                           key={img.id}
