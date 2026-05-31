@@ -121,8 +121,8 @@ export default function DailyItinerarySection({ days, hotelLevel }: { days: Tour
             {/* Day Images Grid (Row-based layout to strictly enforce pageBreakInside: avoid in WebKit) */}
             {day.TourDayImages && day.TourDayImages.filter(img => img.is_selected).length > 0 && (
               <div style={{ marginTop: "14px" }}>
-                {Array.from({ length: Math.ceil(day.TourDayImages.filter(img => img.is_selected).slice(0, 4).length / 2) }).map((_, rowIndex) => {
-                  const rowImages = day.TourDayImages!.filter(img => img.is_selected).slice(0, 4).slice(rowIndex * 2, rowIndex * 2 + 2);
+                {Array.from({ length: Math.ceil(day.TourDayImages.filter(img => img.is_selected).length / 2) }).map((_, rowIndex) => {
+                  const rowImages = day.TourDayImages!.filter(img => img.is_selected).slice(rowIndex * 2, rowIndex * 2 + 2);
                   return (
                     <div key={rowIndex} style={{ 
                       display: "flex", 
