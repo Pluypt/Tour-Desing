@@ -67,7 +67,11 @@ export default function DailyItinerarySection({ days, hotelLevel }: { days: Tour
               }}
             >
             {/* Wrapper สำหรับ Day Header เพื่อป้องกันปัญหาขอบสีแดง (borderLeft) ล้นทะลุหน้ากระดาษ (WebKit bleed bug) */}
-            <div style={{ pageBreakBefore: day.day_number > 1 ? "always" : "auto", breakBefore: day.day_number > 1 ? "page" : "auto" }}>
+            <div style={{ 
+              pageBreakBefore: day.day_number > 1 ? "always" : "auto", 
+              breakBefore: day.day_number > 1 ? "page" : "auto",
+              paddingTop: day.day_number > 1 ? "24px" : "0" /* ดันหัวกระดาษลงมาให้มีระยะขอบที่สวยงาม และแก้บั๊กโดนตัดขอบบนจาก margin ติดลบ */
+            }}>
               {/* Day Header */}
               <div style={{ 
                 display: "flex", alignItems: "center", gap: "12px", marginBottom: "16px", backgroundColor: "#fafafa", padding: "10px 14px", borderRadius: "6px", borderLeft: `4px solid ${PR_RED}` 
