@@ -10,6 +10,7 @@ import StatusSelector from "@/components/builder/StatusSelector";
 import HeroCoverUploader from "@/components/builder/HeroCoverUploader";
 
 const TABS = [
+  { id: "info", label: "ข้อมูลพื้นฐาน" },
   { id: "itinerary", label: "แผนรายวัน" },
   { id: "cost", label: "ต้นทุนและราคา" },
   { id: "images", label: "รูปภาพรายวัน" },
@@ -117,6 +118,59 @@ export default function TourBuilderClient({ initialPlan }: { initialPlan: any })
           </button>
         ))}
       </div>
+
+      {/* Tab: ข้อมูลพื้นฐาน */}
+      {activeTab === "info" && (
+        <div className="card" style={{ maxWidth: "800px", margin: "0 auto", padding: "30px" }}>
+          <h2 style={{ marginBottom: "24px", fontSize: "1.2rem", fontWeight: 700, borderBottom: "1px solid var(--border-color)", paddingBottom: "12px" }}>ข้อมูลพื้นฐาน (General Info)</h2>
+          <p style={{ color: "var(--pr-text-muted)", fontSize: "0.9rem", marginBottom: "24px" }}>
+            ข้อมูลในส่วนนี้จะถูกนำไปแสดงที่ตารางสรุปในหน้าแรกของเอกสาร (พรีวิวหน้าปก)
+          </p>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px" }}>
+            
+            <div>
+              <label className="form-label" style={{ fontSize: "0.85rem", color: "var(--pr-text-muted)", marginBottom: "6px", display: "block" }}>รหัสทัวร์</label>
+              <input type="text" className="form-control" value={plan.tour_code || ""} onChange={e => setPlan({...plan, tour_code: e.target.value})} placeholder="เช่น PR-จีน-7340" />
+            </div>
+
+            <div>
+              <label className="form-label" style={{ fontSize: "0.85rem", color: "var(--pr-text-muted)", marginBottom: "6px", display: "block" }}>ระยะเวลา (วัน)</label>
+              <input type="number" className="form-control" value={plan.duration || ""} onChange={e => setPlan({...plan, duration: parseInt(e.target.value) || null})} placeholder="จำนวนวัน" />
+            </div>
+            
+            <div>
+              <label className="form-label" style={{ fontSize: "0.85rem", color: "var(--pr-text-muted)", marginBottom: "6px", display: "block" }}>จำนวนผู้เดินทาง (ท่าน)</label>
+              <input type="number" className="form-control" value={plan.traveler_count || ""} onChange={e => setPlan({...plan, traveler_count: parseInt(e.target.value) || null})} placeholder="จำนวนคน" />
+            </div>
+
+            <div>
+              <label className="form-label" style={{ fontSize: "0.85rem", color: "var(--pr-text-muted)", marginBottom: "6px", display: "block" }}>ประเภททริป</label>
+              <input type="text" className="form-control" value={plan.trip_type || ""} onChange={e => setPlan({...plan, trip_type: e.target.value})} placeholder="เช่น Private Tour, Group Tour" />
+            </div>
+
+            <div>
+              <label className="form-label" style={{ fontSize: "0.85rem", color: "var(--pr-text-muted)", marginBottom: "6px", display: "block" }}>สายการบิน</label>
+              <input type="text" className="form-control" value={plan.airline || ""} onChange={e => setPlan({...plan, airline: e.target.value})} placeholder="ชื่อสายการบิน" />
+            </div>
+
+            <div>
+              <label className="form-label" style={{ fontSize: "0.85rem", color: "var(--pr-text-muted)", marginBottom: "6px", display: "block" }}>เส้นทางบิน</label>
+              <input type="text" className="form-control" value={plan.flight_route || ""} onChange={e => setPlan({...plan, flight_route: e.target.value})} placeholder="เช่น BKK - NRT" />
+            </div>
+
+            <div>
+              <label className="form-label" style={{ fontSize: "0.85rem", color: "var(--pr-text-muted)", marginBottom: "6px", display: "block" }}>วันที่เริ่มต้น</label>
+              <input type="date" className="form-control" value={plan.start_date ? new Date(plan.start_date).toISOString().split('T')[0] : ""} onChange={e => setPlan({...plan, start_date: e.target.value ? new Date(e.target.value).toISOString() : null})} />
+            </div>
+
+            <div>
+              <label className="form-label" style={{ fontSize: "0.85rem", color: "var(--pr-text-muted)", marginBottom: "6px", display: "block" }}>วันที่สิ้นสุด</label>
+              <input type="date" className="form-control" value={plan.end_date ? new Date(plan.end_date).toISOString().split('T')[0] : ""} onChange={e => setPlan({...plan, end_date: e.target.value ? new Date(e.target.value).toISOString() : null})} />
+            </div>
+
+          </div>
+        </div>
+      )}
 
       {/* Tab: แผนรายวัน */}
       {activeTab === "itinerary" && (
