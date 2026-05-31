@@ -118,28 +118,32 @@ export default function DailyItinerarySection({ days, hotelLevel }: { days: Tour
               <span><strong style={{ color: PR_RED }}>อาหาร:</strong> {meals}</span>
             </div>
 
-            {/* Day Images Grid (Float layout allowing page break between rows without cutting images in half) */}
+            {/* Day Images Grid (Row-based layout to strictly enforce pageBreakInside: avoid in WebKit) */}
             {day.TourDayImages && day.TourDayImages.filter(img => img.is_selected).length > 0 && (
-              <div style={{ marginTop: "14px", overflow: "hidden" }}>
-                {day.TourDayImages.filter(img => img.is_selected).slice(0, 4).map((img, index) => (
-                  <div
-                    key={img.id}
-                    style={{
-                      float: "left",
-                      width: "calc(50% - 5px)", /* กว้าง 50% หักลบช่องว่าง 10px */
-                      height: "48mm", /* ล็อคความสูงตายตัวสำหรับ 16:9 บนตาราง 2 คอลัมน์ของ A4 */
-                      backgroundImage: `url(${img.image_url})`,
-                      backgroundSize: "cover", /* ตัดส่วนเกินออกแทนการบีบ */
-                      backgroundPosition: "center",
-                      backgroundColor: "#eee",
-                      borderRadius: "8px",
-                      pageBreakInside: "avoid", /* ห้ามตัดครึ่งรูปภาพรูปใดรูปหนึ่ง */
-                      breakInside: "avoid",
-                      marginRight: index % 2 === 0 ? "10px" : "0", /* เพิ่มช่องว่างด้านขวาให้รูปแรกของแถว */
-                      marginBottom: "10px", /* เพิ่มช่องว่างด้านล่าง */
-                    }}
-                  />
-                ))}
+              <div style={{ marginTop: "14px" }}>
+                {Array.from({ length: Math.ceil(day.TourDayImages.filter(img => img.is_selected).slice(0, 4).length / 2) }).map((_, rowIndex) => {
+                  const rowImages = day.TourDayImages!.filter(img => img.is_selected).slice(0, 4).slice(rowIndex * 2, rowIndex * 2 + 2);
+                  return (
+                    <div key={rowIndex} style={{ display: "flex", gap: "10px", marginBottom: "10px", pageBreakInside: "avoid", breakInside: "avoid" }}>
+                      {rowImages.map(img => (
+                        <div
+                          key={img.id}
+                          style={{
+                            flex: 1,
+                            height: "48mm", /* ล็อคความสูงตายตัวสำหรับ 16:9 บนตาราง 2 คอลัมน์ของ A4 */
+                            backgroundImage: `url(${img.image_url})`,
+                            backgroundSize: "cover", /* ตัดส่วนเกินออกแทนการบีบ */
+                            backgroundPosition: "center",
+                            backgroundColor: "#eee",
+                            borderRadius: "8px"
+                          }}
+                        />
+                      ))}
+                      {/* ถ้าแถวมีรูปเดียว ให้เติม div เปล่าเพื่อรักษาขนาด 50% */}
+                      {rowImages.length === 1 && <div style={{ flex: 1 }} />}
+                    </div>
+                  );
+                })}
               </div>
             )}
           </div>
