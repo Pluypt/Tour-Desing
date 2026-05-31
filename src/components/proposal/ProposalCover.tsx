@@ -73,14 +73,17 @@ export default function ProposalCover({
           />
         </div>
       ) : (
-        <div style={{
-          width: "60%", margin: "0 auto 24px",
-          borderRadius: "10px", backgroundColor: "#ddd",
-          height: "200px", display: "flex",
-          alignItems: "center", justifyContent: "center",
-          color: "#bbb", fontSize: "13px",
-        }}>
-          ไม่มีรูปหน้าปก
+        <div style={{ textAlign: "center", marginBottom: "24px" }}>
+          <div style={{
+            width: "60%", margin: "0 auto",
+            borderRadius: "10px", backgroundColor: "#ddd",
+            height: "140mm", /* ปรับความสูงให้เท่ากับหน้าปกตอนที่มีรูป (140mm) เพื่อรักษาสัดส่วน Layout หน้ากระดาษให้เหมือนกันทุกแพลน */
+            display: "inline-flex",
+            alignItems: "center", justifyContent: "center",
+            color: "#bbb", fontSize: "13px",
+          }}>
+            ไม่มีรูปหน้าปก
+          </div>
         </div>
       )}
 
