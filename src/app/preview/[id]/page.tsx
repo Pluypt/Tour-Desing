@@ -38,9 +38,9 @@ export default async function ProposalPreviewPage({ params }: { params: Promise<
     <div style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center" }}>
       <style>{`
         @media print {
-          @page { size: A4; margin: 0; }
+          @page { size: A4; margin: 15mm 18mm; }
           body { margin: 0; }
-          #proposal-document { box-shadow: none !important; width: 100% !important; margin: 0 !important; }
+          #proposal-document { box-shadow: none !important; width: 100% !important; margin: 0 !important; padding: 0 !important; }
           * {
             -webkit-print-color-adjust: exact !important;
             print-color-adjust: exact !important;
