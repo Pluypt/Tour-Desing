@@ -118,25 +118,25 @@ export default function DailyItinerarySection({ days, hotelLevel }: { days: Tour
               <span><strong style={{ color: PR_RED }}>อาหาร:</strong> {meals}</span>
             </div>
 
-            {/* Day Images Grid */}
+            {/* Day Images Grid (Flexbox allowing page break between rows) */}
             {day.TourDayImages && day.TourDayImages.filter(img => img.is_selected).length > 0 && (
-              <div style={{ pageBreakInside: "avoid", breakInside: "avoid" }}>
-                <div style={{ marginTop: "14px", display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "10px" }}>
-                  {day.TourDayImages.filter(img => img.is_selected).slice(0, 4).map(img => (
-                    <div
-                      key={img.id}
-                      style={{
-                        width: "100%",
-                        height: "48mm", /* ล็อคความสูงตายตัวสำหรับ 16:9 บนตาราง 2 คอลัมน์ของ A4 */
-                        backgroundImage: `url(${img.image_url})`,
-                        backgroundSize: "cover", /* ตัดส่วนเกินออกแทนการบีบ */
-                        backgroundPosition: "center",
-                        backgroundColor: "#eee",
-                        borderRadius: "8px"
-                      }}
-                    />
-                  ))}
-                </div>
+              <div style={{ marginTop: "14px", display: "flex", flexWrap: "wrap", gap: "10px" }}>
+                {day.TourDayImages.filter(img => img.is_selected).slice(0, 4).map(img => (
+                  <div
+                    key={img.id}
+                    style={{
+                      width: "calc(50% - 5px)", /* กว้าง 50% หักลบช่องว่าง 10px */
+                      height: "48mm", /* ล็อคความสูงตายตัวสำหรับ 16:9 บนตาราง 2 คอลัมน์ของ A4 */
+                      backgroundImage: `url(${img.image_url})`,
+                      backgroundSize: "cover", /* ตัดส่วนเกินออกแทนการบีบ */
+                      backgroundPosition: "center",
+                      backgroundColor: "#eee",
+                      borderRadius: "8px",
+                      pageBreakInside: "avoid", /* ห้ามตัดครึ่งรูปภาพรูปใดรูปหนึ่ง */
+                      breakInside: "avoid"
+                    }}
+                  />
+                ))}
               </div>
             )}
           </div>
