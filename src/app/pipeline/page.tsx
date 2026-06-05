@@ -1,6 +1,8 @@
 import { prisma } from "@/lib/prisma";
 import PipelineCard from "./PipelineCard";
 
+export const dynamic = "force-dynamic";
+
 const PIPELINE_STAGES = [
   { status: "Draft", color: "#9e9e9e", label: "ฉบับร่าง" },
   { status: "Internal Review", color: "#1565c0", label: "รอตรวจสอบ" },
