@@ -9,7 +9,7 @@ export default function ExportButtons({ title }: { title: string }) {
       if (!element) { alert("ไม่พบเอกสาร"); return; }
       
       const opt = {
-        margin:       [15, 0], // เว้นขอบบน-ล่าง 15mm (ซ้าย-ขวา 0 เพราะตัวเอกสารมี padding ซ้ายขวาอยู่แล้ว)
+        margin:       [15, 0] as [number, number], // เว้นขอบบน-ล่าง 15mm (ซ้าย-ขวา 0 เพราะตัวเอกสารมี padding ซ้ายขวาอยู่แล้ว)
         filename:     `${title || 'Tour_Proposal'}.pdf`,
         image:        { type: 'jpeg' as const, quality: 1.0 },
         html2canvas:  { 
