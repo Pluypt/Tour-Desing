@@ -9,10 +9,21 @@ export default function ExportButtons({ title }: { title: string }) {
       if (!element) { alert("ไม่พบเอกสาร"); return; }
       
       const opt = {
-        margin:       0,
+        margin:       [15, 0], // เว้นขอบบน-ล่าง 15mm (ซ้าย-ขวา 0 เพราะตัวเอกสารมี padding ซ้ายขวาอยู่แล้ว)
         filename:     `${title || 'Tour_Proposal'}.pdf`,
         image:        { type: 'jpeg' as const, quality: 1.0 },
-        html2canvas:  { scale: 3, useCORS: true },
+        html2canvas:  { 
+          scale: 3, 
+          useCORS: true,
+          onclone: (clonedDoc: Document) => {
+            const doc = clonedDoc.getElementById('proposal-document');
+            if (doc) {
+              doc.style.paddingTop = '0';
+              doc.style.paddingBottom = '0';
+              doc.style.boxShadow = 'none'; // ลบเงาออกตอนแปลงเป็น PDF
+            }
+          }
+        },
         jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' as const }
       };
 
