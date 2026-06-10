@@ -9,7 +9,7 @@ export default function ExportButtons({ title }: { title: string }) {
       if (!element) { alert("ไม่พบเอกสาร"); return; }
       
       const opt = {
-        margin:       [15, 18, 15, 18] as [number, number, number, number], // เว้นขอบ บน ขวา ล่าง ซ้าย
+        margin:       [15, 0] as [number, number], // เว้นขอบบนล่าง 15mm (ซ้ายขวาปล่อยเป็น 0 เพราะใน element มี padding อยู่แล้ว 18mm)
         filename:     `${title || 'Tour_Proposal'}.pdf`,
         image:        { type: 'jpeg' as const, quality: 1.0 },
         pagebreak:    { mode: ['css', 'legacy'] }, // ให้เคารพคำสั่ง page-break-inside: avoid จะได้ไม่ตัดตัวอักษรหรือจุดขาดครึ่ง
@@ -19,9 +19,7 @@ export default function ExportButtons({ title }: { title: string }) {
           onclone: (clonedDoc: Document) => {
             const doc = clonedDoc.getElementById('proposal-document');
             if (doc) {
-              doc.style.padding = '0'; // ลบ padding เดิมออก
-              doc.style.width = '174mm'; // กำหนดความกว้างเนื้อหาให้พอดีกับหน้า A4 (210) ลบขอบซ้ายขวา (18+18)
-              doc.style.boxShadow = 'none'; // ลบเงาออกตอนแปลงเป็น PDF
+              doc.style.boxShadow = 'none'; // ลบเงาออกตอนแปลงเป็น PDF อย่างเดียว ไม่ต้องยุ่งกับ padding/width เพื่อกันปัญหาขอบแหว่ง
             }
           }
         },
