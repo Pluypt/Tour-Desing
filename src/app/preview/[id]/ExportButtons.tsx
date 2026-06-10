@@ -9,17 +9,18 @@ export default function ExportButtons({ title }: { title: string }) {
       if (!element) { alert("ไม่พบเอกสาร"); return; }
       
       const opt = {
-        margin:       [15, 0] as [number, number], // เว้นขอบบน-ล่าง 15mm (ซ้าย-ขวา 0 เพราะตัวเอกสารมี padding ซ้ายขวาอยู่แล้ว)
+        margin:       [15, 18, 15, 18] as [number, number, number, number], // เว้นขอบ บน ขวา ล่าง ซ้าย
         filename:     `${title || 'Tour_Proposal'}.pdf`,
         image:        { type: 'jpeg' as const, quality: 1.0 },
+        pagebreak:    { mode: ['css', 'legacy'] }, // ให้เคารพคำสั่ง page-break-inside: avoid จะได้ไม่ตัดตัวอักษรหรือจุดขาดครึ่ง
         html2canvas:  { 
           scale: 3, 
           useCORS: true,
           onclone: (clonedDoc: Document) => {
             const doc = clonedDoc.getElementById('proposal-document');
             if (doc) {
-              doc.style.paddingTop = '0';
-              doc.style.paddingBottom = '0';
+              doc.style.padding = '0'; // ลบ padding เดิมออก
+              doc.style.width = '174mm'; // กำหนดความกว้างเนื้อหาให้พอดีกับหน้า A4 (210) ลบขอบซ้ายขวา (18+18)
               doc.style.boxShadow = 'none'; // ลบเงาออกตอนแปลงเป็น PDF
             }
           }
