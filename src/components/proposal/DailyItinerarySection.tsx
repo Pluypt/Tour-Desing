@@ -46,7 +46,16 @@ export default function DailyItinerarySection({ days, hotelLevel }: { days: Tour
         รายละเอียดโปรแกรมรายวัน
       </h2>
 
-      {days.map(day => {
+      {days.map((day, index) => {
+        const previousDay = index > 0 ? days[index - 1] : null;
+        // กำหนดเงื่อนไขว่าวันก่อนหน้าเป็นข้อมูลน้อยหรือไม่ (กิจกรรมไม่เกิน 3 อย่าง และไม่มีรูปภาพ)
+        const isPrevDaySmall = previousDay 
+          ? (previousDay.TourActivities.length <= 3 && (!previousDay.TourDayImages || previousDay.TourDayImages.filter(img => img.is_selected).length === 0))
+          : false;
+        
+        // ถ้าไม่ใช่วันแรก และวันก่อนหน้าไม่ได้มีข้อมูลน้อย ให้บังคับขึ้นหน้าใหม่
+        const shouldBreakPage = day.day_number > 1 && !isPrevDaySmall;
+
         const meals = [
           day.breakfast_included && "อาหารเช้า",
           day.lunch_included && "อาหารเที่ยง",
@@ -72,8 +81,8 @@ export default function DailyItinerarySection({ days, hotelLevel }: { days: Tour
             >
             {/* Wrapper สำหรับ Day Header เพื่อป้องกันปัญหาขอบสีแดง (borderLeft) ล้นทะลุหน้ากระดาษ (WebKit bleed bug) */}
             <div style={{ 
-              pageBreakInside: "avoid",
-              breakInside: "avoid",
+              pageBreakBefore: shouldBreakPage ? "always" : "auto", 
+              breakBefore: shouldBreakPage ? "page" : "auto",
               paddingTop: day.day_number > 1 ? "24px" : "0" /* ดันหัวกระดาษลงมาให้มีระยะขอบที่สวยงาม และแก้บั๊กโดนตัดขอบบนจาก margin ติดลบ */
             }}>
               {/* Day Header */}
