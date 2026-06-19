@@ -12,6 +12,7 @@ import HeroCoverUploader from "@/components/builder/HeroCoverUploader";
 const TABS = [
   { id: "info", label: "ข้อมูลพื้นฐาน" },
   { id: "itinerary", label: "แผนรายวัน" },
+  { id: "conditions", label: "เงื่อนไข" },
   { id: "cost", label: "ต้นทุนและราคา" },
   { id: "images", label: "รูปภาพรายวัน" },
   { id: "cover", label: "ออกแบบหน้าปก" },
@@ -19,7 +20,26 @@ const TABS = [
 
 export default function TourBuilderClient({ initialPlan }: { initialPlan: any }) {
   const router = useRouter();
-  const [plan, setPlan] = useState(initialPlan);
+  const [plan, setPlan] = useState({
+    ...initialPlan,
+    Inclusions: initialPlan.Inclusions?.length > 0 ? initialPlan.Inclusions : [
+      "ตั๋วเครื่องบินไป-กลับตามรายการ",
+      "ที่พักตามระดับที่ระบุ",
+      "รถรับส่งตามโปรแกรม",
+      "อาหารตามที่ระบุในรายการ",
+      "ค่าเข้าชมสถานที่ตามโปรแกรม",
+      "ประกันการเดินทาง",
+      "ทีมงานประสานงานตลอดทริป",
+    ].map((text, i) => ({ id: `default-inc-${i}`, item_text: text, isNew: true })),
+    Exclusions: initialPlan.Exclusions?.length > 0 ? initialPlan.Exclusions : [
+      "ค่าใช้จ่ายส่วนตัว",
+      "ค่าทำพาสปอร์ต",
+      "ค่าธรรมเนียมวีซ่า (ถ้ามี)",
+      "ค่าอาหารหรือเครื่องดื่มนอกเหนือจากรายการ",
+      "ค่าทิปไกด์ / คนขับรถ",
+      "ค่าใช้จ่ายจากเหตุสุดวิสัย",
+    ].map((text, i) => ({ id: `default-exc-${i}`, item_text: text, isNew: true })),
+  });
   const [activeTab, setActiveTab] = useState("itinerary");
   const [selectedDayId, setSelectedDayId] = useState(initialPlan.TourDays?.[0]?.id || null);
   const [saving, setSaving] = useState(false);
@@ -332,6 +352,93 @@ export default function TourBuilderClient({ initialPlan }: { initialPlan: any })
             travelerCount={plan.traveler_count || 1}
             duration={plan.duration || 1}
           />
+        </div>
+      )}
+
+      {/* Tab: เงื่อนไข */}
+      {activeTab === "conditions" && (
+        <div className="card" style={{ maxWidth: "800px", margin: "0 auto", padding: "30px" }}>
+          <h2 style={{ marginBottom: "24px", fontSize: "1.2rem", fontWeight: 700, borderBottom: "1px solid var(--border-color)", paddingBottom: "12px" }}>เงื่อนไข (Inclusions & Exclusions)</h2>
+          
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "30px" }}>
+            {/* Inclusions */}
+            <div>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
+                <h3 style={{ fontSize: "1rem", color: "var(--pr-red)", margin: 0 }}>✓ สิ่งที่รวมในราคา</h3>
+                <button
+                  className="btn-secondary"
+                  style={{ padding: "4px 10px", fontSize: "0.8rem" }}
+                  onClick={() => {
+                    const newInclusions = [...(plan.Inclusions || [])];
+                    newInclusions.push({ id: "new-inc-" + Date.now(), item_text: "", isNew: true });
+                    setPlan({ ...plan, Inclusions: newInclusions });
+                  }}
+                >+ เพิ่ม</button>
+              </div>
+              <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                {(plan.Inclusions || []).map((inc: any, idx: number) => (
+                  <div key={inc.id} style={{ display: "flex", gap: "8px" }}>
+                    <input
+                      type="text"
+                      className="form-control"
+                      value={inc.item_text}
+                      onChange={e => {
+                        const newInclusions = [...plan.Inclusions];
+                        newInclusions[idx].item_text = e.target.value;
+                        setPlan({ ...plan, Inclusions: newInclusions });
+                      }}
+                    />
+                    <button
+                      style={{ color: "var(--pr-red)", background: "none", border: "none", cursor: "pointer", fontSize: "0.85rem" }}
+                      onClick={() => {
+                        const newInclusions = plan.Inclusions.filter((_: any, i: number) => i !== idx);
+                        setPlan({ ...plan, Inclusions: newInclusions });
+                      }}
+                    >ลบ</button>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Exclusions */}
+            <div>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
+                <h3 style={{ fontSize: "1rem", color: "#555", margin: 0 }}>✗ สิ่งที่ไม่รวมในราคา</h3>
+                <button
+                  className="btn-secondary"
+                  style={{ padding: "4px 10px", fontSize: "0.8rem" }}
+                  onClick={() => {
+                    const newExclusions = [...(plan.Exclusions || [])];
+                    newExclusions.push({ id: "new-exc-" + Date.now(), item_text: "", isNew: true });
+                    setPlan({ ...plan, Exclusions: newExclusions });
+                  }}
+                >+ เพิ่ม</button>
+              </div>
+              <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                {(plan.Exclusions || []).map((exc: any, idx: number) => (
+                  <div key={exc.id} style={{ display: "flex", gap: "8px" }}>
+                    <input
+                      type="text"
+                      className="form-control"
+                      value={exc.item_text}
+                      onChange={e => {
+                        const newExclusions = [...plan.Exclusions];
+                        newExclusions[idx].item_text = e.target.value;
+                        setPlan({ ...plan, Exclusions: newExclusions });
+                      }}
+                    />
+                    <button
+                      style={{ color: "var(--pr-red)", background: "none", border: "none", cursor: "pointer", fontSize: "0.85rem" }}
+                      onClick={() => {
+                        const newExclusions = plan.Exclusions.filter((_: any, i: number) => i !== idx);
+                        setPlan({ ...plan, Exclusions: newExclusions });
+                      }}
+                    >ลบ</button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
       )}
 

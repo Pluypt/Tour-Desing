@@ -9,6 +9,8 @@ export default async function TourBuilderPage({ params }: { params: Promise<{ id
     where: { id },
     include: {
       customer: true,
+      Inclusions: { orderBy: { sort_order: "asc" } },
+      Exclusions: { orderBy: { sort_order: "asc" } },
       TourDays: {
         orderBy: { sort_order: "asc" },
         include: {
