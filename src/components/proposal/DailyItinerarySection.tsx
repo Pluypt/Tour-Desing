@@ -94,7 +94,7 @@ export default function DailyItinerarySection({ days, hotelLevel }: { days: Tour
                 </div>
                 <div>
                   <div style={{ fontWeight: 700, fontSize: "15px", color: "#222" }}>{day.day_title || `วันที่ ${day.day_number}`}</div>
-                  {dateStr && <div style={{ fontSize: "11px", color: "#888", marginTop: "2px" }}>{dateStr}</div>}
+                  {dateStr && <div className="date-display" style={{ fontSize: "11px", color: "#888", marginTop: "2px" }}>{dateStr}</div>}
                 </div>
               </div>
             </div>

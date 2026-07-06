@@ -37,6 +37,8 @@ export default async function ProposalPreviewPage({ params }: { params: Promise<
   return (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center" }}>
       <style>{`
+        #proposal-document.hide-dates .date-display { display: none !important; }
+        #proposal-document.hide-dates .date-display-row { display: none !important; }
         @media print {
           @page { size: A4; margin: 15mm 18mm; }
           body { margin: 0; }

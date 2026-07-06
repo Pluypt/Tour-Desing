@@ -1,6 +1,18 @@
 "use client";
 
+import { useState, useEffect } from "react";
+
 export default function ExportButtons({ title }: { title: string }) {
+  const [hideDates, setHideDates] = useState(false);
+
+  useEffect(() => {
+    const doc = document.getElementById('proposal-document');
+    if (doc) {
+      if (hideDates) doc.classList.add('hide-dates');
+      else doc.classList.remove('hide-dates');
+    }
+  }, [hideDates]);
+
   const handleExportPDF = async () => {
     // Dynamically import html2pdf so it only loads on the client side
     try {
@@ -38,7 +50,11 @@ export default function ExportButtons({ title }: { title: string }) {
   };
 
   return (
-    <div style={{ display: "flex", gap: "10px" }}>
+    <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+      <label style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "0.9rem", cursor: "pointer", marginRight: "10px", color: "#555" }}>
+        <input type="checkbox" checked={hideDates} onChange={(e) => setHideDates(e.target.checked)} />
+        ซ่อนวันที่ในเอกสาร
+      </label>
       <button className="btn-secondary" onClick={handleExportDOCX}>ดาวน์โหลด DOCX</button>
       <button className="btn-primary" onClick={handleExportPDF}>ดาวน์โหลด PDF</button>
     </div>

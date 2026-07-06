@@ -310,7 +310,7 @@ export default function TourBuilderClient({ initialPlan }: { initialPlan: any })
                 </div>
 
                 <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-                  {selectedDay.TourActivities.map((activity: any) => (
+                  {selectedDay.TourActivities.map((activity: any, index: number) => (
                     <div key={activity.id} style={{ border: "1px solid var(--border-color)", padding: "12px", borderRadius: "var(--radius-sm)", display: "flex", gap: "12px" }}>
                       <div style={{ width: "90px" }}>
                         <input type="text" className="form-control" value={activity.time_text || ""} onChange={e => handleActivityChange(activity.id, "time_text", e.target.value)} placeholder="ช่วงเวลา" style={{ fontSize: "0.85rem" }} />
@@ -318,9 +318,37 @@ export default function TourBuilderClient({ initialPlan }: { initialPlan: any })
                       <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: "8px" }}>
                         <input type="text" className="form-control" value={activity.activity_title || ""} onChange={e => handleActivityChange(activity.id, "activity_title", e.target.value)} placeholder="ชื่อกิจกรรม" style={{ fontWeight: "bold", fontSize: "0.9rem" }} />
                         <textarea className="form-control" value={activity.activity_description || ""} onChange={e => handleActivityChange(activity.id, "activity_description", e.target.value)} rows={2} placeholder="รายละเอียด" style={{ fontSize: "0.85rem" }} />
-                        <div style={{ display: "flex", justifyContent: "flex-end" }}>
+                        <div style={{ display: "flex", justifyContent: "flex-end", gap: "12px" }}>
                           <button
-                            style={{ color: "var(--pr-red)", fontSize: "0.85rem", border: "none", background: "none", cursor: "pointer" }}
+                            title="เลื่อนขึ้น"
+                            style={{ color: "#555", fontSize: "0.85rem", border: "none", background: "none", cursor: index > 0 ? "pointer" : "not-allowed", opacity: index > 0 ? 1 : 0.3, display: "flex", alignItems: "center", gap: "4px" }}
+                            disabled={index === 0}
+                            onClick={() => {
+                              const updatedDays = [...plan.TourDays];
+                              const activities = [...updatedDays[selectedDayIndex].TourActivities];
+                              [activities[index - 1], activities[index]] = [activities[index], activities[index - 1]];
+                              updatedDays[selectedDayIndex].TourActivities = activities;
+                              setPlan({ ...plan, TourDays: updatedDays });
+                            }}
+                          >
+                            ▲ <span style={{ display: "none" }}>เลื่อนขึ้น</span>
+                          </button>
+                          <button
+                            title="เลื่อนลง"
+                            style={{ color: "#555", fontSize: "0.85rem", border: "none", background: "none", cursor: index < selectedDay.TourActivities.length - 1 ? "pointer" : "not-allowed", opacity: index < selectedDay.TourActivities.length - 1 ? 1 : 0.3, display: "flex", alignItems: "center", gap: "4px" }}
+                            disabled={index === selectedDay.TourActivities.length - 1}
+                            onClick={() => {
+                              const updatedDays = [...plan.TourDays];
+                              const activities = [...updatedDays[selectedDayIndex].TourActivities];
+                              [activities[index + 1], activities[index]] = [activities[index], activities[index + 1]];
+                              updatedDays[selectedDayIndex].TourActivities = activities;
+                              setPlan({ ...plan, TourDays: updatedDays });
+                            }}
+                          >
+                            ▼ <span style={{ display: "none" }}>เลื่อนลง</span>
+                          </button>
+                          <button
+                            style={{ color: "var(--pr-red)", fontSize: "0.85rem", border: "none", background: "none", cursor: "pointer", marginLeft: "10px" }}
                             onClick={() => {
                               const updatedDays = [...plan.TourDays];
                               updatedDays[selectedDayIndex].TourActivities = updatedDays[selectedDayIndex].TourActivities.filter((a: any) => a.id !== activity.id);

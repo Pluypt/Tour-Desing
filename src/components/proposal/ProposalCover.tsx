@@ -112,7 +112,7 @@ export default function ProposalCover({
             ["เส้นทางบิน", flightRoute || "-"],
             ["จัดทำสำหรับ", customerName || "-"],
           ].map(([label, value]) => (
-            <div key={label} style={{ display: "flex", gap: "8px", fontSize: "12px" }}>
+            <div key={label} className={label === "วันที่เดินทาง" ? "date-display-row" : ""} style={{ display: "flex", gap: "8px", fontSize: "12px" }}>
               <span style={{ color: "#999", minWidth: "110px", flexShrink: 0 }}>{label}:</span>
               <span style={{ color: "#333", fontWeight: 500 }}>{value}</span>
             </div>
