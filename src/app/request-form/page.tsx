@@ -3,76 +3,109 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
+const initialFormData = {
+  customerName: "",
+  phone: "",
+  lineId: "",
+  customerType: "Family",
+  travelerCount: "",
+  ageRange: "",
+  customerNote: "",
+  country: "",
+  mainCity: "",
+  secondaryCity: "",
+  startDate: "",
+  endDate: "",
+  duration: "",
+  tripType: "Private Tour",
+  tourCode: "",
+  title: "",
+  theme: "Nature",
+  hotelLevel: "4 Star",
+  budgetPerPerson: "",
+};
+
 export default function TourRequestForm() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [originalPlanFile, setOriginalPlanFile] = useState<{mimeType: string, data: string} | null>(null);
-  const [formData, setFormData] = useState({
-    // Section A
-    customerName: "",
-    phone: "",
-    lineId: "",
-    customerType: "Family",
-    travelerCount: "",
-    ageRange: "",
-    customerNote: "",
-    // Section B
-    country: "",
-    mainCity: "",
-    secondaryCity: "",
-    startDate: "",
-    endDate: "",
-    duration: "", // calculated
-    tripType: "Private Tour",
-    tourCode: "",
-    title: "",
-    theme: "Nature",
-    // Budget & Level
-    hotelLevel: "4 Star",
-    budgetPerPerson: "",
-  });
+  const [formData, setFormData] = useState(initialFormData);
+
+  const calculateDurationFromDates = (startStr: string, endStr: string) => {
+    if (startStr && endStr) {
+      const start = new Date(startStr);
+      const end = new Date(endStr);
+      if (!isNaN(start.getTime()) && !isNaN(end.getTime())) {
+        const diffTime = Math.abs(end.getTime() - start.getTime());
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+        return diffDays.toString();
+      }
+    }
+    return "";
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData(prev => {
+      const next = { ...prev, [name]: value };
+      if (name === "startDate" || name === "endDate") {
+        const dur = calculateDurationFromDates(
+          name === "startDate" ? value : prev.startDate,
+          name === "endDate" ? value : prev.endDate
+        );
+        if (dur) next.duration = dur;
+      }
+      return next;
+    });
   };
 
-  const calculateDuration = () => {
-    if (formData.startDate && formData.endDate) {
-      const start = new Date(formData.startDate);
-      const end = new Date(formData.endDate);
-      const diffTime = Math.abs(end.getTime() - start.getTime());
-      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1; // +1 to include both start and end days
-      setFormData(prev => ({ ...prev, duration: diffDays.toString() }));
+  const handleGenerate = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    // Auto calculate duration if missing
+    let currentDuration = formData.duration;
+    if (!currentDuration && formData.startDate && formData.endDate) {
+      currentDuration = calculateDurationFromDates(formData.startDate, formData.endDate);
     }
-  };
 
-  const handleGenerate = async () => {
-    if (!formData.customerName || !formData.country || !formData.mainCity || !formData.startDate || !formData.travelerCount || !formData.duration) {
-      alert("กรุณากรอกข้อมูลที่จำเป็นก่อนสร้างแพลนทัวร์");
+    if (!formData.customerName?.trim() || !formData.country?.trim() || !formData.mainCity?.trim() || !formData.startDate || !formData.travelerCount || !currentDuration) {
+      alert("กรุณากรอกข้อมูลที่จำเป็น (ชื่อลูกค้า, จำนวนผู้เดินทาง, ประเทศ, เมืองหลัก, วันที่เดินทาง)");
       return;
     }
+
+    const payload = {
+      ...formData,
+      duration: currentDuration,
+      originalPlanFile,
+    };
 
     setLoading(true);
     try {
       const res = await fetch("/api/generate-plan", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...formData, originalPlanFile })
+        body: JSON.stringify(payload)
       });
       
       const data = await res.json();
       if (data.success && data.planId) {
         router.push(`/builder/${data.planId}`);
       } else {
-        alert(data.error || "Failed to generate plan");
+        alert(data.error || "ไม่สามารถสร้างแผนทัวร์ได้ กรุณาลองใหม่อีกครั้ง");
       }
     } catch (error) {
       console.error(error);
-      alert("Error generating plan");
+      alert("เกิดข้อผิดพลาดในการสร้างแผนทัวร์");
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleClear = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    setFormData(initialFormData);
+    setOriginalPlanFile(null);
   };
 
   return (
@@ -122,11 +155,11 @@ export default function TourRequestForm() {
           </div>
           <div className="form-group">
             <label className="form-label">วันที่เดินทาง เริ่มต้น *</label>
-            <input type="date" className="form-control" name="startDate" value={formData.startDate} onChange={handleChange} onBlur={calculateDuration} required />
+            <input type="date" className="form-control" name="startDate" value={formData.startDate} onChange={handleChange} required />
           </div>
           <div className="form-group">
             <label className="form-label">วันที่เดินทาง สิ้นสุด *</label>
-            <input type="date" className="form-control" name="endDate" value={formData.endDate} onChange={handleChange} onBlur={calculateDuration} required />
+            <input type="date" className="form-control" name="endDate" value={formData.endDate} onChange={handleChange} required />
           </div>
           <div className="form-group">
             <label className="form-label">จำนวนวัน * (Auto Calculate)</label>
@@ -155,7 +188,6 @@ export default function TourRequestForm() {
                 
                 if (file.type === "application/pdf") {
                   try {
-                    // Load pdfjs-dist dynamically to avoid SSR issues
                     const pdfjsLib = await import('pdfjs-dist');
                     pdfjsLib.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.js`;
                     
@@ -170,10 +202,9 @@ export default function TourRequestForm() {
                       fullText += `--- Page ${i} ---\n${pageText}\n`;
                     }
                     
-                    // Safe UTF-8 to Base64 encoding in browser
                     const base64 = btoa(unescape(encodeURIComponent(fullText)));
                     setOriginalPlanFile({ mimeType: "text/plain", data: base64 });
-                    alert(`✅ สกัดข้อความจาก PDF สำเร็จ! (ลดขนาดไฟล์พร้อมส่งให้ AI แล้ว)`);
+                    alert(`✅ สกัดข้อความจาก PDF สำเร็จ!`);
                   } catch (err) {
                     console.error("PDF Parsing error:", err);
                     alert("เกิดข้อผิดพลาดในการอ่านไฟล์ PDF โปรดลองไฟล์อื่น");
@@ -181,9 +212,8 @@ export default function TourRequestForm() {
                     setOriginalPlanFile(null);
                   }
                 } else {
-                  // For images, keep the 3MB limit
                   if (file.size > 3 * 1024 * 1024) {
-                    alert("ไฟล์รูปภาพมีขนาดใหญ่เกินไป (สูงสุด 3MB) กรุณาลดขนาดไฟล์ก่อนอัปโหลด");
+                    alert("ไฟล์รูปภาพมีขนาดใหญ่เกินไป (สูงสุด 3MB)");
                     e.target.value = "";
                     setOriginalPlanFile(null);
                     return;
@@ -201,7 +231,6 @@ export default function TourRequestForm() {
         </div>
       </div>
 
-      {/* For MVP, combining C-G into simple requirements field to make it usable */}
       <div className="card">
         <h2 style={{ marginBottom: "15px", borderBottom: "1px solid var(--border-color)", paddingBottom: "10px" }}>ความต้องการเฉพาะ / โรงแรม / อาหาร</h2>
         <div className="form-group">
@@ -219,7 +248,6 @@ export default function TourRequestForm() {
         </div>
       </div>
 
-      {/* Section G: Price Calculation */}
       <div className="card">
         <h2 style={{ marginBottom: "15px", borderBottom: "1px solid var(--border-color)", paddingBottom: "10px" }}>ราคาและงบประมาณ</h2>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px" }}>
@@ -242,9 +270,8 @@ export default function TourRequestForm() {
       </div>
 
       <div style={{ display: "flex", gap: "10px", justifyContent: "flex-end", marginBottom: "40px" }}>
-        <button className="btn-secondary" onClick={() => setFormData({} as any)}>ล้างข้อมูล (Clear)</button>
-        <button className="btn-secondary">บันทึกข้อมูล (Save)</button>
-        <button className="btn-primary" onClick={handleGenerate} disabled={loading}>
+        <button type="button" className="btn-secondary" onClick={handleClear}>ล้างข้อมูล (Clear)</button>
+        <button type="button" className="btn-primary" onClick={handleGenerate} disabled={loading}>
           {loading ? "กำลังสร้างแผนด้วย AI..." : "สร้างแบบร่าง (Generate Draft Plan)"}
         </button>
       </div>
