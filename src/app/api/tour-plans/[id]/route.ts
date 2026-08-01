@@ -86,7 +86,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
       const currentActivityIds = day.TourActivities.filter((a: any) => !a.isNew).map((a: any) => a.id);
       
       // Delete removed activities
-      const activitiesToDelete = existingActivities.filter(a => !currentActivityIds.includes(a.id));
+      const activitiesToDelete = existingActivities.filter((a: any) => !currentActivityIds.includes(a.id));
       for (const toDelete of activitiesToDelete) {
         await prisma.tourActivity.delete({ where: { id: toDelete.id } });
       }

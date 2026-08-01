@@ -98,25 +98,32 @@ export async function POST(req: Request) {
       ];
     }
 
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
-      contents: Array.isArray(promptParts) 
-        ? [{ role: 'user', parts: promptParts }] 
-        : promptParts,
-      config: {
-        responseMimeType: "application/json",
+    let aiPlan;
+    try {
+      if (!process.env.GEMINI_API_KEY) {
+        console.warn("GEMINI_API_KEY is missing in .env, using fallback plan generator");
+        aiPlan = buildFallbackPlan(data.mainCity, data.country, duration, data.startDate);
+      } else {
+        const response = await ai.models.generateContent({
+          model: 'gemini-2.5-flash',
+          contents: Array.isArray(promptParts) 
+            ? [{ role: 'user', parts: promptParts }] 
+            : promptParts,
+          config: {
+            responseMimeType: "application/json",
+          }
+        });
+
+        const jsonText = response.text || "{}";
+        const parsedPlan = safeJsonParse(jsonText);
+
+        aiPlan = validateAIPlan(parsedPlan)
+          ? parsedPlan
+          : buildFallbackPlan(data.mainCity, data.country, duration, data.startDate);
       }
-    });
-
-    const jsonText = response.text || "{}";
-    const parsedPlan = safeJsonParse(jsonText);
-
-    const aiPlan = validateAIPlan(parsedPlan)
-      ? parsedPlan
-      : buildFallbackPlan(data.mainCity, data.country, duration, data.startDate);
-
-    if (!validateAIPlan(parsedPlan)) {
-      console.error("AI returned invalid plan structure, using fallback");
+    } catch (aiErr) {
+      console.error("AI Generation Error (using fallback plan):", aiErr);
+      aiPlan = buildFallbackPlan(data.mainCity, data.country, duration, data.startDate);
     }
 
     // 2.5 Generate Hero Image using Gemini Imagen
