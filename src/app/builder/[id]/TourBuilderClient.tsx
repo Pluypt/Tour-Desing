@@ -306,7 +306,40 @@ export default function TourBuilderClient({ initialPlan }: { initialPlan: any })
 
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "15px" }}>
                   <h3 style={{ fontSize: "1rem", margin: 0 }}>กิจกรรม</h3>
-                  <div style={{ display: "flex", gap: "8px" }}>
+                  <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+                    <button
+                      className="btn-secondary"
+                      style={{ padding: "5px 10px", fontSize: "0.82rem", backgroundColor: "#E3F2FD", color: "#1565C0", borderColor: "#90CAF9" }}
+                      onClick={async () => {
+                        if (!selectedDay) return;
+                        if (!confirm(`ให้ AI รีเสิชแลนด์มาร์กสถานที่ท่องเที่ยวจริงประจำเมืองสำหรับ วันที่ ${selectedDay.day_number}?`)) return;
+                        setSaving(true);
+                        try {
+                          const res = await fetch(`/api/tour-plans/${plan.id}/auto-research-day`, {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ dayId: selectedDay.id, dayNumber: selectedDay.day_number }),
+                          });
+                          const data = await res.json();
+                          if (data.success && data.activities) {
+                            const updatedDays = [...plan.TourDays];
+                            updatedDays[selectedDayIndex].TourActivities = data.activities;
+                            setPlan({ ...plan, TourDays: updatedDays });
+                            alert("รีเสิชแลนด์มาร์กสถานที่จริงสำเร็จ!");
+                          } else {
+                            alert("เกิดข้อผิดพลาดในการรีเสิชสถานที่");
+                          }
+                        } catch (err) {
+                          console.error(err);
+                          alert("เกิดข้อผิดพลาดในการรีเสิชสถานที่");
+                        } finally {
+                          setSaving(false);
+                        }
+                      }}
+                    >
+                      ✨ AI รีเสิชแลนด์มาร์กจริง
+                    </button>
+
                     <select
                       className="form-control"
                       style={{ fontSize: "0.82rem", padding: "4px 8px", width: "auto" }}
