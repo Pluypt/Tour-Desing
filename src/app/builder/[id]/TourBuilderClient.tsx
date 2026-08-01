@@ -8,6 +8,7 @@ import CoverDesignerTab from "@/components/builder/CoverDesignerTab";
 import DailyImageGallery from "@/components/images/DailyImageGallery";
 import StatusSelector from "@/components/builder/StatusSelector";
 import HeroCoverUploader from "@/components/builder/HeroCoverUploader";
+import { POI_PRESETS } from "@/lib/presetLibrary";
 
 const TABS = [
   { id: "info", label: "ข้อมูลพื้นฐาน" },
@@ -179,6 +180,21 @@ export default function TourBuilderClient({ initialPlan }: { initialPlan: any })
             </div>
 
             <div>
+              <label className="form-label" style={{ fontSize: "0.85rem", color: "var(--pr-text-muted)", marginBottom: "6px", display: "block" }}>เที่ยวบินขาไป (Outbound Flight)</label>
+              <input type="text" className="form-control" value={plan.outbound_flight || ""} onChange={e => setPlan({...plan, outbound_flight: e.target.value})} placeholder="เช่น HB296 BKK 01:55 - 06:00 HKG" />
+            </div>
+
+            <div>
+              <label className="form-label" style={{ fontSize: "0.85rem", color: "var(--pr-text-muted)", marginBottom: "6px", display: "block" }}>เที่ยวบินขากลับ (Return Flight)</label>
+              <input type="text" className="form-control" value={plan.return_flight || ""} onChange={e => setPlan({...plan, return_flight: e.target.value})} placeholder="เช่น HB295 HKG 22:15 - 00:15 BKK" />
+            </div>
+
+            <div>
+              <label className="form-label" style={{ fontSize: "0.85rem", color: "var(--pr-text-muted)", marginBottom: "6px", display: "block" }}>ระดับโรงแรมที่พัก</label>
+              <input type="text" className="form-control" value={plan.hotel_level || ""} onChange={e => setPlan({...plan, hotel_level: e.target.value})} placeholder="เช่น 4 ดาว, 5 ดาว" />
+            </div>
+
+            <div>
               <label className="form-label" style={{ fontSize: "0.85rem", color: "var(--pr-text-muted)", marginBottom: "6px", display: "block" }}>วันที่เริ่มต้น</label>
               <input type="date" className="form-control" value={plan.start_date ? new Date(plan.start_date).toISOString().split('T')[0] : ""} onChange={e => setPlan({...plan, start_date: e.target.value ? new Date(e.target.value).toISOString() : null})} />
             </div>
@@ -290,23 +306,55 @@ export default function TourBuilderClient({ initialPlan }: { initialPlan: any })
 
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "15px" }}>
                   <h3 style={{ fontSize: "1rem", margin: 0 }}>กิจกรรม</h3>
-                  <button
-                    className="btn-secondary"
-                    style={{ padding: "5px 12px", fontSize: "0.85rem" }}
-                    onClick={() => {
-                      const updatedDays = [...plan.TourDays];
-                      updatedDays[selectedDayIndex].TourActivities.push({
-                        id: "new-" + Date.now(),
-                        time_text: "",
-                        activity_title: "",
-                        activity_description: "",
-                        isNew: true,
-                      });
-                      setPlan({ ...plan, TourDays: updatedDays });
-                    }}
-                  >
-                    + เพิ่มกิจกรรม
-                  </button>
+                  <div style={{ display: "flex", gap: "8px" }}>
+                    <select
+                      className="form-control"
+                      style={{ fontSize: "0.82rem", padding: "4px 8px", width: "auto" }}
+                      onChange={e => {
+                        const idx = parseInt(e.target.value);
+                        if (isNaN(idx)) return;
+                        const preset = POI_PRESETS[idx];
+                        if (!preset) return;
+
+                        const updatedDays = [...plan.TourDays];
+                        updatedDays[selectedDayIndex].TourActivities.push({
+                          id: "new-poi-" + Date.now(),
+                          time_text: preset.recommendedTime || "เช้า",
+                          activity_title: preset.title,
+                          activity_description: preset.description,
+                          location_name: preset.title,
+                          isNew: true,
+                        });
+                        setPlan({ ...plan, TourDays: updatedDays });
+                        e.target.value = "";
+                      }}
+                    >
+                      <option value="">+ เลือกสถานที่จากคลัง POI</option>
+                      {POI_PRESETS.map((preset, idx) => (
+                        <option key={idx} value={idx}>
+                          [{preset.city}] {preset.title}
+                        </option>
+                      ))}
+                    </select>
+
+                    <button
+                      className="btn-secondary"
+                      style={{ padding: "5px 12px", fontSize: "0.85rem" }}
+                      onClick={() => {
+                        const updatedDays = [...plan.TourDays];
+                        updatedDays[selectedDayIndex].TourActivities.push({
+                          id: "new-" + Date.now(),
+                          time_text: "",
+                          activity_title: "",
+                          activity_description: "",
+                          isNew: true,
+                        });
+                        setPlan({ ...plan, TourDays: updatedDays });
+                      }}
+                    >
+                      + เพิ่มกิจกรรมเอง
+                    </button>
+                  </div>
                 </div>
 
                 <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>

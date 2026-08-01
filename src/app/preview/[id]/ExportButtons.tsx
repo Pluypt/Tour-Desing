@@ -49,12 +49,21 @@ export default function ExportButtons({ title }: { title: string }) {
     alert("ฟีเจอร์การดาวน์โหลด DOCX จะถูกเพิ่มในอนาคตครับ");
   };
 
+  const handleCopyCustomerLink = () => {
+    const url = `${window.location.origin}/tour/${window.location.pathname.split('/').pop()}`;
+    navigator.clipboard.writeText(url);
+    alert(`คัดลอกลิงก์หน้าเว็บสำหรับลูกค้าเรียบร้อยแล้ว!\n\nURL: ${url}`);
+  };
+
   return (
     <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
       <label style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "0.9rem", cursor: "pointer", marginRight: "10px", color: "#555" }}>
         <input type="checkbox" checked={hideDates} onChange={(e) => setHideDates(e.target.checked)} />
         ซ่อนวันที่ในเอกสาร
       </label>
+      <button className="btn-secondary" onClick={handleCopyCustomerLink} style={{ backgroundColor: "#E3F2FD", color: "#1976D2", borderColor: "#90CAF9" }}>
+        🔗 ลิงก์เว็บส่งลูกค้า
+      </button>
       <button className="btn-secondary" onClick={handleExportDOCX}>ดาวน์โหลด DOCX</button>
       <button className="btn-primary" onClick={handleExportPDF}>ดาวน์โหลด PDF</button>
     </div>

@@ -35,6 +35,18 @@ const COST_TYPES = [
   { value: "per_room", label: "ต่อห้อง" },
 ];
 
+const CURRENCIES: Record<string, { label: string; rate: number }> = {
+  THB: { label: "THB (บาท)", rate: 1 },
+  CNY: { label: "CNY (หยวน)", rate: 5.05 },
+  HKD: { label: "HKD (ดอลลาร์ฮ่องกง)", rate: 4.65 },
+  JPY: { label: "JPY (เยน)", rate: 0.24 },
+  USD: { label: "USD (ดอลลาร์)", rate: 36.5 },
+  EUR: { label: "EUR (ยูโร)", rate: 39.5 },
+  SGD: { label: "SGD (ดอลลาร์สิงคโปร์)", rate: 27.2 },
+  KRW: { label: "KRW (วอน)", rate: 0.027 },
+  TWD: { label: "TWD (ดอลลาร์ไต้หวัน)", rate: 1.15 },
+};
+
 export default function CostPlannerTab({ planId, travelerCount, duration }: { planId: string; travelerCount: number; duration: number }) {
   const [costs, setCosts] = useState<CostItem[]>([]);
   const [pricing, setPricing] = useState<PricingSummary | null>(null);
@@ -44,6 +56,12 @@ export default function CostPlannerTab({ planId, travelerCount, duration }: { pl
   const [manualPrice, setManualPrice] = useState(0);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
+
+  // Currency Converter State
+  const [calcCurrency, setCalcCurrency] = useState("CNY");
+  const [calcAmount, setCalcAmount] = useState<number | "">(100);
+
+  const convertedThb = typeof calcAmount === "number" ? Math.round(calcAmount * CURRENCIES[calcCurrency].rate * 100) / 100 : 0;
 
   const fetchCosts = useCallback(async () => {
     const res = await fetch(`/api/tour-plans/${planId}/costs`);
@@ -145,6 +163,69 @@ export default function CostPlannerTab({ planId, travelerCount, duration }: { pl
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
         <h2 style={{ fontSize: "1.2rem", margin: 0 }}>ต้นทุนและราคา</h2>
         <button className="btn-secondary" style={{ padding: "6px 14px", fontSize: "0.9rem" }} onClick={addRow}>+ เพิ่มรายการต้นทุน</button>
+      </div>
+
+      {/* Multi-Currency Converter Widget */}
+      <div
+        style={{
+          backgroundColor: "#FFF8E1",
+          border: "1px solid #FFE082",
+          borderRadius: "10px",
+          padding: "12px 16px",
+          marginBottom: "20px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          flexWrap: "wrap",
+          gap: "12px",
+          fontSize: "0.88rem",
+        }}
+      >
+        <div style={{ fontWeight: 700, color: "#D84315", display: "flex", alignItems: "center", gap: "6px" }}>
+          <span>💱 คำนวณแปลงสกุลเงินต่างประเทศเป็นบาท (THB):</span>
+        </div>
+        <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
+          <input
+            type="number"
+            className="form-control"
+            style={{ width: "110px", padding: "4px 8px", fontSize: "0.85rem" }}
+            value={calcAmount}
+            onChange={e => setCalcAmount(e.target.value === "" ? "" : parseFloat(e.target.value))}
+            placeholder="จำนวนเงิน"
+          />
+          <select
+            className="form-control"
+            style={{ width: "160px", padding: "4px 8px", fontSize: "0.85rem" }}
+            value={calcCurrency}
+            onChange={e => setCalcCurrency(e.target.value)}
+          >
+            {Object.entries(CURRENCIES).map(([code, item]) => (
+              <option key={code} value={code}>{item.label}</option>
+            ))}
+          </select>
+          <span style={{ fontSize: "1rem", fontWeight: 800, color: "#D32F2F" }}>
+            = ฿{convertedThb.toLocaleString()} บาท
+          </span>
+          <button
+            className="btn-secondary"
+            style={{ padding: "4px 12px", fontSize: "0.8rem", backgroundColor: "#FFE082", color: "#5D4037", border: "none" }}
+            onClick={() => {
+              if (convertedThb <= 0) return;
+              setCosts(prev => [...prev, {
+                id: "new-" + Date.now(),
+                category: "other",
+                item_name: `ค่าใช้จ่ายต่างประเทศ (${calcAmount} ${calcCurrency})`,
+                cost_type: "fixed_group",
+                quantity: 1,
+                unit_cost: convertedThb,
+                total_cost: convertedThb,
+                note: `คำนวณจาก ${calcAmount} ${calcCurrency} (เรท 1 ${calcCurrency} = ${CURRENCIES[calcCurrency].rate} THB)`,
+              }]);
+            }}
+          >
+            + แทรกลงรายการต้นทุน
+          </button>
+        </div>
       </div>
 
       {/* Cost Table */}

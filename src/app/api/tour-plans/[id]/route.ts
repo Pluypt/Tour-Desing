@@ -15,10 +15,21 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
       where: { id },
       data: {
         title: body.title,
+        tour_code: body.tour_code ?? undefined,
+        duration: body.duration ? parseInt(body.duration) : undefined,
+        traveler_count: body.traveler_count ? parseInt(body.traveler_count) : undefined,
+        trip_type: body.trip_type ?? undefined,
+        airline: body.airline ?? undefined,
+        flight_route: body.flight_route ?? undefined,
+        outbound_flight: body.outbound_flight ?? undefined,
+        return_flight: body.return_flight ?? undefined,
+        start_date: body.start_date ? new Date(body.start_date) : undefined,
+        end_date: body.end_date ? new Date(body.end_date) : undefined,
+        hotel_level: body.hotel_level ?? undefined,
         hero_image_url: body.hero_image_url ?? undefined,
         selling_price_per_person: body.selling_price_per_person ?? undefined,
         total_selling_price: body.total_selling_price ?? undefined,
-        status: "Draft",
+        status: body.status || "Draft",
         updated_at: new Date()
       }
     });

@@ -102,8 +102,19 @@ export default async function ProposalPreviewPage({ params }: { params: Promise<
           depositAmount={null}
         />
 
-        {/* 3. Short Itinerary */}
-        <ShortItinerarySection days={plan.TourDays} />
+        {/* 3. Short Itinerary Table */}
+        <ShortItinerarySection
+          days={plan.TourDays}
+          title={plan.title}
+          duration={plan.duration}
+          startDate={plan.start_date}
+          endDate={plan.end_date}
+          airline={plan.airline}
+          flightRoute={plan.flight_route}
+          outboundFlight={plan.outbound_flight}
+          returnFlight={plan.return_flight}
+          hotelLevel={plan.hotel_level}
+        />
 
         {/* 4. Inclusions & Exclusions */}
         <InclusionExclusionSection

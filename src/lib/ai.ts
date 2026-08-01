@@ -24,17 +24,26 @@ export function safeJsonParse<T = unknown>(text: string): T | null {
 export type AIPlan = {
   tour_name: string;
   summary?: string;
+  airline?: string;
+  flight_route?: string;
+  outbound_flight?: string;
+  return_flight?: string;
   itinerary: Array<{
     day_number: number;
     date?: string;
     daily_theme: string;
     hotel_name_suggestion?: string;
+    breakfast_included?: boolean;
+    lunch_included?: boolean;
+    dinner_included?: boolean;
     activities: Array<{
       time_period?: string;
-      time_start?: string; // รองรับข้อมูลเก่า
-      time_end?: string; // รองรับข้อมูลเก่า
+      time_start?: string;
+      time_end?: string;
+      activity_title?: string;
       location_name: string;
       description: string;
+      is_highlight?: boolean;
     }>;
   }>;
 };
