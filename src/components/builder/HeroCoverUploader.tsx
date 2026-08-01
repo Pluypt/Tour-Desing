@@ -200,29 +200,50 @@ export default function HeroCoverUploader({ planId, heroImageUrl, onUpdate }: He
             onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(0,0,0,0.4)")}
             onMouseLeave={(e) => (e.currentTarget.style.background = "rgba(0,0,0,0)")}
           >
-            <div style={{ padding: "8px", display: "flex", gap: "6px" }}>
-              <button
-                onClick={() => fileInputRef.current?.click()}
-                disabled={isLoading}
+            <div style={{ padding: "8px", display: "flex", flexDirection: "column", gap: "6px" }}>
+              <select
                 style={{
-                  flex: 1, fontSize: "0.72rem", padding: "5px 0",
-                  borderRadius: "6px", border: "none", cursor: "pointer",
-                  background: "rgba(255,255,255,0.92)", color: "#333", fontWeight: 600,
+                  fontSize: "0.72rem", padding: "4px 6px", borderRadius: "6px",
+                  border: "none", background: "rgba(255,255,255,0.95)", color: "#333", fontWeight: 600, cursor: "pointer",
+                }}
+                onChange={(e) => {
+                  if (e.target.value) {
+                    onUpdate(e.target.value);
+                    e.target.value = "";
+                  }
                 }}
               >
-                📤 เปลี่ยนรูป
-              </button>
-              <button
-                onClick={handleGenerateAI}
-                disabled={isLoading}
-                style={{
-                  flex: 1, fontSize: "0.72rem", padding: "5px 0",
-                  borderRadius: "6px", border: "none", cursor: "pointer",
-                  background: "rgba(211,47,47,0.92)", color: "#fff", fontWeight: 600,
-                }}
-              >
-                {generating ? "⏳ กำลังสร้าง..." : "✨ AI ใหม่"}
-              </button>
+                <option value="">🖼️ เลือกรูปแลนด์มาร์กตรงเมือง...</option>
+                <option value="https://images.unsplash.com/photo-1548625149-fc4a29cf7092?w=1200&auto=format&fit=crop&q=80">🇲🇴 มาเก๊า - Venetian & ตึกโคโลเนียล</option>
+                <option value="https://images.unsplash.com/photo-1506970845246-18f21d533b20?w=1200&auto=format&fit=crop&q=80">🇭🇰 ฮ่องกง - อ่าววิกตอเรีย สกายไลน์</option>
+                <option value="https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=1200&auto=format&fit=crop&q=80">🇯🇵 โตเกียว - ภูเขาไฟฟูจิ & วัดเซ็นโซจิ</option>
+                <option value="https://images.unsplash.com/photo-1508804185872-d7badad00f7d?w=1200&auto=format&fit=crop&q=80">🇨🇳 เฉิงตู/จีน - กำแพงเมืองจีน & เมืองเก่า</option>
+                <option value="https://images.unsplash.com/photo-1525625293386-3f8f99389edd?w=1200&auto=format&fit=crop&q=80">🇸🇬 สิงคโปร์ - Gardens by the Bay</option>
+              </select>
+              <div style={{ display: "flex", gap: "6px" }}>
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={isLoading}
+                  style={{
+                    flex: 1, fontSize: "0.72rem", padding: "5px 0",
+                    borderRadius: "6px", border: "none", cursor: "pointer",
+                    background: "rgba(255,255,255,0.92)", color: "#333", fontWeight: 600,
+                  }}
+                >
+                  📤 เปลี่ยนรูป
+                </button>
+                <button
+                  onClick={handleGenerateAI}
+                  disabled={isLoading}
+                  style={{
+                    flex: 1, fontSize: "0.72rem", padding: "5px 0",
+                    borderRadius: "6px", border: "none", cursor: "pointer",
+                    background: "rgba(211,47,47,0.92)", color: "#fff", fontWeight: 600,
+                  }}
+                >
+                  {generating ? "⏳ กำลังสร้าง..." : "✨ AI ใหม่"}
+                </button>
+              </div>
             </div>
           </div>
           {/* Loading overlay */}

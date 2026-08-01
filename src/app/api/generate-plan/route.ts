@@ -140,6 +140,20 @@ export async function POST(req: Request) {
       console.error("Image generation failed (non-critical):", imgError);
     }
 
+    if (!heroImageUrl) {
+      const destLower = `${data.mainCity} ${data.country}`.toLowerCase();
+      heroImageUrl = "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=1200&auto=format&fit=crop&q=80";
+      if (destLower.includes("macao") || destLower.includes("macau") || destLower.includes("มาเก๊า")) {
+        heroImageUrl = "https://images.unsplash.com/photo-1548625149-fc4a29cf7092?w=1200&auto=format&fit=crop&q=80";
+      } else if (destLower.includes("hong kong") || destLower.includes("ฮ่องกง")) {
+        heroImageUrl = "https://images.unsplash.com/photo-1506970845246-18f21d533b20?w=1200&auto=format&fit=crop&q=80";
+      } else if (destLower.includes("japan") || destLower.includes("tokyo") || destLower.includes("ญี่ปุ่น")) {
+        heroImageUrl = "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=1200&auto=format&fit=crop&q=80";
+      } else if (destLower.includes("china") || destLower.includes("chengdu") || destLower.includes("เฉิงตู") || destLower.includes("จีน")) {
+        heroImageUrl = "https://images.unsplash.com/photo-1508804185872-d7badad00f7d?w=1200&auto=format&fit=crop&q=80";
+      }
+    }
+
     // 3. Save Plan to Database
     const plan = await prisma.tourPlan.create({
       data: {
