@@ -356,25 +356,66 @@ export function buildFallbackPlan(
     const itinerary = Array.from({ length: duration }, (_, i) => {
       const date = new Date(new Date(startDate).getTime() + i * 24 * 60 * 60 * 1000);
       const dayNo = i + 1;
-      const presetDayIndex = Math.min(i, preset.days.length - 1);
-      const dayPreset = preset.days[presetDayIndex];
+      
+      // If duration > preset days, create unique fallback for extra days
+      let dayPreset = preset.days[i];
+      if (!dayPreset) {
+        if (dayNo === duration) {
+          dayPreset = {
+            theme: `อิสระช้อปปิ้งเมือง ${mainCity} - เดินทางกลับกรุงเทพฯ (สนามบินสุวรรณภูมิ)`,
+            activities: [
+              {
+                time_period: "เช้า",
+                activity_title: `เช็คเอาท์โรงแรม & ช้อปปิ้งของฝาก ${mainCity}`,
+                location_name: `ย่านการค้าใจกลางเมือง ${mainCity}`,
+                description: `เช็คเอาท์จากที่พัก นำท่านสู่ **ย่านการค้าใจกลางเมือง ${mainCity}** เลือกซื้อของฝาก สินค้าพื้นเมือง และขนมท้องถิ่น`
+              },
+              {
+                time_period: "ขากลับ",
+                activity_title: "เดินทางกลับประเทศไทย (สนามบินสุวรรณภูมิ)",
+                location_name: `สนามบินนานาชาติ ${mainCity} - สนามบินสุวรรณภูมิ`,
+                description: `เดินทางสู่ **สนามบินนานาชาติเมือง ${mainCity}** เช็คอินเดินทางกลับกรุงเทพฯ (สุวรรณภูมิ) โดยสวัสดิภาพ`
+              }
+            ]
+          };
+        } else {
+          dayPreset = {
+            theme: `ท่องเที่ยวชมธรรมชาติและย่านเมืองเก่า ${mainCity} (วันที่ ${dayNo})`,
+            activities: [
+              {
+                time_period: "เช้า",
+                activity_title: `ชมจุดชมวิวธรรมชาติประจำเมือง ${mainCity}`,
+                location_name: `อุทยานธรรมชาติ ${mainCity}`,
+                description: `นำท่านชม **อุทยานธรรมชาติและจุดชมวิวเมือง ${mainCity}** สัมผัสอากาศสดชื่นและทัศนียภาพอันสวยงาม`,
+                is_highlight: true
+              },
+              {
+                time_period: "กลางวัน",
+                activity_title: `รับประทานอาหารกลางวัน เมนูท้องถิ่น ${mainCity}`,
+                location_name: `ร้านอาหารขึ้นชื่อเมือง ${mainCity}`,
+                description: `ลิ้มลองอาหารรสเลิศและเมนูท้องถิ่นขึ้นชื่อในย่าน **เมือง ${mainCity}**`
+              },
+              {
+                time_period: "บ่าย",
+                activity_title: `เดินเที่ยวชมย่านเมืองเก่า ${mainCity}`,
+                location_name: `ย่านเมืองเก่าโบราณ ${mainCity}`,
+                description: `นำท่านชม **ย่านเมืองเก่าโบราณ ${mainCity}** สัมผัสสถาปัตยกรรมดั้งเดิมและวิถีชีวิตผู้คนท้องถิ่น`,
+                is_highlight: true
+              }
+            ]
+          };
+        }
+      }
 
       return {
         day_number: dayNo,
         date: date.toISOString().split("T")[0],
-        daily_theme: dayPreset?.theme || `ท่องเที่ยวไฮไลต์เมือง ${mainCity} วันที่ ${dayNo}`,
+        daily_theme: dayPreset.theme,
         hotel_name_suggestion: preset.hotel,
         breakfast_included: dayNo > 1,
         lunch_included: true,
         dinner_included: dayNo < duration,
-        activities: dayPreset?.activities || [
-          {
-            time_period: "เช้า",
-            activity_title: `ท่องเที่ยวแลนด์มาร์กสำคัญ ${mainCity}`,
-            location_name: `สถานที่ไฮไลต์เมือง ${mainCity}`,
-            description: `นำท่านชม **สถานที่ท่องเที่ยวสำคัญประจำเมือง ${mainCity}**`
-          }
-        ]
+        activities: dayPreset.activities
       };
     });
 
@@ -389,7 +430,7 @@ export function buildFallbackPlan(
     };
   }
 
-  // General dynamic fallback for any other city
+  // General dynamic fallback with distinct activities for each day
   const city = mainCity || "ไฮไลต์";
   const cntry = country || "";
   const destName = cntry ? `${city} (${cntry})` : city;
@@ -398,44 +439,88 @@ export function buildFallbackPlan(
     const date = new Date(new Date(startDate).getTime() + i * 24 * 60 * 60 * 1000);
     const dayNo = i + 1;
 
-    let dailyTheme = `เดินทางสู่เมือง ${city} - เที่ยวชมแลนด์มาร์กสำคัญประจำวัน`;
     if (dayNo === 1) {
-      dailyTheme = `กรุงเทพฯ (สนามบินสุวรรณภูมิ) - เดินทางถึง ${city} - เช็คอินแลนด์มาร์กแรก`;
+      return {
+        day_number: 1,
+        date: date.toISOString().split("T")[0],
+        daily_theme: `กรุงเทพฯ (สนามบินสุวรรณภูมิ) - เดินทางถึง ${city} - เช็คอินที่พัก`,
+        hotel_name_suggestion: `โรงแรมระดับ 4 ดาว ใจกลางเมือง ${city}`,
+        breakfast_included: false,
+        lunch_included: true,
+        dinner_included: true,
+        activities: [
+          {
+            time_period: "เช้า / บ่าย",
+            activity_title: `ออกเดินทางจากกรุงเทพฯ สู่เมือง ${city}`,
+            location_name: `สนามบินสุวรรณภูมิ - สนามบิน ${city}`,
+            description: `คณะพร้อมกัน ณ **สนามบินสุวรรณภูมิ** ออกเดินทางสู่ **เมือง ${city}** ผ่านพิธีการตรวจคนเข้าเมือง`
+          },
+          {
+            time_period: "เย็น",
+            activity_title: `เช็คอินเข้าสู่ที่พัก & ชมวิวเมือง ${city}`,
+            location_name: `ใจกลางเมือง ${city}`,
+            description: `เดินทางเข้าสู่ที่พัก พักผ่อนและถ่ายภาพบรรยากาศยามเย็นใจกลาง **เมือง ${city}**`,
+            is_highlight: true
+          }
+        ]
+      };
     } else if (dayNo === duration) {
-      dailyTheme = `เก็บตกย่านช้อปปิ้งเมือง ${city} - เดินทางกลับกรุงเทพฯ (สนามบินสุวรรณภูมิ)`;
+      return {
+        day_number: dayNo,
+        date: date.toISOString().split("T")[0],
+        daily_theme: `ช้อปปิ้งของฝากเมือง ${city} - เดินทางกลับกรุงเทพฯ (สนามบินสุวรรณภูมิ)`,
+        hotel_name_suggestion: `โรงแรมระดับ 4 ดาว ใจกลางเมือง ${city}`,
+        breakfast_included: true,
+        lunch_included: true,
+        dinner_included: false,
+        activities: [
+          {
+            time_period: "เช้า",
+            activity_title: `ช้อปปิ้งของฝากย่านการค้าเมือง ${city}`,
+            location_name: `ถนนคนเดินและย่านการค้า ${city}`,
+            description: `อิสระเดินเล่น **ย่านการค้าเมือง ${city}** เลือกซื้อสินค้าพื้นเมือง ขนม และของฝากชื่อดัง`
+          },
+          {
+            time_period: "บ่าย / เย็น",
+            activity_title: `เดินทางกลับประเทศไทย (สนามบินสุวรรณภูมิ)`,
+            location_name: `สนามบิน ${city} - สนามบินสุวรรณภูมิ`,
+            description: `นำท่านเดินทางสู่สนามบิน เช็คอินเดินทางกลับกรุงเทพฯ (สุวรรณภูมิ) โดยสวัสดิภาพ`
+          }
+        ]
+      };
+    } else {
+      return {
+        day_number: dayNo,
+        date: date.toISOString().split("T")[0],
+        daily_theme: `ไฮไลต์ท่องเที่ยวธรรมชาติต่างเมือง & สถาปัตยกรรมโบราณ ${city} (วันที่ ${dayNo})`,
+        hotel_name_suggestion: `โรงแรมระดับ 4 ดาว ใจกลางเมือง ${city}`,
+        breakfast_included: true,
+        lunch_included: true,
+        dinner_included: true,
+        activities: [
+          {
+            time_period: "เช้า",
+            activity_title: `ชมแลนด์มาร์กประวัติศาสตร์ & มรดกทางวัฒนธรรม ${city}`,
+            location_name: `วัดและสถานที่โบราณ ${city}`,
+            description: `นำท่านชม **สถานที่โบราณและมรดกทางวัฒนธรรมประจำเมือง ${city}** ไหว้พระขอพรเพื่อความเป็นสิริมงคล`,
+            is_highlight: true
+          },
+          {
+            time_period: "กลางวัน",
+            activity_title: `รับประทานอาหารกลางวัน เมนูพิเศษประจำเมือง ${city}`,
+            location_name: `ภัตตาคารท้องถิ่น ${city}`,
+            description: `ลิ้มลองอาหารรสเลิศและเมนูเด็ดขึ้นชื่อประจำภูมิภาค **${city}**`
+          },
+          {
+            time_period: "บ่าย",
+            activity_title: `เที่ยวชมอุทยานและจุดชมวิวเมือง ${city}`,
+            location_name: `จุดชมวิวเมือง ${city}`,
+            description: `เดินทางสู่ **จุดชมวิวเมือง ${city}** ถ่ายภาพทัศนียภาพอันสวยงามตระการตา`,
+            is_highlight: true
+          }
+        ]
+      };
     }
-
-    return {
-      day_number: dayNo,
-      date: date.toISOString().split("T")[0],
-      daily_theme: dailyTheme,
-      hotel_name_suggestion: `โรงแรมระดับมาตรฐาน 4 ดาว ในเมือง ${city} หรือเทียบเท่า`,
-      breakfast_included: dayNo > 1,
-      lunch_included: true,
-      dinner_included: dayNo < duration,
-      activities: [
-        {
-          time_period: dayNo === 1 ? "เช้า / บ่าย" : "เช้า",
-          activity_title: `เที่ยวชมแลนด์มาร์กสำคัญในเมือง ${city}`,
-          location_name: `จุดเช็คอินไฮไลต์ ${city}`,
-          description: `นำท่านเดินทางสู่ **สถานที่ท่องเที่ยวสำคัญประจำเมือง ${city}** สัมผัสบรรยากาศความงดงามและถ่ายภาพเช็คอิน`,
-          is_highlight: true
-        },
-        {
-          time_period: "กลางวัน",
-          activity_title: `รับประทานอาหารกลางวัน เมนูท้องถิ่น ${city}`,
-          location_name: `ร้านอาหารขึ้นชื่อเมือง ${city}`,
-          description: `ลิ้มลองอาหารรสเลิศและเมนูท้องถิ่นขึ้นชื่อประจำเมือง **${city}**`
-        },
-        {
-          time_period: "บ่าย / เย็น",
-          activity_title: `อิสระเดินเล่นย่านวัฒนธรรมและช้อปปิ้ง ${city}`,
-          location_name: `ย่านการค้าเมือง ${city}`,
-          description: `นำท่านสู่ **ย่านการค้าและถนนคนเดินเมือง ${city}** เลือกซื้อของฝาก สินค้าพื้นเมือง และพักผ่อนตามอัธยาศัย`,
-          is_highlight: true
-        }
-      ]
-    };
   });
 
   return {
