@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { ai } from "@/lib/ai";
+import { ai, buildFallbackPlan } from "@/lib/ai";
 
 export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -59,77 +59,17 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
 
     // 2. Fallback to real landmark dictionary if Gemini AI is not active
     if (researchedActivities.length === 0) {
-      if (city.toLowerCase().includes("macao") || city.toLowerCase().includes("มาเก๊า") || country.toLowerCase().includes("macao")) {
-        if (dayNumber === 1) {
-          researchedActivities = [
-            {
-              time_period: "เช้า",
-              activity_title: "ชมซากโบสถ์เซนต์พอล (Ruins of St. Paul's)",
-              location_name: "โบสถ์เซนต์พอล (Ruins of St. Paul's)",
-              description: "นำท่านถ่ายภาพ **โบสถ์เซนต์พอล (Ruins of St. Paul's)** ซากโบสถ์คริสต์สถาปัตยกรรมตะวันตกผสมผสานสัญลักษณ์ศาสนาพุทธ แลนด์มาร์กอันดับหนึ่งของมาเก๊า"
-            },
-            {
-              time_period: "กลางวัน",
-              activity_title: "จัตุรัสเซนาโด้สแควร์ (Senado Square)",
-              location_name: "เซนาโด้สแควร์ (Senado Square)",
-              description: "นำท่านสู่ **เซนาโด้สแควร์ (Senado Square)** จัตุรัสใจกลางเมืองมาเก๊าที่ถูกล้อมรอบด้วยตึกสไตล์ยุโรป มรดกโลก UNESCO"
-            },
-            {
-              time_period: "บ่าย",
-              activity_title: "ไหว้พระขอพร วัดอาม่า (A-Ma Temple)",
-              location_name: "วัดอาม่า (A-Ma Temple)",
-              description: "นำท่านกราบไหว้ขอพร ณ **วัดอาม่า (A-Ma Temple)** หนึ่งในวัดศักดิ์สิทธิ์และเก่าแก่ที่สุดของมาเก๊า ขอพรเรื่องการงาน การเงิน และความมงคล"
-            },
-            {
-              time_period: "เย็น",
-              activity_title: "ถ่ายรูปเจ้าแม่กวนอิมริมทะเล",
-              location_name: "เจ้าแม่กวนอิมริมทะเล (Kun Iam Statue)",
-              description: "นำท่านถ่ายรูปกับ **เจ้าแม่กวนอิมริมทะเล (Kun Iam Statue)** องค์พระทองสัมฤทธิ์ประดิษฐานบนบัวทองคำริมทะเล"
-            }
-          ];
-        } else {
-          researchedActivities = [
-            {
-              time_period: "เช้า",
-              activity_title: "ขอพรหาดรีพัลส์เบย์ & เจ้าแม่กวนอิมอ่องฮ่ำ",
-              location_name: "อ่าวรีพัลส์เบย์ (Repulse Bay)",
-              description: "นำท่านสู่ **อ่าวรีพัลส์เบย์ (Repulse Bay)** อธิษฐานขอพร **เจ้าแม่กวนอิมอ่องฮ่ำ** ข้ามสะพานสีแดงต่ออายุ และโยนเหรียญเข้าปากปลาโชคลาภ"
-            },
-            {
-              time_period: "กลางวัน",
-              activity_title: "หมุนกังหันนำโชค วัดแชกงหมิว",
-              location_name: "วัดแชกงหมิว (Che Kung Temple)",
-              description: "นำท่านไหว้พระขอพร **วัดแชกงหมิว (วัดกังหันนำโชค)** หมุนกังหันพัดพาโชคลาภ ขจัดสิ่งอัปมงคลออกไป"
-            },
-            {
-              time_period: "บ่าย",
-              activity_title: "ผูกด้ายแดงขอพรความรัก วัดหวังต้าเซียน",
-              location_name: "วัดหวังต้าเซียน (Wong Tai Sin Temple)",
-              description: "นำท่านสักการะ **วัดหวังต้าเซียน** วัดชื่อดังที่มีชื่อเสียงด้านการผูกด้ายแดงขอพรเรื่องความรัก"
-            },
-            {
-              time_period: "เย็น",
-              activity_title: "อิสระช้อปปิ้งย่านจิมซาจุ่ย",
-              location_name: "ถนนคนเดินจิมซาจุ่ย (Tsim Sha Tsui)",
-              description: "เพลิดเพลินกับการช้อปปิ้งย่าน **จิมซาจุ่ย (Tsim Sha Tsui)** ชมวิวเส้นขอบฟ้าและอ่าววิกตอเรีย (Victoria Harbour)"
-            }
-          ];
-        }
-      } else {
-        researchedActivities = [
-          {
-            time_period: "เช้า",
-            activity_title: `เยี่ยมชมแลนด์มาร์กสำคัญ ${city}`,
-            location_name: `วัดและพระราชวังโบราณ ${city}`,
-            description: `นำท่านชม **วัดและสถาปัตยกรรมสำคัญประจำเมือง ${city}** ถ่ายภาพเช็คอินจุดท่องเที่ยวอันโดดเด่นประจำภูมิภาค`
-          },
-          {
-            time_period: "บ่าย",
-            activity_title: `ย่านวัฒนธรรมและช้อปปิ้งเมือง ${city}`,
-            location_name: `ถนนคนเดินและย่านการค้า ${city}`,
-            description: `นำท่านสู่ **ถนนคนเดินย่านเมืองเก่า ${city}** สัมผัสวิถีชีวิตท้องถิ่น ลิ้มลองอาหารพื้นเมืองขึ้นชื่อ`
-          }
-        ];
+      const fullFallback = buildFallbackPlan(city, country, Math.max(dayNumber, 4), new Date().toISOString());
+      const dayIdx = Math.min(dayNumber - 1, fullFallback.itinerary.length - 1);
+      const dayData = fullFallback.itinerary[dayIdx];
+
+      if (dayData && dayData.activities) {
+        researchedActivities = dayData.activities.map(act => ({
+          time_period: act.time_period || "เช้า",
+          activity_title: act.activity_title || `ท่องเที่ยว ${city}`,
+          location_name: act.location_name || city,
+          description: act.description || `นำท่านชม **${city}**`
+        }));
       }
     }
 

@@ -109,7 +109,46 @@ export default function TourBuilderClient({ initialPlan }: { initialPlan: any })
             <StatusSelector planId={plan.id} currentStatus={plan.status || "Draft"} />
           </div>
         </div>
-        <div style={{ display: "flex", gap: "10px" }}>
+        <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+          <button
+            className="btn-secondary"
+            style={{ backgroundColor: "#F3E5F5", color: "#6A1B9A", borderColor: "#CE93D8", display: "flex", alignItems: "center", gap: "6px" }}
+            disabled={saving}
+            onClick={async () => {
+              if (!confirm("ต้องการให้ระบบ Gen เนื้อหาแผนการเดินทางใหม่ทั้งหมดสำหรับทริปนี้หรือไม่?")) return;
+              setSaving(true);
+              try {
+                const res = await fetch("/api/generate-plan", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                    customerName: plan.customer?.name || "ลูกค้า",
+                    country: plan.country || "จีน",
+                    mainCity: plan.main_city || "คุนหมิง",
+                    startDate: plan.start_date ? new Date(plan.start_date).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+                    duration: plan.duration || plan.TourDays?.length || 4,
+                    travelerCount: plan.traveler_count || 1,
+                    customerType: "General",
+                    hotelLevel: plan.hotel_level || "4 ดาว"
+                  })
+                });
+                const data = await res.json();
+                if (data.success && data.planId) {
+                  alert("Gen เนื้อหาใหม่สำเร็จ!");
+                  router.push(`/builder/${data.planId}`);
+                } else {
+                  alert(data.error || "เกิดข้อผิดพลาดในการ Gen เนื้อหาใหม่");
+                }
+              } catch (err) {
+                console.error(err);
+                alert("เกิดข้อผิดพลาดในการ Gen เนื้อหาใหม่");
+              } finally {
+                setSaving(false);
+              }
+            }}
+          >
+            ✨ Gen เนื้อหาใหม่ทั้งหมด
+          </button>
           <Link href={`/preview/${plan.id}`} className="btn-secondary">พรีวิว & ดาวน์โหลด</Link>
           <button className="btn-primary" onClick={handleSave} disabled={saving}>
             {saving ? "กำลังบันทึก..." : "บันทึกข้อมูล"}
