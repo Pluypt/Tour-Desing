@@ -121,23 +121,25 @@ export async function POST(req: Request) {
 
     // 2.5 Generate Hero Image using Gemini Imagen
     let heroImageUrl: string | null = null;
-    try {
-      const imagePrompt = `A stunning travel photography hero image for a tour to ${data.mainCity}, ${data.country}. Beautiful landscape or iconic landmark, golden hour lighting, vibrant colors, professional travel photography style, wide angle shot, no text, no people.`;
-      const imageResponse = await ai.models.generateImages({
-        model: 'imagen-3.0-generate-002',
-        prompt: imagePrompt,
-        config: {
-          numberOfImages: 1,
-          aspectRatio: '16:9',
-          outputMimeType: 'image/jpeg',
-        },
-      });
-      const imageBytes = imageResponse.generatedImages?.[0]?.image?.imageBytes;
-      if (imageBytes) {
-        heroImageUrl = `data:image/jpeg;base64,${imageBytes}`;
+    if (process.env.GEMINI_API_KEY) {
+      try {
+        const imagePrompt = `A stunning travel photography hero image for a tour to ${data.mainCity}, ${data.country}. Beautiful landscape or iconic landmark, golden hour lighting, vibrant colors, professional travel photography style, wide angle shot, no text, no people.`;
+        const imageResponse = await ai.models.generateImages({
+          model: 'imagen-3.0-generate-002',
+          prompt: imagePrompt,
+          config: {
+            numberOfImages: 1,
+            aspectRatio: '16:9',
+            outputMimeType: 'image/jpeg',
+          },
+        });
+        const imageBytes = imageResponse.generatedImages?.[0]?.image?.imageBytes;
+        if (imageBytes) {
+          heroImageUrl = `data:image/jpeg;base64,${imageBytes}`;
+        }
+      } catch (imgError) {
+        console.error("Image generation failed (non-critical):", imgError);
       }
-    } catch (imgError) {
-      console.error("Image generation failed (non-critical):", imgError);
     }
 
     if (!heroImageUrl) {
