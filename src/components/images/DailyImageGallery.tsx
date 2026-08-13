@@ -78,20 +78,49 @@ export default function DailyImageGallery({
 
     setUploading(true);
     try {
-      const reader = new FileReader();
-      reader.onload = async (e) => {
-        const base64 = e.target?.result as string;
+      const img = new Image();
+      const objectUrl = URL.createObjectURL(file);
+      
+      img.onload = async () => {
+        URL.revokeObjectURL(objectUrl);
+        
+        // Resize to max 1200px width/height for fast loading & small payload size (< 500KB)
+        const MAX_DIM = 1200;
+        let width = img.width;
+        let height = img.height;
+
+        if (width > MAX_DIM || height > MAX_DIM) {
+          if (width > height) {
+            height = Math.round((height * MAX_DIM) / width);
+            width = MAX_DIM;
+          } else {
+            width = Math.round((width * MAX_DIM) / height);
+            height = MAX_DIM;
+          }
+        }
+
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        if (ctx) {
+          ctx.drawImage(img, 0, 0, width, height);
+        }
+        
+        const compressedBase64 = canvas.toDataURL("image/jpeg", 0.82);
+
         const res = await fetch(`/api/tour-days/${dayId}/images`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            image_url: base64,
+            image_url: compressedBase64,
             provider: "manual_upload",
             alt_text: file.name,
             location_name: "อัพโหลดเอง",
             sort_order: images.length,
           }),
         });
+
         const data = await res.json();
         if (data.success) {
           setImages(prev => [...prev, data.image]);
@@ -101,7 +130,14 @@ export default function DailyImageGallery({
         setUploading(false);
         if (fileInputRef.current) fileInputRef.current.value = "";
       };
-      reader.readAsDataURL(file);
+
+      img.onerror = () => {
+        alert("ไม่สามารถอ่านรูปภาพนี้ได้");
+        setUploading(false);
+        if (fileInputRef.current) fileInputRef.current.value = "";
+      };
+
+      img.src = objectUrl;
     } catch (error) {
       alert("เกิดข้อผิดพลาดในการอ่านไฟล์");
       setUploading(false);

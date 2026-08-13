@@ -39,8 +39,8 @@ export async function POST(req: Request, { params }: { params: Promise<{ dayId: 
     });
 
     return NextResponse.json({ success: true, image });
-  } catch (error) {
-    console.error(error);
-    return NextResponse.json({ success: false, error: "Failed to save image" }, { status: 500 });
+  } catch (error: any) {
+    console.error("Error saving tour day image:", error);
+    return NextResponse.json({ success: false, error: "Failed to save image: " + (error?.message || String(error)) }, { status: 500 });
   }
 }
