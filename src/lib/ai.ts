@@ -14,6 +14,9 @@ export const ai = new Proxy({} as GoogleGenAI, {
     }
     const instance = new GoogleGenAI({ apiKey: key });
     const val = (instance as any)[prop];
+    if (typeof val === "object" && val !== null) {
+      return val;
+    }
     return typeof val === "function" ? val.bind(instance) : val;
   }
 });

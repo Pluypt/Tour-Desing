@@ -98,7 +98,7 @@ export async function POST(req: Request) {
         aiPlan = buildFallbackPlan(data.mainCity, data.country, duration, data.startDate);
       } else {
         const response = await ai.models.generateContent({
-          model: 'gemini-2.5-flash',
+          model: 'gemini-2.0-flash',
           contents: Array.isArray(promptParts) 
             ? [{ role: 'user', parts: promptParts }] 
             : promptParts,
