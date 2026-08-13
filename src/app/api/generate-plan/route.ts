@@ -183,7 +183,7 @@ export async function POST(req: Request) {
               data: {
                 tour_day_id: day.id,
                 time_text: activity.time_period || activity.time_start || "",
-                activity_title: activity.location_name,
+                activity_title: activity.activity_title || activity.location_name,
                 activity_description: activity.description,
                 location_name: activity.location_name,
                 sort_order: i + 1,

@@ -346,7 +346,7 @@ export function buildFallbackPlan(
   // Try to find matching city preset key
   const matchKey = Object.keys(DESTINATION_DATA).find(k => 
     cityInput.includes(k) || 
-    (k === "kunming" && (cityInput.includes("คุนหมิง") || cityInput.includes("kunming"))) ||
+    (k === "kunming" && (cityInput.includes("คุนหมิง") || cityInput.includes("คุณหมิง") || cityInput.includes("kunming"))) ||
     (k === "guangzhou" && (cityInput.includes("กวางโจว") || cityInput.includes("guangzhou"))) ||
     (k === "macao" && (cityInput.includes("มาเก๊า") || cityInput.includes("ฮ่องกง")))
   );
