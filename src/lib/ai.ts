@@ -6,18 +6,29 @@ export function getAI() {
   return new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 }
 
+let cachedInstance: GoogleGenAI | null = null;
+let cachedKey: string | undefined = undefined;
+
+function getInstance(): GoogleGenAI {
+  const key = process.env.GEMINI_API_KEY;
+  if (!key) {
+    throw new Error("GEMINI_API_KEY environment variable is not configured");
+  }
+  if (!cachedInstance || cachedKey !== key) {
+    cachedInstance = new GoogleGenAI({ apiKey: key });
+    cachedKey = key;
+  }
+  return cachedInstance;
+}
+
 export const ai = new Proxy({} as GoogleGenAI, {
   get(_target, prop) {
-    const key = process.env.GEMINI_API_KEY;
-    if (!key) {
-      throw new Error("GEMINI_API_KEY is missing");
-    }
-    const instance = new GoogleGenAI({ apiKey: key });
+    const instance = getInstance();
     const val = (instance as any)[prop];
-    if (typeof val === "object" && val !== null) {
-      return val;
+    if (typeof val === "function") {
+      return val.bind(instance);
     }
-    return typeof val === "function" ? val.bind(instance) : val;
+    return val;
   }
 });
 
