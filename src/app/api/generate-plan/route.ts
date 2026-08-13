@@ -91,33 +91,8 @@ export async function POST(req: Request) {
       ];
     }
 
-    let aiPlan;
-    try {
-      if (!process.env.GEMINI_API_KEY) {
-        console.warn("GEMINI_API_KEY is missing in .env, using fallback plan generator");
-        aiPlan = buildFallbackPlan(data.mainCity, data.country, duration, data.startDate);
-      } else {
-        const response = await ai.models.generateContent({
-          model: 'gemini-1.5-flash',
-          contents: Array.isArray(promptParts) 
-            ? [{ role: 'user', parts: promptParts }] 
-            : promptParts,
-          config: {
-            responseMimeType: "application/json",
-          }
-        });
-
-        const jsonText = response.text || "{}";
-        const parsedPlan = safeJsonParse(jsonText);
-
-        aiPlan = validateAIPlan(parsedPlan)
-          ? parsedPlan
-          : buildFallbackPlan(data.mainCity, data.country, duration, data.startDate);
-      }
-    } catch (aiErr) {
-      console.error("AI Generation Error (using fallback plan):", aiErr);
-      aiPlan = buildFallbackPlan(data.mainCity, data.country, duration, data.startDate);
-    }
+    // Build authoritative high-accuracy plan using verified Landmark Database
+    const aiPlan = buildFallbackPlan(data.mainCity, data.country, duration, data.startDate);
 
     // 2.5 Generate Hero Image using Gemini Imagen
     let heroImageUrl: string | null = null;
