@@ -118,28 +118,14 @@ export default function TourBuilderClient({ initialPlan }: { initialPlan: any })
               if (!confirm("ต้องการให้ระบบ Gen เนื้อหาแผนการเดินทางใหม่ทั้งหมดสำหรับทริปนี้หรือไม่?")) return;
               setSaving(true);
               try {
-                const res = await fetch("/api/generate-plan", {
+                const res = await fetch(`/api/tour-plans/${plan.id}/regenerate`, {
                   method: "POST",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({
-                    customerName: plan.customer?.name || "ลูกค้า",
-                    country: plan.country || "จีน",
-                    mainCity: plan.main_city || "คุนหมิง",
-                    startDate: plan.start_date ? new Date(plan.start_date).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
-                    endDate: plan.end_date ? new Date(plan.end_date).toISOString().split('T')[0] : new Date(Date.now() + (plan.duration || 4) * 86400000).toISOString().split('T')[0],
-                    duration: plan.duration || plan.TourDays?.length || 4,
-                    travelerCount: plan.traveler_count || 1,
-                    customerType: "General",
-                    hotelLevel: plan.hotel_level || "4 ดาว",
-                    tripType: plan.trip_type || "Private Tour",
-                    theme: plan.theme || "Nature",
-                    budgetPerPerson: plan.budget_per_person || 0
-                  })
+                  headers: { "Content-Type": "application/json" }
                 });
                 const data = await res.json();
-                if (data.success && data.planId) {
-                  alert("Gen เนื้อหาใหม่สำเร็จ!");
-                  router.push(`/builder/${data.planId}`);
+                if (data.success) {
+                  alert("Gen เนื้อหาเรียบร้อยแล้ว!");
+                  window.location.reload();
                 } else {
                   alert(data.error || "เกิดข้อผิดพลาดในการ Gen เนื้อหาใหม่");
                 }
