@@ -273,61 +273,69 @@ const DESTINATION_DATA: Record<string, {
   }
 };
 
-/**
- * Build a fallback itinerary with real researched landmarks.
- */
 export function buildFallbackPlan(
   mainCity: string,
   country: string,
   duration: number,
   startDate: string
 ): AIPlan {
-  const cityKey = (mainCity || country || "").toLowerCase();
-  
-  // Find matching destination preset key
-  const matchKey = Object.keys(DESTINATION_DATA).find(k => cityKey.includes(k)) || "macao";
-  const preset = DESTINATION_DATA[matchKey] || DESTINATION_DATA.macao;
+  const city = mainCity || "ไฮไลต์";
+  const cntry = country || "";
+  const destName = cntry ? `${city} (${cntry})` : city;
 
   const itinerary = Array.from({ length: duration }, (_, i) => {
     const date = new Date(
       new Date(startDate).getTime() + i * 24 * 60 * 60 * 1000
     );
     const dayNo = i + 1;
-    const presetDayIndex = Math.min(i, preset.days.length - 1);
-    const dayPreset = preset.days[presetDayIndex];
+
+    let dailyTheme = `เดินทางสู่เมือง ${city} - เที่ยวชมแลนด์มาร์กสำคัญประจำวัน`;
+    if (dayNo === 1) {
+      dailyTheme = `กรุงเทพฯ (สนามบินสุวรรณภูมิ) - ออกเดินทางสู่ ${city} - เช็คอินแลนด์มาร์กแรก`;
+    } else if (dayNo === duration) {
+      dailyTheme = `เก็บตกย่านช้อปปิ้งเมือง ${city} - เดินทางกลับกรุงเทพฯ (สนามบินสุวรรณภูมิ)`;
+    }
 
     return {
       day_number: dayNo,
       date: date.toISOString().split("T")[0],
-      daily_theme: dayPreset?.theme || `ไฮไลต์ท่องเที่ยวเมือง ${mainCity} วันที่ ${dayNo}`,
-      hotel_name_suggestion: preset.hotel || `โรงแรมระดับ 4 ดาว เมือง ${mainCity}`,
+      daily_theme: dailyTheme,
+      hotel_name_suggestion: `โรงแรมระดับมาตรฐานในเมือง ${city} หรือเทียบเท่า`,
       breakfast_included: dayNo > 1,
       lunch_included: true,
       dinner_included: dayNo < duration,
-      activities: dayPreset?.activities || [
+      activities: [
         {
-          time_period: "เช้า",
-          activity_title: `เที่ยวชมแลนด์มาร์กสำคัญ ${mainCity}`,
-          location_name: `แลนด์มาร์กใจกลางเมือง ${mainCity}`,
-          description: `นำท่านชม **แลนด์มาร์กชื่อดังประจำเมือง ${mainCity}** ถ่ายภาพเช็คอินจุดท่องเที่ยวอันโดดเด่น`
+          time_period: dayNo === 1 ? "เช้า / บ่าย" : "เช้า",
+          activity_title: `เที่ยวชมแลนด์มาร์กและสถานที่สำคัญในเมือง ${city}`,
+          location_name: `แลนด์มาร์กไฮไลต์ ${city}`,
+          description: `นำท่านเดินทางสู่ **สถานที่ท่องเที่ยวสำคัญประจำเมือง ${city}** ถ่ายภาพเช็คอินจุดไฮไลต์ยอดนิยม`,
+          is_highlight: true
         },
         {
-          time_period: "บ่าย",
-          activity_title: `สัมผัสย่านวัฒนธรรมและช้อปปิ้ง ${mainCity}`,
-          location_name: `ย่านการค้าเมือง ${mainCity}`,
-          description: `นำท่านสู่ **ย่านการค้าและวัฒนธรรมเมือง ${mainCity}** ลิ้มลองอาหารท้องถิ่นขึ้นชื่อประจำภูมิภาค`
+          time_period: "กลางวัน",
+          activity_title: `รับประทานอาหารกลางวัน เมนูท้องถิ่น ${city}`,
+          location_name: `ร้านอาหารขึ้นชื่อเมือง ${city}`,
+          description: `ลิ้มลองอาหารรสเลิศและเมนูท้องถิ่นขึ้นชื่อในย่าน **เมือง ${city}**`
+        },
+        {
+          time_period: "บ่าย / เย็น",
+          activity_title: `อิสระเดินเล่นย่านวัฒนธรรมและช้อปปิ้ง ${city}`,
+          location_name: `ย่านการค้าเมือง ${city}`,
+          description: `นำท่านสู่ **ย่านการค้าและถนนคนเดินเมือง ${city}** เลือกซื้อของฝาก สินค้าพื้นเมือง และพักผ่อนตามอัธยาศัย`,
+          is_highlight: true
         }
       ]
     };
   });
 
   return {
-    tour_name: preset.tourName || `โปรแกรมท่องเที่ยว ${mainCity} - ${country} ${duration} วัน ${duration - 1} คืน`,
-    summary: `แพลนท่องเที่ยวสัมผัสไฮไลต์แลนด์มาร์กจริง ${mainCity}, ${country} ระยะเวลา ${duration} วัน`,
-    airline: "Thai Airways / Greater Bay Airlines",
-    flight_route: `BKK - ${mainCity} - BKK`,
-    outbound_flight: "HB296 BKK 01:55 - 06:00 HKG",
-    return_flight: "HB295 HKG 22:15 - 00:15 BKK",
+    tour_name: `โปรแกรมท่องเที่ยว ${destName} ${duration} วัน ${Math.max(1, duration - 1)} คืน`,
+    summary: `แพลนท่องเที่ยวสัมผัสไฮไลต์แลนด์มาร์กสำคัญเมือง ${city} ระยะเวลา ${duration} วัน`,
+    airline: "สายการบินชั้นนำ (Standard Airlines)",
+    flight_route: `BKK - ${city} - BKK`,
+    outbound_flight: "ออกเดินทางจากสุวรรณภูมิ (เวลาตามรอบเที่ยวบิน)",
+    return_flight: "เดินทางกลับถึงสุวรรณภูมิ โดยสวัสดิภาพ",
     itinerary,
   };
 }

@@ -44,8 +44,8 @@ const customerAdapter = {
           }
         }
       }
-      const snapshot = await q.count().get();
-      return snapshot.data().count;
+      const snapshot = await q.get();
+      return snapshot.size;
     }, 0);
   },
 
@@ -67,8 +67,8 @@ const customerAdapter = {
 
       if (args?.include?._count?.select?.TourPlans) {
         for (const customer of customers) {
-          const planSnap = await adminDb.collection('tour_plans').where('customer_id', '==', customer.id).count().get();
-          customer._count = { TourPlans: planSnap.data().count };
+          const planSnap = await adminDb.collection('tour_plans').where('customer_id', '==', customer.id).get();
+          customer._count = { TourPlans: planSnap.size };
         }
       }
 
@@ -235,8 +235,8 @@ const tourPlanAdapter = {
           }
         }
       }
-      const snapshot = await q.count().get();
-      return snapshot.data().count;
+      const snapshot = await q.get();
+      return snapshot.size;
     }, 0);
   },
 

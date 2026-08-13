@@ -12,19 +12,19 @@ if (!admin.apps.length) {
       const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY);
       app = admin.initializeApp({
         credential: admin.credential.cert(serviceAccount),
-        projectId: "tour-desing"
+        projectId: serviceAccount.project_id || "tourdesing-e0529"
       });
       console.log('Firebase Admin initialized with FIREBASE_SERVICE_ACCOUNT_KEY env.');
     } else if (fs.existsSync(serviceAccountPath)) {
       const serviceAccount = JSON.parse(fs.readFileSync(serviceAccountPath, 'utf8'));
       app = admin.initializeApp({
         credential: admin.credential.cert(serviceAccount),
-        projectId: "tour-desing"
+        projectId: serviceAccount.project_id || "tourdesing-e0529"
       });
       console.log('Firebase Admin initialized with key file.');
     } else {
       app = admin.initializeApp({
-        projectId: "tour-desing"
+        projectId: "tourdesing-e0529"
       });
       console.warn('Firebase Admin initialized without service account key. Place firebase-admin-key.json in project root for full admin permissions.');
     }
