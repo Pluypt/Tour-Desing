@@ -1,7 +1,9 @@
 import { GoogleGenAI } from "@google/genai";
 
 // Shared Gemini client
-export const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "AIzaSyDummyKeyForInitialization" });
+export const ai = new GoogleGenAI(
+  process.env.GEMINI_API_KEY ? { apiKey: process.env.GEMINI_API_KEY } : {}
+);
 
 /**
  * Safely parse JSON from AI response.
