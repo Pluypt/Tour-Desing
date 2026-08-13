@@ -1,9 +1,22 @@
 import { GoogleGenAI } from "@google/genai";
 
-// Shared Gemini client
-export const ai = new GoogleGenAI(
-  process.env.GEMINI_API_KEY ? { apiKey: process.env.GEMINI_API_KEY } : {}
-);
+// Shared Gemini client instance (created on demand only when API key exists)
+export function getAI() {
+  if (!process.env.GEMINI_API_KEY) return null;
+  return new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+}
+
+export const ai = new Proxy({} as GoogleGenAI, {
+  get(_target, prop) {
+    const key = process.env.GEMINI_API_KEY;
+    if (!key) {
+      throw new Error("GEMINI_API_KEY is missing");
+    }
+    const instance = new GoogleGenAI({ apiKey: key });
+    const val = (instance as any)[prop];
+    return typeof val === "function" ? val.bind(instance) : val;
+  }
+});
 
 /**
  * Safely parse JSON from AI response.
