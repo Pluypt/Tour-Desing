@@ -25,7 +25,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
 
     for (const day of plan.TourDays) {
       const activitiesList = day.TourActivities
-        .map(a => `- ${a.activity_title || ""}: ${a.activity_description || ""}`)
+        .map((a: any) => `- ${a.activity_title || ""}: ${a.activity_description || ""}`)
         .join("\n");
 
       const prompt = `คุณคือผู้ช่วยสร้าง keyword สำหรับค้นหารูปภาพประกอบแผนทัวร์

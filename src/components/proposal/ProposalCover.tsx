@@ -44,8 +44,14 @@ export default function ProposalCover({
   const overlay = getOverlay(overlayStyle, accentColor);
   const textOnImage = overlayStyle === "light" ? "#222" : "#fff";
 
+  const formatThaiDate = (date: Date) => {
+    const d = new Date(date);
+    if (d.getFullYear() > 2500) d.setFullYear(d.getFullYear() - 543);
+    return d.toLocaleDateString("th-TH", { day: "numeric", month: "long", year: "numeric" });
+  };
+
   const dateRange = startDate && endDate
-    ? `${startDate.toLocaleDateString("th-TH", { day: "numeric", month: "long", year: "numeric" })} – ${endDate.toLocaleDateString("th-TH", { day: "numeric", month: "long", year: "numeric" })}`
+    ? `${formatThaiDate(startDate)} – ${formatThaiDate(endDate)}`
     : "-";
 
   return (
@@ -57,40 +63,35 @@ export default function ProposalCover({
         <p style={{ color: "#999", fontSize: "11px", margin: 0 }}>บริการแพ็กเกจทัวร์ต่างประเทศครบวงจร</p>
       </div>
 
-      {/* Hero / Cover Image */}
-      <div style={{
-        width: "100%", height: "240px", borderRadius: "10px", overflow: "hidden",
-        marginBottom: "24px", position: "relative", backgroundColor: "#ddd",
-        backgroundImage: heroImageUrl ? `url(${heroImageUrl})` : undefined,
-        backgroundSize: "cover", backgroundPosition: "center",
-      }}>
-        {heroImageUrl && hasCustomCover && (
-          <>
-            <div style={{ position: "absolute", inset: 0, background: overlay }} />
-            <div style={{ position: "absolute", inset: 0, padding: "20px 24px", display: "flex", flexDirection: "column", justifyContent: "flex-end", color: textOnImage }}>
-              {badgeText && (
-                <div style={{ backgroundColor: accentColor, color: "white", padding: "2px 10px", borderRadius: "12px", fontSize: "10px", fontWeight: 700, width: "fit-content", marginBottom: "8px" }}>
-                  {badgeText}
-                </div>
-              )}
-              {title && <div style={{ fontSize: "20px", fontWeight: 800, lineHeight: 1.2, marginBottom: "4px", textShadow: "0 1px 4px rgba(0,0,0,0.4)" }}>{title}</div>}
-              {subheadline && <div style={{ fontSize: "12px", opacity: 0.9, marginBottom: "8px" }}>{subheadline}</div>}
-              <div style={{ display: "flex", gap: "14px", fontSize: "11px", opacity: 0.85 }}>
-                {travelDateText && <span>📅 {travelDateText}</span>}
-                {priceText && <span style={{ color: "#FFD700", fontWeight: 700 }}>฿ {priceText}</span>}
-              </div>
-            </div>
-            <div style={{ position: "absolute", top: "12px", left: "16px", color: textOnImage, fontSize: "10px", fontWeight: 700, opacity: 0.9, textShadow: "0 1px 3px rgba(0,0,0,0.5)" }}>
-              PR TRAVEL GROUP
-            </div>
-          </>
-        )}
-        {!heroImageUrl && (
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%", color: "#bbb", fontSize: "13px" }}>
+      {/* Hero / Cover Image — use background-image for most reliable cover cropping in PDF engine */}
+      {heroImageUrl ? (
+        <div style={{ textAlign: "center", marginBottom: "24px" }}>
+          <div
+            style={{
+              width: "60%",
+              height: "140mm",         /* ความกว้าง 60% ของ A4 คือ ~105mm ดังนั้นความสูง 3:4 คือ ~140mm */
+              backgroundImage: `url(${heroImageUrl})`,
+              backgroundSize: "cover", /* ตัดส่วนที่เกินออก ไม่บีบสัดส่วนรูป */
+              backgroundPosition: "center",
+              display: "inline-block",
+              borderRadius: "10px",
+            }}
+          />
+        </div>
+      ) : (
+        <div style={{ textAlign: "center", marginBottom: "24px" }}>
+          <div style={{
+            width: "60%", margin: "0 auto",
+            borderRadius: "10px", backgroundColor: "#ddd",
+            height: "140mm", /* ปรับความสูงให้เท่ากับหน้าปกตอนที่มีรูป (140mm) เพื่อรักษาสัดส่วน Layout หน้ากระดาษให้เหมือนกันทุกแพลน */
+            display: "inline-flex",
+            alignItems: "center", justifyContent: "center",
+            color: "#bbb", fontSize: "13px",
+          }}>
             ไม่มีรูปหน้าปก
           </div>
-        )}
-      </div>
+        </div>
+      )}
 
       {/* Tour Title */}
       <div style={{ textAlign: "center", marginBottom: "24px" }}>
@@ -111,7 +112,7 @@ export default function ProposalCover({
             ["เส้นทางบิน", flightRoute || "-"],
             ["จัดทำสำหรับ", customerName || "-"],
           ].map(([label, value]) => (
-            <div key={label} style={{ display: "flex", gap: "8px", fontSize: "12px" }}>
+            <div key={label} className={label === "วันที่เดินทาง" ? "date-display-row" : ""} style={{ display: "flex", gap: "8px", fontSize: "12px" }}>
               <span style={{ color: "#999", minWidth: "110px", flexShrink: 0 }}>{label}:</span>
               <span style={{ color: "#333", fontWeight: 500 }}>{value}</span>
             </div>

@@ -53,7 +53,7 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
               <div style={{ color: "var(--pr-text-muted)", padding: "20px 0", textAlign: "center" }}>ยังไม่มีแพลนทัวร์</div>
             ) : (
               <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-                {customer.TourPlans.map(plan => {
+                {customer.TourPlans.map((plan: any) => {
                   const statusColor = STATUS_COLORS[plan.status || ""] || "#9e9e9e";
                   return (
                     <div key={plan.id} style={{ border: "1px solid var(--border-color)", borderRadius: "8px", padding: "14px 16px" }}>

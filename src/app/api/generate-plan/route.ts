@@ -23,60 +23,52 @@ export async function POST(req: Request) {
     const tourCode = `PR-${data.country?.substring(0, 3).toUpperCase()}-${new Date().getTime().toString().slice(-4)}`;
 
     // 2. Generate Plan using Gemini AI
-    const systemPrompt = `คุณคือสุดยอดกลไกจัดวางเส้นทางท่องเที่ยว (Elite Travel Routing Engine) และผู้เชี่ยวชาญด้านการวางแผนการเดินทางระดับสูง (Master Concierge) หน้าที่ของคุณคือการสร้างแผนการเดินทาง (Itinerary) ที่มีความสมจริงสูง ลำดับสถานที่อย่างมีตรรกะ และปรับแต่งให้เข้ากับพารามิเตอร์ข้อมูลที่ได้รับมาอย่างเคร่งครัด
+    const systemPrompt = `คุณคือผู้เชี่ยวชาญด้านการจัดโปรแกรมทัวร์ต่างประเทศระดับพรีเมียม (Master Travel Itinerary Architect) และ Copywriter มืออาชีพของบริษัททัวร์ชั้นนำ หน้าที่ของคุณคือการสร้างแผนการเดินทาง (Itinerary) ที่มีความสมจริงสูงสุด สถานที่และโรงแรมต้องเป็นสถานที่จริงที่เปิดให้บริการจริงในปัจจุบัน 
 
 คุณต้องส่งออกผลลัพธ์เป็นโครงสร้าง JSON ที่ถูกต้องตามหลักไวยากรณ์ (Valid JSON object) เท่านั้น ห้ามใส่ข้อความอารัมภบท บทสนทนา หรือคำอธิบายใดๆ นอกเหนือจากตัว JSON เด็ดขาด
 
 [ตัวแปรข้อมูลเข้า / INPUT PARAMETERS]
 จุดหมายปลายทาง (Destination): ${data.country}, ${data.mainCity} ${data.secondaryCity ? `และ ${data.secondaryCity}` : ""}
 ระยะเวลา (Duration): ${duration} วัน (ตั้งแต่ ${data.startDate} ถึง ${data.endDate})
-เที่ยวบินขาไป (Flight Arrival): ถึงเวลา ยึดตามความเหมาะสม ณ สนามบิน หลักของเมือง
-เที่ยวบินขากลับ (Flight Departure): ออกเวลา ยึดตามความเหมาะสม ณ สนามบิน หลักของเมือง
 ประเภทลูกค้า (Customer Type): ${data.customerType}
 จำนวนผู้เดินทาง (Total Pax): ${data.travelerCount} ท่าน
-ลักษณะกรุ๊ปและข้อจำกัดทางกายภาพ (Demographics & Accessibility): ${data.ageRange || "ไม่มีข้อจำกัดพิเศษ"}
-จังหวะการเดินทาง (Travel Pace): มาตรฐาน (Standard)
-ความสนใจหลัก (Core Interests): ${data.theme || "ท่องเที่ยวทั่วไป"}
-ระดับโรงแรมที่พัก (Hotel Tier): ${data.hotelLevel}
-ข้อจำกัดด้านอาหาร (Dietary Restrictions): ${data.customerNote || "ไม่มี"}
-หมายเหตุเพิ่มเติม (Additional Notes): ${data.customerNote || "-"}
+ลักษณะกรุ๊ปและข้อจำกัด (Notes & Demographics): ${data.ageRange || "ไม่มีข้อจำกัดพิเศษ"} ${data.customerNote || ""}
+ความสนใจหลัก (Core Interests): ${data.theme || "ท่องเที่ยวทั่วไป ไฮไลต์แลนด์มาร์ก ช้อปปิ้ง ชิมอาหาร"}
+ระดับโรงแรมที่พัก (Hotel Tier): ${data.hotelLevel || "4 ดาว"}
 
-[ข้อบังคับในการจัดเส้นทางและตรรกะอย่างเคร่งครัด / STRICT ROUTING & LOGIC CONSTRAINTS]
-1. ตรรกะเชิงภูมิศาสตร์ (GEOSPATIAL LOGIC): ต้องจัดกลุ่มสถานที่ท่องเที่ยว (POI) ที่อยู่ใกล้เคียงกันทางภูมิศาสตร์หรือย่านเดียวกันให้อยู่ในวันเดียวกันเสมอ หลีกเลี่ยงการจัดตารางที่ต้องเดินทางข้ามเมืองหรือข้ามเขตไปมาในวันเดียวเพื่อป้องกันความเหนื่อยล้า
-2. ความสมจริงด้านเวลา (TIME REALISM):
-   - วันที่ 1 (วันไปถึง): กิจกรรมแรกต้องเริ่มต้นอย่างน้อย 2.5 ชั่วโมง "หลังจาก" เวลาที่เครื่องบินลงจอด
-   - วันสุดท้าย (วันกลับ): กิจกรรมทั้งหมดต้องสิ้นสุดอย่างน้อย 4 ชั่วโมง "ก่อน" เวลาที่เครื่องบินออก
-   - ต้องจัดสรรเวลา 1.5 ถึง 2 ชั่วโมงสำหรับมื้อกลางวันและมื้อค่ำเสมอ
-   - ต้องคำนึงถึงระยะเวลาที่ใช้ในการเดินทาง (Transit time) ระหว่างสถานที่ให้สมเหตุสมผลตามสภาพการจราจรจริง
-3. จังหวะการเที่ยวและความเหนื่อยล้า (PACING & FATIGUE):
-   - จังหวะ "สบายๆ (Relaxed)": กิจกรรมหลักสูงสุด 2-3 แห่ง/วัน
-   - จังหวะ "มาตรฐาน (Standard)": กิจกรรมหลักสูงสุด 3-4 แห่ง/วัน
-   - จังหวะ "อัดแน่น (Packed)": กิจกรรมหลักสูงสุด 4-5 แห่ง/วัน
-4. การปรับแต่งเฉพาะบุคคล (PERSONALIZATION):
-   - ต้องเลือกร้านอาหารที่สอดคล้องกับข้อจำกัดด้านอาหาร อย่างเคร่งครัด ห้ามแนะนำผิดเด็ดขาด
-   - หากระบุว่ามีผู้สูงอายุหรือข้อจำกัดทางกายภาพ ห้ามจัดกิจกรรมที่ต้องปีนเขา เดินขึ้นบันไดสูงชัน หรือตารางที่เหนื่อยล้าเกินไป
-   - เสนอชื่อโรงแรมที่พักให้ตรงกับระดับที่ลูกค้าต้องการ
+[คำแนะนำด้านสไตล์การเขียนและข้อมูลจริง / STRICT CONTENT RULES]
+1. สำนวนการเขียน (TRAVEL AGENCY NARRATIVE STYLE):
+   - เขียนด้วยสำนวนภาษาไทยทางการ สไตล์บริษัททัวร์ชั้นนำ (เช่น "คณะพร้อมกัน ณ ท่าอากาศยานสุวรรณภูมิ...", "นำท่านเดินทางสู่...", "นำท่านถ่ายภาพจุดเช็คอิน...", "อิสระให้ท่านได้เพลิดเพลินกับ...")
+   - ในเนื้อหาคำบรรยาย (description) ให้เน้นตัวหนาด้วยเครื่องหมาย **ชื่อสถานที่** สำหรับสถานที่ท่องเที่ยวสำคัญเสมอ (เช่น "นำท่านเดินทางสู่ **วัดอาม่า** หนึ่งในวัดศักดิ์สิทธิ์และเก่าแก่ที่สุด...")
+2. ข้อมูลสถานที่และโรงแรมจริง (REAL PLACES & REAL HOTELS):
+   - ระบุชื่อสถานที่ท่องเที่ยว จุดเช็คอิน และร้านอาหาร/ย่านช้อปปิ้งจริงในเมืองนั้นๆ
+   - ระบุชื่อโรงแรมที่เปิดให้บริการจริงในเมืองนั้นๆ ตามระดับดาวที่ลูกค้าต้องการ (เช่น "The Kowloon Hotel หรือเทียบเท่า", "Shinagawa Prince Hotel หรือเทียบเท่า", "Chengdu Shangri-La Hotel หรือเทียบเท่า")
+3. ข้อมูลเที่ยวบินและสายการบิน (FLIGHT & ROUTE INFO):
+   - กำหนดชื่อสายการบิน (airline) และรหัสเที่ยวบิน (outbound_flight, return_flight) พร้อมเวลาออกและเวลาถึงที่สมจริงสำหรับเส้นทางนั้นๆ
 
 [รูปแบบโครงสร้าง JSON / JSON OUTPUT SCHEMA]
 {
-  "plan_id": "auto-generated-uuid",
-  "tour_name": "ชื่อแพลนทัวร์ที่น่าสนใจและดูพรีเมียม (ภาษาไทย)",
-  "summary": "สรุปภาพรวมของทริปนี้ความยาว 2 ประโยค (ภาษาไทย)",
-  "total_days": ${duration},
-  "estimated_budget_tier": "Low | Medium | High | Ultra-Luxury",
+  "tour_name": "ชื่อโปรแกรมทัวร์ภาษาไทยสุดหรูและน่าสนใจ (เช่น ไฮไลต์มาเก๊า-ฮ่องกง ไหว้พระขอพร 3 วัน 2 คืน)",
+  "summary": "สรุปภาพรวมของทริปนี้ความยาว 2 ประโยค",
+  "airline": "สายการบิน (เช่น Thai Airways / Greater Bay Airlines / Cathay Pacific)",
+  "flight_route": "เส้นทางบิน (เช่น BKK-HKG / HKG-BKK)",
+  "outbound_flight": "รหัสเที่ยวบินขาไป (เช่น TG600 BKK 08:00 - 11:45 HKG)",
+  "return_flight": "รหัสเที่ยวบินขากลับ (เช่น TG601 HKG 12:45 - 14:30 BKK)",
   "itinerary": [
     {
       "day_number": 1,
       "date": "YYYY-MM-DD",
-      "daily_theme": "คอนเซปต์ของวัน (เช่น วันแรกของการเดินทาง & มนตร์เสน่ห์แห่งเดอะบันด์)",
-      "hotel_name_suggestion": "ชื่อโรงแรมที่แนะนำซึ่งตรงกับระดับที่ต้องการ",
+      "daily_theme": "คอนเซปต์ของวัน (เช่น กรุงเทพฯ (สนามบินสุวรรณภูมิ) - ฮ่องกง - มาเก๊า - โบสถ์เซนต์พอล - เซนาโด้สแควร์)",
+      "hotel_name_suggestion": "ชื่อโรงแรมจริง (เช่น The Kowloon Hotel หรือเทียบเท่า 4 ดาว)",
+      "breakfast_included": false,
+      "lunch_included": true,
+      "dinner_included": true,
       "activities": [
         {
-          "time_start": "HH:MM",
-          "time_end": "HH:MM",
-          "activity_type": "Flight | Transport | Attraction | Dining | Leisure",
-          "location_name": "ชื่อสถานที่หรือชื่อร้านอาหารแบบเจาะจง",
-          "description": "คำอธิบายสั้นๆ ดึงดูดใจ และปรับเนื้อหาให้เข้ากับประเภทลูกค้า",
+          "time_period": "21.00 น. | 00.55 น. | เช้า | กลางวัน | บ่าย | เย็น",
+          "activity_title": "หัวข้อกิจกรรม (เช่น ออกเดินทางสู่ เกาะฮ่องกง / ชมโบสถ์เซนต์พอล)",
+          "location_name": "ชื่อสถานที่จริง",
+          "description": "คำอธิบายรายละเอียดสไตล์ทัวร์ มีเน้น **ชื่อสถานที่สำคัญ** ด้วยตัวหนา",
           "is_highlight": true
         }
       ]
@@ -84,23 +76,47 @@ export async function POST(req: Request) {
   ]
 }`;
 
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
-      contents: systemPrompt,
-      config: {
-        responseMimeType: "application/json",
+    let promptParts: any = systemPrompt;
+
+    if (data.originalPlanFile && data.originalPlanFile.data) {
+      const enhancedPrompt = systemPrompt + "\n\n[ข้อบังคับเพิ่มเติม] ผู้ใช้ได้แนบไฟล์แพลนต้นแบบมาด้วย (เป็นเอกสารหรือรูปภาพที่แนบมานี้) กรุณาสกัดข้อมูลสถานที่ท่องเที่ยว ลำดับวัน และกิจกรรม จากไฟล์แนบนี้เป็นหลัก (ถ้าอ่านออก) เพื่อสร้างแผนการเดินทางให้ตรงกับต้นฉบับมากที่สุด";
+      promptParts = [
+        { text: enhancedPrompt },
+        {
+          inlineData: {
+            data: data.originalPlanFile.data,
+            mimeType: data.originalPlanFile.mimeType
+          }
+        }
+      ];
+    }
+
+    let aiPlan;
+    try {
+      if (!process.env.GEMINI_API_KEY) {
+        console.warn("GEMINI_API_KEY is missing in .env, using fallback plan generator");
+        aiPlan = buildFallbackPlan(data.mainCity, data.country, duration, data.startDate);
+      } else {
+        const response = await ai.models.generateContent({
+          model: 'gemini-2.5-flash',
+          contents: Array.isArray(promptParts) 
+            ? [{ role: 'user', parts: promptParts }] 
+            : promptParts,
+          config: {
+            responseMimeType: "application/json",
+          }
+        });
+
+        const jsonText = response.text || "{}";
+        const parsedPlan = safeJsonParse(jsonText);
+
+        aiPlan = validateAIPlan(parsedPlan)
+          ? parsedPlan
+          : buildFallbackPlan(data.mainCity, data.country, duration, data.startDate);
       }
-    });
-
-    const jsonText = response.text || "{}";
-    const parsedPlan = safeJsonParse(jsonText);
-
-    const aiPlan = validateAIPlan(parsedPlan)
-      ? parsedPlan
-      : buildFallbackPlan(data.mainCity, data.country, duration, data.startDate);
-
-    if (!validateAIPlan(parsedPlan)) {
-      console.error("AI returned invalid plan structure, using fallback");
+    } catch (aiErr) {
+      console.error("AI Generation Error (using fallback plan):", aiErr);
+      aiPlan = buildFallbackPlan(data.mainCity, data.country, duration, data.startDate);
     }
 
     // 2.5 Generate Hero Image using Gemini Imagen
@@ -124,6 +140,20 @@ export async function POST(req: Request) {
       console.error("Image generation failed (non-critical):", imgError);
     }
 
+    if (!heroImageUrl) {
+      const destLower = `${data.mainCity} ${data.country}`.toLowerCase();
+      heroImageUrl = "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=1200&auto=format&fit=crop&q=80";
+      if (destLower.includes("macao") || destLower.includes("macau") || destLower.includes("มาเก๊า")) {
+        heroImageUrl = "https://images.unsplash.com/photo-1548625149-fc4a29cf7092?w=1200&auto=format&fit=crop&q=80";
+      } else if (destLower.includes("hong kong") || destLower.includes("ฮ่องกง")) {
+        heroImageUrl = "https://images.unsplash.com/photo-1506970845246-18f21d533b20?w=1200&auto=format&fit=crop&q=80";
+      } else if (destLower.includes("japan") || destLower.includes("tokyo") || destLower.includes("ญี่ปุ่น")) {
+        heroImageUrl = "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=1200&auto=format&fit=crop&q=80";
+      } else if (destLower.includes("china") || destLower.includes("chengdu") || destLower.includes("เฉิงตู") || destLower.includes("จีน")) {
+        heroImageUrl = "https://images.unsplash.com/photo-1508804185872-d7badad00f7d?w=1200&auto=format&fit=crop&q=80";
+      }
+    }
+
     // 3. Save Plan to Database
     const plan = await prisma.tourPlan.create({
       data: {
@@ -144,6 +174,10 @@ export async function POST(req: Request) {
         status: "Draft",
         customer_note: data.customerNote,
         hero_image_url: heroImageUrl,
+        airline: aiPlan.airline || "Thai Airways / Greater Bay Airlines",
+        flight_route: aiPlan.flight_route || `BKK - ${data.mainCity} - BKK`,
+        outbound_flight: aiPlan.outbound_flight || "HB296 BKK 01:55 - 06:00 HKG",
+        return_flight: aiPlan.return_flight || "HB295 HKG 22:15 - 00:15 BKK",
       }
     });
 
@@ -158,9 +192,9 @@ export async function POST(req: Request) {
             day_title: dayData.daily_theme,
             city: data.mainCity,
             hotel_name: dayData.hotel_name_suggestion,
-            breakfast_included: dayData.day_number > 1,
-            lunch_included: true,
-            dinner_included: dayData.day_number < duration,
+            breakfast_included: dayData.breakfast_included ?? (dayData.day_number > 1),
+            lunch_included: dayData.lunch_included ?? true,
+            dinner_included: dayData.dinner_included ?? (dayData.day_number < duration),
             sort_order: dayData.day_number,
           }
         });
@@ -171,7 +205,7 @@ export async function POST(req: Request) {
             await prisma.tourActivity.create({
               data: {
                 tour_day_id: day.id,
-                time_text: activity.time_start,
+                time_text: activity.time_period || activity.time_start || "",
                 activity_title: activity.location_name,
                 activity_description: activity.description,
                 location_name: activity.location_name,
@@ -184,8 +218,8 @@ export async function POST(req: Request) {
     }
 
     return NextResponse.json({ success: true, planId: plan.id });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error generating plan:", error);
-    return NextResponse.json({ success: false, error: "Failed to generate plan" }, { status: 500 });
+    return NextResponse.json({ success: false, error: "Failed to generate plan: " + (error.message || String(error)) }, { status: 500 });
   }
 }

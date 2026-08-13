@@ -15,13 +15,68 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
       where: { id },
       data: {
         title: body.title,
+        tour_code: body.tour_code ?? undefined,
+        duration: body.duration ? parseInt(body.duration) : undefined,
+        traveler_count: body.traveler_count ? parseInt(body.traveler_count) : undefined,
+        trip_type: body.trip_type ?? undefined,
+        airline: body.airline ?? undefined,
+        flight_route: body.flight_route ?? undefined,
+        outbound_flight: body.outbound_flight ?? undefined,
+        return_flight: body.return_flight ?? undefined,
+        start_date: body.start_date ? new Date(body.start_date) : undefined,
+        end_date: body.end_date ? new Date(body.end_date) : undefined,
+        hotel_level: body.hotel_level ?? undefined,
         hero_image_url: body.hero_image_url ?? undefined,
         selling_price_per_person: body.selling_price_per_person ?? undefined,
         total_selling_price: body.total_selling_price ?? undefined,
-        status: "Draft",
+        status: body.status || "Draft",
         updated_at: new Date()
       }
     });
+
+    // Handle Inclusions
+    if (body.Inclusions) {
+      const existingIncs = await prisma.inclusion.findMany({ where: { tour_plan_id: id } });
+      const currIncIds = body.Inclusions.filter((x: any) => !x.isNew).map((x: any) => x.id);
+      for (const toDelete of existingIncs.filter((x: any) => !currIncIds.includes(x.id))) {
+        await prisma.inclusion.delete({ where: { id: toDelete.id } });
+      }
+      for (const idx in body.Inclusions) {
+        const inc = body.Inclusions[idx];
+        if (inc.isNew) {
+          await prisma.inclusion.create({
+            data: { tour_plan_id: id, item_text: inc.item_text, sort_order: parseInt(idx) }
+          });
+        } else {
+          await prisma.inclusion.update({
+            where: { id: inc.id },
+            data: { item_text: inc.item_text, sort_order: parseInt(idx) }
+          });
+        }
+      }
+    }
+
+    // Handle Exclusions
+    if (body.Exclusions) {
+      const existingExcs = await prisma.exclusion.findMany({ where: { tour_plan_id: id } });
+      const currExcIds = body.Exclusions.filter((x: any) => !x.isNew).map((x: any) => x.id);
+      for (const toDelete of existingExcs.filter((x: any) => !currExcIds.includes(x.id))) {
+        await prisma.exclusion.delete({ where: { id: toDelete.id } });
+      }
+      for (const idx in body.Exclusions) {
+        const exc = body.Exclusions[idx];
+        if (exc.isNew) {
+          await prisma.exclusion.create({
+            data: { tour_plan_id: id, item_text: exc.item_text, sort_order: parseInt(idx) }
+          });
+        } else {
+          await prisma.exclusion.update({
+            where: { id: exc.id },
+            data: { item_text: exc.item_text, sort_order: parseInt(idx) }
+          });
+        }
+      }
+    }
 
     // Update Days and Activities
     for (const day of body.TourDays) {
@@ -42,7 +97,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
       const currentActivityIds = day.TourActivities.filter((a: any) => !a.isNew).map((a: any) => a.id);
       
       // Delete removed activities
-      const activitiesToDelete = existingActivities.filter(a => !currentActivityIds.includes(a.id));
+      const activitiesToDelete = existingActivities.filter((a: any) => !currentActivityIds.includes(a.id));
       for (const toDelete of activitiesToDelete) {
         await prisma.tourActivity.delete({ where: { id: toDelete.id } });
       }

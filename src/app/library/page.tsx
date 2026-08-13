@@ -2,6 +2,8 @@ import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import LibraryActions from "./LibraryActions";
 
+export const dynamic = "force-dynamic";
+
 export default async function TourLibraryPage() {
   const plans = await prisma.tourPlan.findMany({
     orderBy: { updated_at: "desc" },

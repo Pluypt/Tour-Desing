@@ -37,10 +37,21 @@ export default async function ProposalPreviewPage({ params }: { params: Promise<
   return (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center" }}>
       <style>{`
+        #proposal-document.hide-dates .date-display { display: none !important; }
+        #proposal-document.hide-dates .date-display-row { display: none !important; }
         @media print {
-          @page { size: A4; margin: 0; }
+          @page { size: A4; margin: 15mm 18mm; }
           body { margin: 0; }
-          #proposal-document { box-shadow: none !important; width: 100% !important; }
+          #proposal-document { box-shadow: none !important; width: 100% !important; margin: 0 !important; padding: 0 !important; }
+          * {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+            color-adjust: exact !important;
+          }
+          img {
+            max-width: 100% !important;
+            page-break-inside: avoid;
+          }
         }
       `}</style>
 
@@ -91,8 +102,19 @@ export default async function ProposalPreviewPage({ params }: { params: Promise<
           depositAmount={null}
         />
 
-        {/* 3. Short Itinerary */}
-        <ShortItinerarySection days={plan.TourDays} />
+        {/* 3. Short Itinerary Table */}
+        <ShortItinerarySection
+          days={plan.TourDays}
+          title={plan.title}
+          duration={plan.duration}
+          startDate={plan.start_date}
+          endDate={plan.end_date}
+          airline={plan.airline}
+          flightRoute={plan.flight_route}
+          outboundFlight={plan.outbound_flight}
+          returnFlight={plan.return_flight}
+          hotelLevel={plan.hotel_level}
+        />
 
         {/* 4. Inclusions & Exclusions */}
         <InclusionExclusionSection

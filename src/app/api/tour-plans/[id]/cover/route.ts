@@ -4,11 +4,42 @@ import { prisma } from "@/lib/prisma";
 export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
-    const cover = await prisma.tourCoverDesign.findFirst({
-      where: { tour_plan_id: id },
-      orderBy: { created_at: "desc" },
-    });
-    return NextResponse.json({ success: true, cover });
+    
+    // Fetch both cover design and main tour plan
+    const [cover, plan] = await Promise.all([
+      prisma.tourCoverDesign.findFirst({
+        where: { tour_plan_id: id },
+        orderBy: { created_at: "desc" },
+      }),
+      prisma.tourPlan.findUnique({
+        where: { id },
+      })
+    ]);
+
+    if (!plan) {
+      return NextResponse.json({ success: false, error: "Plan not found" }, { status: 404 });
+    }
+
+    const defaultHeadline = plan.title || "";
+    const defaultSubheadline = [plan.country, plan.main_city].filter(Boolean).join(" - ");
+    const defaultDateText = plan.duration ? `${plan.duration} วัน` : "";
+    const defaultBadge = plan.trip_type || "";
+
+    const responseCover = {
+      template_name: cover?.template_name || "Premium Proposal",
+      background_url: cover?.background_url || plan.hero_image_url || "",
+      headline: cover?.headline || defaultHeadline,
+      subheadline: cover?.subheadline || defaultSubheadline,
+      travel_date_text: cover?.travel_date_text || defaultDateText,
+      price_text: cover?.price_text || "",
+      badge_text: cover?.badge_text || defaultBadge,
+      highlight_text: cover?.highlight_text || "",
+      theme_color: cover?.theme_color || "#D32F2F",
+      text_color: cover?.text_color || "#FFFFFF",
+      overlay_style: cover?.overlay_style || "dark",
+    };
+
+    return NextResponse.json({ success: true, cover: responseCover });
   } catch (error) {
     console.error(error);
     return NextResponse.json({ success: false, error: "Failed to fetch cover" }, { status: 500 });

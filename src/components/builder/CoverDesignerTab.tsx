@@ -236,7 +236,7 @@ export default function CoverDesignerTab({ planId }: { planId: string }) {
       <div>
         <div style={{ fontSize: "0.85rem", color: "var(--pr-text-muted)", marginBottom: "8px", fontWeight: 600 }}>ตัวอย่างหน้าปก</div>
         <div style={{
-          width: "100%", aspectRatio: "16/9", borderRadius: "10px", overflow: "hidden",
+          width: "100%", aspectRatio: "3/4", borderRadius: "10px", overflow: "hidden",
           position: "relative", backgroundColor: "#222",
           backgroundImage: cover.background_url ? `url(${cover.background_url})` : undefined,
           backgroundSize: "cover", backgroundPosition: "center",
