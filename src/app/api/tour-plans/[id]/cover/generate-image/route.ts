@@ -32,7 +32,7 @@ Do not include text, logo, watermark, or people faces.`;
           },
         });
 
-        const imageBytes = imageResponse.generatedImages?.[0]?.image?.imageBytes;
+        const imageBytes = (imageResponse as any).generatedImages?.[0]?.image?.imageBytes;
         if (imageBytes) {
           backgroundUrl = `data:image/jpeg;base64,${imageBytes}`;
         }

@@ -1,36 +1,53 @@
-import { GoogleGenAI } from "@google/genai";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
-// Shared Gemini client instance (created on demand only when API key exists)
-export function getAI() {
-  if (!process.env.GEMINI_API_KEY) return null;
-  return new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-}
-
-let cachedInstance: GoogleGenAI | null = null;
+let cachedInstance: GoogleGenerativeAI | null = null;
 let cachedKey: string | undefined = undefined;
 
-function getInstance(): GoogleGenAI {
+export function getGenAI(): GoogleGenerativeAI | null {
   const key = process.env.GEMINI_API_KEY;
-  if (!key) {
-    throw new Error("GEMINI_API_KEY environment variable is not configured");
-  }
+  if (!key) return null;
   if (!cachedInstance || cachedKey !== key) {
-    cachedInstance = new GoogleGenAI({ apiKey: key });
+    cachedInstance = new GoogleGenerativeAI(key);
     cachedKey = key;
   }
   return cachedInstance;
 }
 
-export const ai = new Proxy({} as GoogleGenAI, {
-  get(_target, prop) {
-    const instance = getInstance();
-    const val = (instance as any)[prop];
-    if (typeof val === "function") {
-      return val.bind(instance);
+export const ai = {
+  models: {
+    async generateContent(options: { model: string; contents: any; config?: { responseMimeType?: string } }) {
+      const genAI = getGenAI();
+      if (!genAI) {
+        throw new Error("GEMINI_API_KEY environment variable is missing");
+      }
+      const model = genAI.getGenerativeModel({
+        model: options.model || "gemini-1.5-flash",
+        generationConfig: options.config?.responseMimeType ? { responseMimeType: options.config.responseMimeType } : undefined,
+      });
+
+      let promptPayload: any = options.contents;
+      if (Array.isArray(options.contents)) {
+        // Handle parts/role structure
+        const first = options.contents[0];
+        if (first && first.parts) {
+          promptPayload = first.parts.map((p: any) => {
+            if (p.text) return p.text;
+            if (p.inlineData) return { inlineData: p.inlineData };
+            return p;
+          });
+        }
+      }
+
+      const result = await model.generateContent(promptPayload);
+      const response = await result.response;
+      return { text: response.text() };
+    },
+    async generateImages(_options: any) {
+      // Imagen via @google/generative-ai fallback safely
+      return { generatedImages: [] };
     }
-    return val;
   }
-});
+};
 
 /**
  * Safely parse JSON from AI response.

@@ -98,7 +98,7 @@ export async function POST(req: Request) {
         aiPlan = buildFallbackPlan(data.mainCity, data.country, duration, data.startDate);
       } else {
         const response = await ai.models.generateContent({
-          model: 'gemini-2.0-flash',
+          model: 'gemini-1.5-flash',
           contents: Array.isArray(promptParts) 
             ? [{ role: 'user', parts: promptParts }] 
             : promptParts,
@@ -133,7 +133,7 @@ export async function POST(req: Request) {
             outputMimeType: 'image/jpeg',
           },
         });
-        const imageBytes = imageResponse.generatedImages?.[0]?.image?.imageBytes;
+        const imageBytes = (imageResponse as any).generatedImages?.[0]?.image?.imageBytes;
         if (imageBytes) {
           heroImageUrl = `data:image/jpeg;base64,${imageBytes}`;
         }

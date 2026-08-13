@@ -32,7 +32,7 @@ Composition: portrait orientation, vertical frame. No text, no logos.`;
           },
         });
 
-        const imageBytes = imageResponse.generatedImages?.[0]?.image?.imageBytes;
+        const imageBytes = (imageResponse as any).generatedImages?.[0]?.image?.imageBytes;
         if (imageBytes) {
           heroImageUrl = `data:image/jpeg;base64,${imageBytes}`;
         }
