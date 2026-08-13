@@ -107,20 +107,198 @@ export function validateAIPlan(plan: unknown): plan is AIPlan {
 /**
  * Real destination dictionary for fallback generation
  */
+/**
+ * Comprehensive real landmark database for various popular cities
+ */
 const DESTINATION_DATA: Record<string, {
   tourName: string;
   hotel: string;
+  airline: string;
+  flightRoute: string;
+  outboundFlight: string;
+  returnFlight: string;
   days: Array<{
     theme: string;
     activities: Array<{ time_period: string; activity_title: string; location_name: string; description: string; is_highlight?: boolean }>;
   }>;
 }> = {
-  macao: {
-    tourName: "ไฮไลต์ มาเก๊า - ฮ่องกง ไหว้พระขอพร 3 วัน 2 คืน",
-    hotel: "The Kowloon Hotel หรือเทียบเท่า 4 ดาว",
+  kunming: {
+    tourName: "มหัศจรรย์ คุนหมิง ตาหลี่ ลี่เจียง ภูเขาหิมะมังกรหยก",
+    hotel: "Kunming Grand Park Hotel หรือเทียบเท่า 4 ดาว",
+    airline: "China Eastern Airlines (MU) / Thai Airways (TG)",
+    flightRoute: "BKK - KMG - BKK",
+    outboundFlight: "MU748 BKK 15:55 - 19:30 KMG",
+    returnFlight: "MU747 KMG 13:15 - 14:55 BKK",
     days: [
       {
-        theme: "กรุงเทพฯ (สนามบินสุวรรณภูมิ) - ฮ่องกง - ข้ามสะพานมาเก๊า HZMB - โบสถ์เซนต์พอล - เซนาโด้สแควร์ - วัดอาม่า - เจ้าแม่กวนอิมริมทะเล",
+        theme: "กรุงเทพฯ (สนามบินสุวรรณภูมิ) - คุนหมิง (สนามบินฉางสุ่ย) - เข้าสู่ที่พักเมืองคุนหมิง",
+        activities: [
+          {
+            time_period: "13.00 น.",
+            activity_title: "พร้อมกัน ณ สนามบินสุวรรณภูมิ",
+            location_name: "สนามบินสุวรรณภูมิ (BKK)",
+            description: "คณะพร้อมกัน ณ **ท่าอากาศยานสุวรรณภูมิ** อาคารผู้โดยสารขาออก เช็คอินเคาน์เตอร์สายการบิน China Eastern Airlines"
+          },
+          {
+            time_period: "15.55 น.",
+            activity_title: "บินลัดฟ้าสู่เมืองคุนหมิง",
+            location_name: "สนามบินนานาชาติคุนหมิงฉางสุ่ย (KMG)",
+            description: "ออกเดินทางสู่ **นครคุนหมิง** โดยเที่ยวบิน **MU748** สัมผัสเมืองแห่งฤดูใบไม้ผลิ"
+          },
+          {
+            time_period: "19.30 น.",
+            activity_title: "เดินทางถึงคุนหมิง - เช็คอินเข้าสู่ที่พัก",
+            location_name: "โรงแรมใจกลางเมืองคุนหมิง",
+            description: "เดินทางถึง **สนามบินคุนหมิงฉางสุ่ย** ผ่านพิธีการตรวจคนเข้าเมือง จากนั้นนำท่านเดินทางเข้าสู่ที่พักพักผ่อนตามอัธยาศัย",
+            is_highlight: true
+          }
+        ]
+      },
+      {
+        theme: "คุนหมิง - ชมอุทยานป่าหินมรดกโลก (Stone Forest) - ตำหนักทองจินเตี้ยน - ถนนคนเดินหนานผิง",
+        activities: [
+          {
+            time_period: "เช้า",
+            activity_title: "มหัศจรรย์มรดกโลก อุทยานป่าหิน (Stone Forest)",
+            location_name: "อุทยานป่าหิน (Stone Forest National Park)",
+            description: "นำท่านชม **อุทยานป่าหิน (Stone Forest)** มรดกโลกทางธรรมชาติ UNESCO ชมกลุ่มเสาหินปูนธรรมชาติรูปร่างแปลกตาอันงดงามตระการตา",
+            is_highlight: true
+          },
+          {
+            time_period: "กลางวัน",
+            activity_title: "รับประทานอาหารกลางวัน เมนูสุกี้เห็ดคุนหมิง",
+            location_name: "ร้านอาหารพื้นเมืองคุนหมิง",
+            description: "ลิ้มลองเมนูขึ้นชื่อ **สุกี้เห็ดคุนหมิง** ซุปเห็ดธรรมชาติเสฉวนรสกลมกล่อม"
+          },
+          {
+            time_period: "บ่าย",
+            activity_title: "ชมตำหนักทองจินเตี้ยน (Golden Temple)",
+            location_name: "ตำหนักทองจินเตี้ยน",
+            description: "นำท่านสู่ **ตำหนักทองจินเตี้ยน** อาคารทองสัมฤทธิ์ที่ใหญ่ที่สุดในจีน สร้างด้วยทองสัมฤทธิ์โบราณบนยอดเขาหมิงเฟิง",
+            is_highlight: true
+          },
+          {
+            time_period: "เย็น",
+            activity_title: "ช้อปปิ้งถนนคนเดินหนานผิง & ซุ้มประตูม้าทองไก่หยก",
+            location_name: "ถนนคนเดินหนานผิง (Nanping Pedestrian Street)",
+            description: "อิสระเดินเล่น **ถนนคนเดินหนานผิง** และถ่ายภาพกับ **ซุ้มประตูม้าทองไก่หยก** สัญลักษณ์อันเก่าแก่ใจกลางนครคุนหมิง",
+            is_highlight: true
+          }
+        ]
+      },
+      {
+        theme: "คุนหมิง - วัดหยวนทง - ทะเลสาบเตียนฉือ (วัดหลงเหมิน เขากวางเอ๋อร์)",
+        activities: [
+          {
+            time_period: "เช้า",
+            activity_title: "ไหว้พระขอพร วัดหยวนทง (Yuantong Temple)",
+            location_name: "วัดหยวนทง (Yuantong Temple)",
+            description: "นำท่านสักการะ **วัดหยวนทง** วัดพุทธที่ใหญ่และเก่าแก่ที่สุดในคุนหมิง อายุกว่า 1,200 ปี ไหว้พระพรหมไทยโบราณและองค์เจ้าแม่กวนอิม",
+            is_highlight: true
+          },
+          {
+            time_period: "กลางวัน",
+            activity_title: "รับประทานอาหารกลางวัน เมนูอาหารจีนเสฉวน-ยูนนาน",
+            location_name: "ภัตตาคารท้องถิ่นยูนนาน",
+            description: "รับประทานอาหารกลางวัน ณ ภัตตาคาร ลิ้มลองอาหารพื้นเมืองยูนนานแท้ๆ"
+          },
+          {
+            time_period: "บ่าย",
+            activity_title: "นั่งกระเช้าขึ้น เขากวางเอ๋อร์ & ลอดประตูมังกรหลงเหมิน",
+            location_name: "เขากวางเอ๋อร์ - ประตูมังกรหลงเหมิน",
+            description: "นั่งกระเช้าไฟฟ้าขึ้น **เขากวางเอ๋อร์** ชมทัศนียภาพ **ทะเลสาบเตียนฉือ** และลอด **ประตูมังกรหลงเหมิน** เชื่อว่าลอดแล้วจะมีความเจริญรุ่งเรือง",
+            is_highlight: true
+          },
+          {
+            time_period: "เย็น",
+            activity_title: "รับประทานอาหารเย็น เมนูเป็ดปักกิ่งยูนนาน",
+            location_name: "ภัตตาคารเป็ดปักกิ่งคุนหมิง",
+            description: "ลิ้มรสชาติ **เป็ดปักกิ่งสไตล์ยูนนาน** หนังกรอบเนื้อนุ่ม พร้อมน้ำจิ้มรสเด็ด"
+          }
+        ]
+      },
+      {
+        theme: "คุนหมิง - ตลาดดอกไม้โต่วหนาน - สนามบินคุนหมิงฉางสุ่ย - กรุงเทพฯ (สุวรรณภูมิ)",
+        activities: [
+          {
+            time_period: "เช้า",
+            activity_title: "ชมตลาดดอกไม้สดโต่วหนาน (Dounan Flower Market)",
+            location_name: "ตลาดดอกไม้โต่วหนาน (Dounan Flower Market)",
+            description: "นำท่านชม **ตลาดดอกไม้โต่วหนาน** ตลาดการค้าดอกไม้สดที่ใหญ่ที่สุดในเอเชีย เลือกชมและถ่ายภาพดอกไม้นานาพันธุ์"
+          },
+          {
+            time_period: "10.30 น.",
+            activity_title: "เดินทางสู่สนามบินคุนหมิงฉางสุ่ย",
+            location_name: "สนามบินนานาชาติคุนหมิงฉางสุ่ย",
+            description: "เดินทางสู่ **สนามบินคุนหมิงฉางสุ่ย** เช็คอินโหลดสัมภาระเตรียมตัวเดินทางกลับประเทศไทย"
+          },
+          {
+            time_period: "13.15 น.",
+            activity_title: "ออกเดินทางกลับสู่กรุงเทพฯ",
+            location_name: "สนามบินสุวรรณภูมิ (BKK)",
+            description: "ออกเดินทางกลับกรุงเทพฯ โดยเที่ยวบิน **MU747** ถึงสนามบินสุวรรณภูมิเวลา **14.55 น.** โดยสวัสดิภาพและความประทับใจ"
+          }
+        ]
+      }
+    ]
+  },
+  guangzhou: {
+    tourName: "ตระการตา กวางโจว แคนตันทาวเวอร์ ถนนคนเดินเป่ยจิงหลู่",
+    hotel: "Guangzhou Garden Hotel หรือเทียบเท่า 4 ดาว",
+    airline: "Thai Airways (TG) / China Southern Airlines (CZ)",
+    flightRoute: "BKK - CAN - BKK",
+    outboundFlight: "CZ3082 BKK 11:55 - 15:50 CAN",
+    returnFlight: "CZ3081 CAN 09:00 - 11:00 BKK",
+    days: [
+      {
+        theme: "กรุงเทพฯ (สุวรรณภูมิ) - กวางโจว (สนามบินไป๋หยุน) - ชมวิวหอคอยกวางโจว (Canton Tower)",
+        activities: [
+          {
+            time_period: "09.00 น.",
+            activity_title: "เช็คอิน ณ สนามบินสุวรรณภูมิ",
+            location_name: "สนามบินสุวรรณภูมิ",
+            description: "คณะพร้อมกัน ณ สนามบินสุวรรณภูมิ เช็คอินเที่ยวบิน **CZ3082** สู่เมืองกวางโจว"
+          },
+          {
+            time_period: "15.50 น.",
+            activity_title: "เดินทางถึงกวางโจว - ชมหอคอยแคนตันทาวเวอร์",
+            location_name: "หอคอยแคนตันทาวเวอร์ (Canton Tower)",
+            description: "เดินทางถึงสนามบินไป๋หยุน กวางโจว นำท่านถ่ายภาพ **หอคอยแคนตันทาวเวอร์ (Canton Tower)** แลนด์มาร์กความสูง 604 เมตรริมแม่น้ำจูเจียง",
+            is_highlight: true
+          }
+        ]
+      },
+      {
+        theme: "กวางโจว - อนุสรณ์สถานดร.ซุนยัดเซ็น - วัดหกต้นไทร - ถนนคนเดินเป่ยจิงหลู่",
+        activities: [
+          {
+            time_period: "เช้า",
+            activity_title: "ชมอนุสรณ์สถาน ดร.ซุนยัดเซ็น & วัดหกต้นไทร",
+            location_name: "อนุสรณ์สถาน ดร.ซุนยัดเซ็น - วัดหกต้นไทร",
+            description: "นำท่านชม **อนุสรณ์สถาน ดร.ซุนยัดเซ็น** สถาปัตยกรรมแปดเหลี่ยมอันทรงคุณค่า และสักการะพระบรมสารีริกธาตุ ณ **วัดหกต้นไทร (Six Banyan Tree Temple)**",
+            is_highlight: true
+          },
+          {
+            time_period: "บ่าย/เย็น",
+            activity_title: "ช้อปปิ้งถนนคนเดินเป่ยจิงหลู่ (Beijing Road)",
+            location_name: "ถนนคนเดินเป่ยจิงหลู่",
+            description: "อิสระช้อปปิ้ง **ถนนคนเดินเป่ยจิงหลู่** ชมร่องรอยถนนโบราณสมัยราชวงศ์ซ่งและหยวนที่ถูกเปิดซ้อนใต้กระจกแก้วใสใจกลางถนน",
+            is_highlight: true
+          }
+        ]
+      }
+    ]
+  },
+  macao: {
+    tourName: "ไฮไลต์ มาเก๊า - ฮ่องกง ไหว้พระขอพร",
+    hotel: "The Kowloon Hotel หรือเทียบเท่า 4 ดาว",
+    airline: "Greater Bay Airlines (HB) / Cathay Pacific (CX)",
+    flightRoute: "BKK - HKG - BKK",
+    outboundFlight: "HB296 BKK 01:55 - 06:00 HKG",
+    returnFlight: "HB295 HKG 22:15 - 00:15 BKK",
+    days: [
+      {
+        theme: "กรุงเทพฯ (สุวรรณภูมิ) - ฮ่องกง - ข้ามสะพานมาเก๊า HZMB - โบสถ์เซนต์พอล - เซนาโด้สแควร์ - วัดอาม่า",
         activities: [
           {
             time_period: "00.55 น.",
@@ -132,139 +310,20 @@ const DESTINATION_DATA: Record<string, {
             time_period: "06.00 น.",
             activity_title: "ข้ามสะพานมาเก๊า HZMB",
             location_name: "สะพานเชื่อมฮ่องกง-จูไห่-มาเก๊า (HZMB)",
-            description: "เดินทางถึงสนามบินฮ่องกง นำท่านข้ามสะพาน **HZMB (Hong Kong-Zhuhai-Macao Bridge)** สะพานข้ามทะเลยาวที่สุดในโลกสู่เขตบริหารพิเศษมาเก๊า"
+            description: "เดินทางถึงสนามบินฮ่องกง นำท่านข้ามสะพาน **HZMB (Hong Kong-Zhuhai-Macao Bridge)** สะพานข้ามทะเลยาวที่สุดในโลกสู่มาเก๊า"
           },
           {
             time_period: "เช้า",
             activity_title: "ชมซากโบสถ์เซนต์พอล (Ruins of St. Paul's)",
             location_name: "โบสถ์เซนต์พอล (Ruins of St. Paul's)",
-            description: "นำท่านถ่ายภาพ **โบสถ์เซนต์พอล (Ruins of St. Paul's)** หรือที่ชาวมาเก๊าเรียกว่า 'ต้าซานปา' ซากโบสถ์คริสต์สถาปัตยกรรมตะวันตกผสมผสานสัญลักษณ์ศาสนาพุทธ แลนด์มาร์กอันดับหนึ่งของมาเก๊า",
+            description: "นำท่านถ่ายภาพ **โบสถ์เซนต์พอล (Ruins of St. Paul's)** ซากโบสถ์คริสต์สถาปัตยกรรมตะวันตกผสมผสานสัญลักษณ์ศาสนาพุทธ",
             is_highlight: true
           },
           {
             time_period: "กลางวัน",
             activity_title: "เดินเล่นจัตุรัสเซนาโด้สแควร์ (Senado Square)",
             location_name: "เซนาโด้สแควร์ (Senado Square)",
-            description: "นำท่านสู่ **เซนาโด้สแควร์ (Senado Square)** จัตุรัสใจกลางเมืองมาเก๊าที่ล้อมรอบด้วยอาคารทรงโคโลเนียลสไตล์ยุโรป มรดกโลก UNESCO ลิ้มลองทาร์ตไข่มาเก๊าแท้ๆ",
-            is_highlight: true
-          },
-          {
-            time_period: "บ่าย",
-            activity_title: "ไหว้พระขอพร วัดอาม่า (A-Ma Temple)",
-            location_name: "วัดอาม่า (A-Ma Temple)",
-            description: "นำท่านกราบไหว้ขอพร ณ **วัดอาม่า (A-Ma Temple)** หนึ่งในวัดศักดิ์สิทธิ์และเก่าแก่ที่สุดของมาเก๊า ขอพรเรื่องการงาน การเงิน และความเป็นสิริมงคล",
-            is_highlight: true
-          },
-          {
-            time_period: "เย็น",
-            activity_title: "กราบองค์เจ้าแม่กวนอิมริมทะเล",
-            location_name: "เจ้าแม่กวนอิมริมทะเล (Kun Iam Statue)",
-            description: "นำท่านถ่ายรูปกับ **เจ้าแม่กวนอิมริมทะเล (Kun Iam Statue)** องค์พระทองสัมฤทธิ์ประดิษฐานบนบัวทองคำริมอ่าวมาเก๊า",
-            is_highlight: true
-          }
-        ]
-      },
-      {
-        theme: "หาดรีพัลส์เบย์ - วัดเจ้าแม่กวนอิมอ่องฮ่ำ - วัดแชกงหมิว - วัดหวังต้าเซียน",
-        activities: [
-          {
-            time_period: "เช้า",
-            activity_title: "ขอพรหาดรีพัลส์เบย์ & เจ้าแม่กวนอิมอ่องฮ่ำ",
-            location_name: "อ่าวรีพัลส์เบย์ (Repulse Bay)",
-            description: "นำท่านสู่ **อ่าวรีพัลส์เบย์ (Repulse Bay)** อธิษฐานขอพร **เจ้าแม่กวนอิมอ่องฮ่ำ** ข้ามสะพานสีแดงต่ออายุ และโยนเหรียญเข้าปากปลาโชคลาภ",
-            is_highlight: true
-          },
-          {
-            time_period: "กลางวัน",
-            activity_title: "หมุนกังหันนำโชค วัดแชกงหมิว",
-            location_name: "วัดแชกงหมิว (Che Kung Temple)",
-            description: "นำท่านไหว้พระขอพร **วัดแชกงหมิว (วัดกังหันนำโชค)** หมุนกังหันพัดพาโชคลาภ ขจัดสิ่งอัปมงคล และนำพาความสุขความเจริญ",
-            is_highlight: true
-          },
-          {
-            time_period: "บ่าย",
-            activity_title: "ผูกด้ายแดงขอพรความรัก วัดหวังต้าเซียน",
-            location_name: "วัดหวังต้าเซียน (Wong Tai Sin Temple)",
-            description: "นำท่านสักการะ **วัดหวังต้าเซียน** วัดชื่อดังที่มีชื่อเสียงด้านการผูกด้ายแดงขอพรเรื่องความรัก และการเสี่ยงเซียมซีที่แม่นยำที่สุดในฮ่องกง",
-            is_highlight: true
-          },
-          {
-            time_period: "เย็น",
-            activity_title: "อิสระช้อปปิ้ง ย่านจิมซาจุ่ย",
-            location_name: "ถนนคนเดินจิมซาจุ่ย (Tsim Sha Tsui)",
-            description: "เพลิดเพลินกับการช้อปปิ้งย่าน **จิมซาจุ่ย (Tsim Sha Tsui)** ชมวิวเส้นขอบฟ้าและอ่าววิกตอเรีย (Victoria Harbour)"
-          }
-        ]
-      },
-      {
-        theme: "อิสระช้อปปิ้ง Citygate Outlets - สนามบินฮ่องกง - กรุงเทพฯ (สุวรรณภูมิ)",
-        activities: [
-          {
-            time_period: "เช้า",
-            activity_title: "ช้อปปิ้งแบรนด์เนม Citygate Outlets",
-            location_name: "ห้างซิตี้เกท เอาท์เล็ท (Citygate Outlets)",
-            description: "เช็คเอาท์จากโรงแรม นำท่านสู่ **Citygate Outlets** ห้างเอาท์เล็ทขนาดใหญ่ใกล้สนามบิน เลือกซื้อสินค้าแบรนด์เนมชั้นนำในราคาสุดพิเศษ"
-          },
-          {
-            time_period: "22.15 น.",
-            activity_title: "เดินทางกลับประเทศไทย (สุวรรณภูมิ)",
-            location_name: "สนามบินฮ่องกง - สนามบินสุวรรณภูมิ",
-            description: "เดินทางสู่สนามบินฮ่องกง เช็คอินเดินทางกลับกรุงเทพฯ โดยสายการบิน **Greater Bay Airlines (HB295)** ถึงสนามบินสุวรรณภูมิเวลา 00.15 น.+1 โดยสวัสดิภาพ"
-          }
-        ]
-      }
-    ]
-  },
-  tokyo: {
-    tourName: "มหัศจรรย์ โตเกียว ฟูจิ คาวากูจิโกะ 5 วัน 3 คืน",
-    hotel: "Shinagawa Prince Hotel หรือเทียบเท่า 4 ดาว",
-    days: [
-      {
-        theme: "กรุงเทพฯ (สุวรรณภูมิ) - โตเกียว (สนามบินนาริตะ) - วัดเซ็นโซจิ อาซากุสะ - ย่านชินจูกุ",
-        activities: [
-          {
-            time_period: "เช้า",
-            activity_title: "เดินทางถึง เมืองโตเกียว ประเทศญี่ปุ่น",
-            location_name: "สนามบินนานาชาตินาริตะ",
-            description: "เดินทางถึง **สนามบินนาริตะ โตเกียว** ผ่านพิธีการตรวจคนเข้าเมืองและต้อนรับโดยทีมงาน"
-          },
-          {
-            time_period: "บ่าย",
-            activity_title: "ชมวัดเซ็นโซจิ อาซากุสะ (Sensoji Temple)",
-            location_name: "วัดอาซากุสะ - ถนนนากามิเสะ",
-            description: "นำท่านชม **วัดเซ็นโซจิ (Sensoji Temple)** หรือวัดอาซากุสะ ถ่ายภาพกับโคมแดงยักษ์ ถนนช้อปปิ้งนากามิเสะ ซื้อของฝากและขนมญี่ปุ่นโบราณ",
-            is_highlight: true
-          },
-          {
-            time_period: "เย็น",
-            activity_title: "ช้อปปิ้งย่านชินจูกุ (Shinjuku)",
-            location_name: "ย่านชินจูกุ โตเกียว",
-            description: "อิสระช้อปปิ้ง **ย่านชินจูกุ (Shinjuku)** ถ่ายภาพกับจอ 3D แมวยักษ์ ช้อปปิ้งเครื่องสำอางและสินค้าแฟชั่นชั้นนำ",
-            is_highlight: true
-          }
-        ]
-      }
-    ]
-  },
-  chengdu: {
-    tourName: "มรดกโลก เฉิงตู หมีแพนด้า ถนนโบราณจิ๋นหลี่ 4 วัน 3 คืน",
-    hotel: "Chengdu Holiday Inn Express หรือเทียบเท่า 4 ดาว",
-    days: [
-      {
-        theme: "กรุงเทพฯ (สุวรรณภูมิ) - เฉิงตู - ศูนย์อนุรักษ์หมีแพนด้า - ถนนโบราณจิ๋นหลี่",
-        activities: [
-          {
-            time_period: "เช้า",
-            activity_title: "ชมความน่ารัก ณ ศูนย์อนุรักษ์หมีแพนด้าเฉิงตู",
-            location_name: "ศูนย์อนุรักษ์หมีแพนด้าเฉิงตู (Chengdu Panda Base)",
-            description: "นำท่านเยี่ยมชม **ศูนย์อนุรักษ์หมีแพนด้าเฉิงตู** ชมความน่ารักของหมีแพนด้ายักษ์และแพนด้าแดงในป่าไผ่ธรรมชาติ",
-            is_highlight: true
-          },
-          {
-            time_period: "เย็น",
-            activity_title: "เดินเที่ยวถนนโบราณจิ๋นหลี่ (Jinli Ancient Street)",
-            location_name: "ถนนโบราณจิ๋นหลี่",
-            description: "สัมผัสบรรยากาศย่านเมืองเก่าสามก๊ก **ถนนโบราณจิ๋นหลี่** ชมโคมไฟสไตล์โบราณ ชิมหมาล่าเสียบไม้ และของกินพื้นเมืองเสฉวน",
+            description: "นำท่านสู่ **เซนาโด้สแควร์ (Senado Square)** จัตุรัสใจกลางเมืองมาเก๊าที่ล้อมรอบด้วยอาคารทรงโคโลเนียลสไตล์ยุโรป",
             is_highlight: true
           }
         ]
@@ -273,25 +332,75 @@ const DESTINATION_DATA: Record<string, {
   }
 };
 
+/**
+ * Build a fallback itinerary with real researched landmarks.
+ */
 export function buildFallbackPlan(
   mainCity: string,
   country: string,
   duration: number,
   startDate: string
 ): AIPlan {
+  const cityInput = (mainCity || country || "").toLowerCase();
+  
+  // Try to find matching city preset key
+  const matchKey = Object.keys(DESTINATION_DATA).find(k => 
+    cityInput.includes(k) || 
+    (k === "kunming" && (cityInput.includes("คุนหมิง") || cityInput.includes("kunming"))) ||
+    (k === "guangzhou" && (cityInput.includes("กวางโจว") || cityInput.includes("guangzhou"))) ||
+    (k === "macao" && (cityInput.includes("มาเก๊า") || cityInput.includes("ฮ่องกง")))
+  );
+
+  if (matchKey && DESTINATION_DATA[matchKey]) {
+    const preset = DESTINATION_DATA[matchKey];
+    const itinerary = Array.from({ length: duration }, (_, i) => {
+      const date = new Date(new Date(startDate).getTime() + i * 24 * 60 * 60 * 1000);
+      const dayNo = i + 1;
+      const presetDayIndex = Math.min(i, preset.days.length - 1);
+      const dayPreset = preset.days[presetDayIndex];
+
+      return {
+        day_number: dayNo,
+        date: date.toISOString().split("T")[0],
+        daily_theme: dayPreset?.theme || `ท่องเที่ยวไฮไลต์เมือง ${mainCity} วันที่ ${dayNo}`,
+        hotel_name_suggestion: preset.hotel,
+        breakfast_included: dayNo > 1,
+        lunch_included: true,
+        dinner_included: dayNo < duration,
+        activities: dayPreset?.activities || [
+          {
+            time_period: "เช้า",
+            activity_title: `ท่องเที่ยวแลนด์มาร์กสำคัญ ${mainCity}`,
+            location_name: `สถานที่ไฮไลต์เมือง ${mainCity}`,
+            description: `นำท่านชม **สถานที่ท่องเที่ยวสำคัญประจำเมือง ${mainCity}**`
+          }
+        ]
+      };
+    });
+
+    return {
+      tour_name: `${preset.tourName} ${duration} วัน ${Math.max(1, duration - 1)} คืน`,
+      summary: `โปรแกรมท่องเที่ยวสัมผัสไฮไลต์แลนด์มาร์กจริงเมือง ${mainCity} ระยะเวลา ${duration} วัน`,
+      airline: preset.airline,
+      flight_route: preset.flightRoute,
+      outbound_flight: preset.outboundFlight,
+      return_flight: preset.returnFlight,
+      itinerary
+    };
+  }
+
+  // General dynamic fallback for any other city
   const city = mainCity || "ไฮไลต์";
   const cntry = country || "";
   const destName = cntry ? `${city} (${cntry})` : city;
 
   const itinerary = Array.from({ length: duration }, (_, i) => {
-    const date = new Date(
-      new Date(startDate).getTime() + i * 24 * 60 * 60 * 1000
-    );
+    const date = new Date(new Date(startDate).getTime() + i * 24 * 60 * 60 * 1000);
     const dayNo = i + 1;
 
     let dailyTheme = `เดินทางสู่เมือง ${city} - เที่ยวชมแลนด์มาร์กสำคัญประจำวัน`;
     if (dayNo === 1) {
-      dailyTheme = `กรุงเทพฯ (สนามบินสุวรรณภูมิ) - ออกเดินทางสู่ ${city} - เช็คอินแลนด์มาร์กแรก`;
+      dailyTheme = `กรุงเทพฯ (สนามบินสุวรรณภูมิ) - เดินทางถึง ${city} - เช็คอินแลนด์มาร์กแรก`;
     } else if (dayNo === duration) {
       dailyTheme = `เก็บตกย่านช้อปปิ้งเมือง ${city} - เดินทางกลับกรุงเทพฯ (สนามบินสุวรรณภูมิ)`;
     }
@@ -300,23 +409,23 @@ export function buildFallbackPlan(
       day_number: dayNo,
       date: date.toISOString().split("T")[0],
       daily_theme: dailyTheme,
-      hotel_name_suggestion: `โรงแรมระดับมาตรฐานในเมือง ${city} หรือเทียบเท่า`,
+      hotel_name_suggestion: `โรงแรมระดับมาตรฐาน 4 ดาว ในเมือง ${city} หรือเทียบเท่า`,
       breakfast_included: dayNo > 1,
       lunch_included: true,
       dinner_included: dayNo < duration,
       activities: [
         {
           time_period: dayNo === 1 ? "เช้า / บ่าย" : "เช้า",
-          activity_title: `เที่ยวชมแลนด์มาร์กและสถานที่สำคัญในเมือง ${city}`,
-          location_name: `แลนด์มาร์กไฮไลต์ ${city}`,
-          description: `นำท่านเดินทางสู่ **สถานที่ท่องเที่ยวสำคัญประจำเมือง ${city}** ถ่ายภาพเช็คอินจุดไฮไลต์ยอดนิยม`,
+          activity_title: `เที่ยวชมแลนด์มาร์กสำคัญในเมือง ${city}`,
+          location_name: `จุดเช็คอินไฮไลต์ ${city}`,
+          description: `นำท่านเดินทางสู่ **สถานที่ท่องเที่ยวสำคัญประจำเมือง ${city}** สัมผัสบรรยากาศความงดงามและถ่ายภาพเช็คอิน`,
           is_highlight: true
         },
         {
           time_period: "กลางวัน",
           activity_title: `รับประทานอาหารกลางวัน เมนูท้องถิ่น ${city}`,
           location_name: `ร้านอาหารขึ้นชื่อเมือง ${city}`,
-          description: `ลิ้มลองอาหารรสเลิศและเมนูท้องถิ่นขึ้นชื่อในย่าน **เมือง ${city}**`
+          description: `ลิ้มลองอาหารรสเลิศและเมนูท้องถิ่นขึ้นชื่อประจำเมือง **${city}**`
         },
         {
           time_period: "บ่าย / เย็น",
@@ -332,10 +441,10 @@ export function buildFallbackPlan(
   return {
     tour_name: `โปรแกรมท่องเที่ยว ${destName} ${duration} วัน ${Math.max(1, duration - 1)} คืน`,
     summary: `แพลนท่องเที่ยวสัมผัสไฮไลต์แลนด์มาร์กสำคัญเมือง ${city} ระยะเวลา ${duration} วัน`,
-    airline: "สายการบินชั้นนำ (Standard Airlines)",
+    airline: `สายการบินบินตรงสู่ ${city}`,
     flight_route: `BKK - ${city} - BKK`,
-    outbound_flight: "ออกเดินทางจากสุวรรณภูมิ (เวลาตามรอบเที่ยวบิน)",
-    return_flight: "เดินทางกลับถึงสุวรรณภูมิ โดยสวัสดิภาพ",
+    outbound_flight: `ออกเดินทางจากสนามบินสุวรรณภูมิ มุ่งสู่สนามบิน ${city}`,
+    return_flight: `เดินทางออกจากสนามบิน ${city} กลับถึงกรุงเทพฯ (สุวรรณภูมิ)`,
     itinerary,
   };
 }
