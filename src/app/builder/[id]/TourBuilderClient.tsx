@@ -126,10 +126,14 @@ export default function TourBuilderClient({ initialPlan }: { initialPlan: any })
                     country: plan.country || "จีน",
                     mainCity: plan.main_city || "คุนหมิง",
                     startDate: plan.start_date ? new Date(plan.start_date).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+                    endDate: plan.end_date ? new Date(plan.end_date).toISOString().split('T')[0] : new Date(Date.now() + (plan.duration || 4) * 86400000).toISOString().split('T')[0],
                     duration: plan.duration || plan.TourDays?.length || 4,
                     travelerCount: plan.traveler_count || 1,
                     customerType: "General",
-                    hotelLevel: plan.hotel_level || "4 ดาว"
+                    hotelLevel: plan.hotel_level || "4 ดาว",
+                    tripType: plan.trip_type || "Private Tour",
+                    theme: plan.theme || "Nature",
+                    budgetPerPerson: plan.budget_per_person || 0
                   })
                 });
                 const data = await res.json();
