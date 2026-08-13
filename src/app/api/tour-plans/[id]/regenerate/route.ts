@@ -13,64 +13,8 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     const duration = plan.duration || 4;
     const startDateStr = plan.start_date ? new Date(plan.start_date).toISOString().split('T')[0] : new Date().toISOString().split('T')[0];
 
-    // 1. Build authoritative high-accuracy plan (using Gemini AI or verified Landmark Database)
-    let aiPlan: any = null;
-
-    if (process.env.GEMINI_API_KEY) {
-      try {
-        const prompt = `คุณคือผู้เชี่ยวชาญด้านการจัดโปรแกรมทัวร์ต่างประเทศระดับพรีเมียม (Master Travel Architect) ของบริษัททัวร์ชั้นนำ
-กรุณาสร้างแผนการเดินทาง (Itinerary) สถานที่ท่องเที่ยวจริงและตรงตามความเป็นจริง 100% สำหรับ:
-- จุดหมายปลายทาง: ${country}, เมือง ${mainCity}
-- ระยะเวลา: ${duration} วัน
-- สำนวนการเขียน: สำนวนทัวร์ทางการ เน้นตัวหนาด้วย **ชื่อสถานที่** เสมอ
-
-ตอบกลับเป็น JSON รูปแบบนี้เท่านั้น:
-{
-  "tour_name": "ชื่อโปรแกรมทัวร์ภาษาไทย (เช่น มหัศจรรย์ คุนหมิง ตาหลี่ ลี่เจียง 4 วัน 3 คืน)",
-  "airline": "ชื่อสายการบินจริง",
-  "flight_route": "เส้นทางบินจริง",
-  "outbound_flight": "เที่ยวบินขาไปจริง",
-  "return_flight": "เที่ยวบินขากลับจริง",
-  "itinerary": [
-    {
-      "day_number": 1,
-      "date": "YYYY-MM-DD",
-      "daily_theme": "หัวข้อไฮไลต์สถานที่ในแต่ละวัน (ห้ามซ้ำกัน)",
-      "hotel_name_suggestion": "ชื่อโรงแรมจริงหรือระดับเทียบเท่า",
-      "breakfast_included": false,
-      "lunch_included": true,
-      "dinner_included": true,
-      "activities": [
-        {
-          "time_period": "เช้า | กลางวัน | บ่าย | เย็น",
-          "activity_title": "หัวข้อกิจกรรมพร้อมชื่อสถานที่จริง",
-          "location_name": "ชื่อสถานที่ท่องเที่ยวจริง",
-          "description": "คำอธิบายละเอียดเน้น **ชื่อสถานที่** ด้วยตัวหนา",
-          "is_highlight": true
-        }
-      ]
-    }
-  ]
-}`;
-
-        const response = await ai.models.generateContent({
-          model: 'gemini-1.5-flash',
-          contents: [{ role: 'user', parts: [{ text: prompt }] }],
-          config: { responseMimeType: "application/json" }
-        });
-
-        const parsed = safeJsonParse(response.text || "{}");
-        if (validateAIPlan(parsed)) {
-          aiPlan = parsed;
-        }
-      } catch (aiErr) {
-        console.warn("AI generation failed during in-place regenerate, using landmark database:", aiErr);
-      }
-    }
-
-    if (!aiPlan) {
-      aiPlan = buildFallbackPlan(mainCity, country, duration, startDateStr);
-    }
+    // Build authoritative high-accuracy plan using verified Landmark Database
+    const aiPlan = buildFallbackPlan(mainCity, country, duration, startDateStr);
 
     // 2. Update Plan metadata
     await prisma.tourPlan.update({
