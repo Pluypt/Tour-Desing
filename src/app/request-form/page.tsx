@@ -8,7 +8,7 @@ const initialFormData = {
   phone: "",
   lineId: "",
   customerType: "Family",
-  travelerCount: "",
+  travelerCount: "2",
   ageRange: "",
   customerNote: "",
   country: "",
@@ -16,7 +16,7 @@ const initialFormData = {
   secondaryCity: "",
   startDate: "",
   endDate: "",
-  duration: "",
+  duration: "3",
   tripType: "Private Tour",
   tourCode: "",
   title: "",
@@ -59,24 +59,41 @@ export default function TourRequestForm() {
     });
   };
 
-  const handleGenerate = async (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
+  const handleGenerate = async (e?: React.FormEvent) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
 
-    // Auto calculate duration if missing
+    // Auto calculate duration or fallback to 3 days
     let currentDuration = formData.duration;
     if (!currentDuration && formData.startDate && formData.endDate) {
       currentDuration = calculateDurationFromDates(formData.startDate, formData.endDate);
     }
+    if (!currentDuration || parseInt(currentDuration) <= 0) {
+      currentDuration = "3";
+    }
 
-    if (!formData.customerName?.trim() || !formData.country?.trim() || !formData.mainCity?.trim() || !formData.startDate || !formData.travelerCount || !currentDuration) {
-      alert("กรุณากรอกข้อมูลที่จำเป็น (ชื่อลูกค้า, จำนวนผู้เดินทาง, ประเทศ, เมืองหลัก, วันที่เดินทาง)");
+    // Check required fields with specific error messaging
+    const missingFields: string[] = [];
+    if (!formData.customerName?.trim()) missingFields.push("ชื่อลูกค้า");
+    if (!formData.country?.trim()) missingFields.push("ประเทศปลายทาง");
+    if (!formData.mainCity?.trim()) missingFields.push("เมืองหลัก");
+    if (!formData.travelerCount || parseInt(formData.travelerCount) <= 0) missingFields.push("จำนวนผู้เดินทาง");
+
+    if (missingFields.length > 0) {
+      alert(`กรุณากรอกข้อมูลที่จำเป็นให้ครบถ้วน: ${missingFields.join(", ")}`);
       return;
     }
 
     const payload = {
       ...formData,
+      customerName: formData.customerName.trim(),
+      country: formData.country.trim(),
+      mainCity: formData.mainCity.trim(),
+      travelerCount: formData.travelerCount || "2",
       duration: currentDuration,
+      startDate: formData.startDate || new Date().toISOString().split("T")[0],
       originalPlanFile,
     };
 
@@ -87,6 +104,18 @@ export default function TourRequestForm() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
       });
+
+      if (!res.ok) {
+        const text = await res.text();
+        console.error("API Response Error:", res.status, text);
+        let msg = "เกิดข้อผิดพลาดในการสร้างแผนทัวร์ กรุณาลองใหม่อีกครั้ง";
+        try {
+          const parsed = JSON.parse(text);
+          if (parsed.error) msg = parsed.error;
+        } catch (_) {}
+        alert(msg);
+        return;
+      }
       
       const data = await res.json();
       if (data.success && data.planId) {
@@ -95,8 +124,8 @@ export default function TourRequestForm() {
         alert(data.error || "ไม่สามารถสร้างแผนทัวร์ได้ กรุณาลองใหม่อีกครั้ง");
       }
     } catch (error) {
-      console.error(error);
-      alert("เกิดข้อผิดพลาดในการสร้างแผนทัวร์");
+      console.error("Generate plan exception:", error);
+      alert("เกิดข้อผิดพลาดในการเชื่อมต่อ กรุณาตรวจสอบอินเทอร์เน็ตและลองอีกครั้ง");
     } finally {
       setLoading(false);
     }
@@ -109,7 +138,7 @@ export default function TourRequestForm() {
   };
 
   return (
-    <div className="container" style={{ padding: 0 }}>
+    <form onSubmit={handleGenerate} className="container" style={{ padding: 0 }}>
       <h1 className="page-title">Tour Request Form</h1>
       
       <div className="card">
@@ -117,11 +146,11 @@ export default function TourRequestForm() {
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px" }}>
           <div className="form-group">
             <label className="form-label">ชื่อลูกค้า *</label>
-            <input type="text" className="form-control" name="customerName" value={formData.customerName} onChange={handleChange} required />
+            <input type="text" className="form-control" name="customerName" placeholder="เช่น คุณสมชาย" value={formData.customerName} onChange={handleChange} required />
           </div>
           <div className="form-group">
             <label className="form-label">เบอร์โทร</label>
-            <input type="text" className="form-control" name="phone" value={formData.phone} onChange={handleChange} />
+            <input type="text" className="form-control" name="phone" placeholder="เช่น 0812345678" value={formData.phone} onChange={handleChange} />
           </div>
           <div className="form-group">
             <label className="form-label">ประเภทลูกค้า</label>
@@ -137,7 +166,7 @@ export default function TourRequestForm() {
           </div>
           <div className="form-group">
             <label className="form-label">จำนวนผู้เดินทาง *</label>
-            <input type="number" className="form-control" name="travelerCount" value={formData.travelerCount} onChange={handleChange} required />
+            <input type="number" className="form-control" name="travelerCount" min="1" placeholder="เช่น 2" value={formData.travelerCount} onChange={handleChange} required />
           </div>
         </div>
       </div>
@@ -147,23 +176,23 @@ export default function TourRequestForm() {
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px" }}>
           <div className="form-group">
             <label className="form-label">ประเทศปลายทาง *</label>
-            <input type="text" className="form-control" name="country" value={formData.country} onChange={handleChange} required />
+            <input type="text" className="form-control" name="country" placeholder="เช่น จีน, ญี่ปุ่น, ฮ่องกง" value={formData.country} onChange={handleChange} required />
           </div>
           <div className="form-group">
             <label className="form-label">เมืองหลัก *</label>
-            <input type="text" className="form-control" name="mainCity" value={formData.mainCity} onChange={handleChange} required />
+            <input type="text" className="form-control" name="mainCity" placeholder="เช่น คุนหมิง, โตเกียว, มาเก๊า" value={formData.mainCity} onChange={handleChange} required />
           </div>
           <div className="form-group">
-            <label className="form-label">วันที่เดินทาง เริ่มต้น *</label>
-            <input type="date" className="form-control" name="startDate" value={formData.startDate} onChange={handleChange} required />
+            <label className="form-label">วันที่เดินทาง เริ่มต้น</label>
+            <input type="date" className="form-control" name="startDate" value={formData.startDate} onChange={handleChange} />
           </div>
           <div className="form-group">
-            <label className="form-label">วันที่เดินทาง สิ้นสุด *</label>
-            <input type="date" className="form-control" name="endDate" value={formData.endDate} onChange={handleChange} required />
+            <label className="form-label">วันที่เดินทาง สิ้นสุด</label>
+            <input type="date" className="form-control" name="endDate" value={formData.endDate} onChange={handleChange} />
           </div>
           <div className="form-group">
-            <label className="form-label">จำนวนวัน * (Auto Calculate)</label>
-            <input type="text" className="form-control" name="duration" value={formData.duration} onChange={handleChange} readOnly />
+            <label className="form-label">จำนวนวัน (Auto Calculate)</label>
+            <input type="text" className="form-control" name="duration" value={formData.duration} onChange={handleChange} placeholder="3" />
           </div>
           <div className="form-group">
             <label className="form-label">ประเภททริป</label>
@@ -281,10 +310,10 @@ export default function TourRequestForm() {
 
       <div style={{ display: "flex", gap: "10px", justifyContent: "flex-end", marginBottom: "40px" }}>
         <button type="button" className="btn-secondary" onClick={handleClear}>ล้างข้อมูล (Clear)</button>
-        <button type="button" className="btn-primary" onClick={handleGenerate} disabled={loading}>
+        <button type="submit" className="btn-primary" disabled={loading} style={{ cursor: loading ? "not-allowed" : "pointer" }}>
           {loading ? "กำลังสร้างแผนด้วย AI..." : "สร้างแบบร่าง (Generate Draft Plan)"}
         </button>
       </div>
-    </div>
+    </form>
   );
 }

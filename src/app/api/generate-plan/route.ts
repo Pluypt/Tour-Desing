@@ -3,6 +3,9 @@ import { prisma } from "@/lib/prisma";
 import { ai, safeJsonParse, validateAIPlan, buildFallbackPlan } from "@/lib/ai";
 import { estimateMarketPrice } from "@/lib/pricing";
 
+export const maxDuration = 60;
+export const dynamic = "force-dynamic";
+
 export async function POST(req: Request) {
   try {
     const data = await req.json();
@@ -28,66 +31,51 @@ export async function POST(req: Request) {
     // 2. Create Customer
     const customer = await prisma.customer.create({
       data: {
-        name: data.customerName || "ลูกค้าคนสำคัญ",
+        name: data.customerName || "ลูกค้าทั่วไป",
         phone: data.phone || "",
         line_id: data.lineId || "",
-        customer_type: data.customerType || "General",
-        traveler_count: pax,
-        age_range: data.ageRange || "",
-        note: data.customerNote || "",
-        average_budget: finalSellingPricePerPerson,
-        interested_countries: data.country || "",
+        customer_type: data.customerType || "Family",
       }
     });
 
-    // 3. Generate Plan using Gemini AI or Fallback Database
-    const systemPrompt = `คุณคือผู้เชี่ยวชาญด้านการจัดโปรแกรมทัวร์ต่างประเทศระดับพรีเมียม (Master Travel Itinerary Architect) และ Content Creator สไตล์ Lemon8 หน้าที่ของคุณคือการสร้างแผนการเดินทาง (Itinerary) ที่มีความสมจริง ทันสมัย และตอบโจทย์นักท่องเที่ยวยุคใหม่
+    // 3. AI Itinerary Generation Prompt
+    const systemPrompt = `คุณคือผู้เชี่ยวชาญด้านโปรแกรมทัวร์และ Content Creator สไตล์ Lemon8
+กรุณาสร้างแผนการเดินทางสำหรับลูกค้า: ${data.customerName}
+ปลายทาง: ${data.mainCity}, ${data.country}
+จำนวนผู้เดินทาง: ${pax} คน
+ระยะเวลา: ${duration} วัน (${duration - 1} คืน)
+ประเภททริป: ${data.tripType || "Private Tour"}
+ระดับโรงแรม: ${data.hotelLevel || "4 ดาว"}
+ความต้องการเพิ่มเติม: ${data.customerNote || "ไม่มี"}
 
-คุณต้องส่งออกผลลัพธ์เป็นโครงสร้าง JSON ที่ถูกต้องตามหลักไวยากรณ์ (Valid JSON object) เท่านั้น ห้ามใส่ข้อความอารัมภบท บทสนทนา หรือ markdown code fence ใดๆ นอกเหนือจากตัว JSON เด็ดขาด
+[กฎเหล็กในการสร้างแผนการเดินทาง]
+1. วันแรก (Day 1): ต้องเน้นกิจกรรมการเดินทางเท่านั้น (นัดหมายสนามบินสุวรรณภูมิ, เที่ยวบิน, ผ่านพิธีการตรวจคนเข้าเมือง, รับกระเป๋าสัมภาระ, รถรับส่งเข้าสู่โรงแรมที่พัก, พักผ่อนตามอัธยาศัย) ห้ามใส่สถานที่ท่องเที่ยวในวันแรกเด็ดขาด
+2. วันสุดท้าย (Day ${duration}): ต้องเน้นกิจกรรมการเดินทางกลับเท่านั้น (รับประทานอาหารเช้า, เช็คเอาท์โรงแรม, เดินทางสู่สนามบิน, เช็คอินสัมภาระ, บินกลับกรุงเทพฯ สุวรรณภูมิ) ห้ามใส่สถานที่ท่องเที่ยวในวันสุดท้ายเด็ดขาด
+3. วันระหว่างทริป (Day 2 ถึง Day ${duration - 1}): สกัดแลนด์มาร์กใหม่ มุมถ่ายรูปยอดฮิต คาเฟ่ aesthetic จุดเช็คอินสไตล์ Lemon8 / Xiaohongshu / Instagram ที่กำลังเป็นไวรัลและเป็นของจริงในเมืองนั้น มีเน้นตัวหนา **[ชื่อสถานที่]**
+4. ทุกวันต้องไม่ซ้ำกัน และมีโครงสร้างครบถ้วน
 
-[ตัวแปรข้อมูลเข้า / INPUT PARAMETERS]
-จุดหมายปลายทาง (Destination): ${data.country}, ${data.mainCity} ${data.secondaryCity ? `และ ${data.secondaryCity}` : ""}
-ระยะเวลา (Duration): ${duration} วัน (ตั้งแต่ ${data.startDate} ถึง ${data.endDate})
-ประเภทลูกค้า (Customer Type): ${data.customerType}
-จำนวนผู้เดินทาง (Total Pax): ${pax} ท่าน
-ลักษณะกรุ๊ปและข้อจำกัด: ${data.ageRange || "ไม่มีข้อจำกัดพิเศษ"} ${data.customerNote || ""}
-ความสนใจหลัก: ${data.theme || "ท่องเที่ยวไฮไลต์ คาเฟ่ชิค มุมถ่ายรูปสไตล์ Lemon8 ช้อปปิ้ง ชิมอาหาร"}
-ระดับโรงแรมที่พัก: ${data.hotelLevel || "4 ดาว"}
-
-[กฎเหล็กในการสร้างเนื้อหา / STRICT CONTENT RULES]
-1. โครงสร้างวันแรกและวันสุดท้าย (CRITICAL TRAVEL FOCUS):
-   - วันแรก (DAY 1): ต้องเน้นการเดินทางโดยเฉพาะ (นัดหมายสนามบินสุวรรณภูมิ/เช็คอิน/เที่ยวบิน/เดินทางถึง/ผ่านตม./รับสัมภาระ/เข้าโรงแรมที่พัก/พักผ่อน) **ห้ามระบุสถานที่ท่องเที่ยวหรือพาไปเที่ยวในวันแรกเด็ดขาด**
-   - วันสุดท้าย (LAST DAY): ต้องเน้นการเดินทางกลับโดยเฉพาะ (รับประทานอาหารเช้า/จัดเก็บสัมภาระเช็คเอาท์โรงแรม/เดินทางสู่สนามบิน/เช็คอินโหลดกระเป๋า/บินกลับกรุงเทพฯ สุวรรณภูมิ) **ห้ามระบุสถานที่ท่องเที่ยวในวันสุดท้ายเด็ดขาด**
-2. สถานที่ท่องเที่ยววันระหว่างทริป (DAY 2 ถึง DAY ${duration - 1}):
-   - ต้องอัพเดตสถานที่ท่องเที่ยวตามเทรนด์ Lemon8, Xiaohongshu (RED), Instagram, TikTok เป็นจุดเช็คอินใหม่ มุมถ่ายรูป aesthetic คาเฟ่สุดชิค สถาปัตยกรรมโดดเด่น ย่านอาร์ต และแลนด์มาร์กที่เป็นไฮไลต์จริงของเมืองนั้นๆ
-   - ในเนื้อหาคำบรรยาย (description) ให้เน้นตัวหนา **[ชื่อสถานที่/คาเฟ่/จุดเช็คอิน]** เสมอ
-3. โรงแรมและเที่ยวบินจริง:
-   - ระบุชื่อโรงแรมที่เปิดให้บริการจริงตามระดับดาว
-   - ระบุชื่อสายการบิน และรหัสเที่ยวบินขาไป-ขากลับที่สมจริงสำหรับเส้นทางนั้น
-
-[รูปแบบโครงสร้าง JSON / JSON OUTPUT SCHEMA]
+ส่งออกเป็น JSON Object รูปแบบ:
 {
-  "tour_name": "ชื่อโปรแกรมทัวร์ภาษาไทยสุดหรูและน่าสนใจ",
-  "summary": "สรุปภาพรวมของทริปนี้ความยาว 2 ประโยค",
-  "airline": "สายการบิน (เช่น Thai Airways / Greater Bay Airlines / Cathay Pacific)",
-  "flight_route": "เส้นทางบิน (เช่น BKK-HKG / HKG-BKK)",
-  "outbound_flight": "รหัสเที่ยวบินขาไป (เช่น TG600 BKK 08:00 - 11:45 HKG)",
-  "return_flight": "รหัสเที่ยวบินขากลับ (เช่น TG601 HKG 12:45 - 14:30 BKK)",
+  "tour_name": "ชื่อโปรแกรมทัวร์สุดหรูและน่าดึงดูด",
+  "airline": "ชื่อสายการบิน (เช่น China Eastern Airlines / Greater Bay Airlines / Cathay Pacific)",
+  "flight_route": "เส้นทางบิน (เช่น BKK - KMG - BKK)",
+  "outbound_flight": "เที่ยวบินขาไป (เช่น MU748 BKK 15:55 - 19:30 KMG)",
+  "return_flight": "เที่ยวบินขากลับ (เช่น MU747 KMG 13:15 - 14:55 BKK)",
   "itinerary": [
     {
       "day_number": 1,
-      "date": "YYYY-MM-DD",
-      "daily_theme": "กรุงเทพฯ (สนามบินสุวรรณภูมิ) - เมืองปลายทาง - เช็คอินโรงแรมที่พัก",
-      "hotel_name_suggestion": "ชื่อโรงแรมจริง 4 ดาว",
+      "date": "${data.startDate || "2026-10-01"}",
+      "daily_theme": "ธีมของวัน",
+      "hotel_name_suggestion": "ชื่อโรงแรมที่พัก",
       "breakfast_included": false,
       "lunch_included": true,
       "dinner_included": true,
       "activities": [
         {
-          "time_period": "เช้า / บ่าย / เย็น",
-          "activity_title": "หัวข้อกิจกรรมการเดินทาง",
-          "location_name": "ชื่อสถานที่",
-          "description": "คำอธิบายการเดินทาง นัดหมายสนามบิน และเข้าพักโรงแรม",
+          "time_period": "13.00 น.",
+          "activity_title": "ชื่อกิจกรรม",
+          "location_name": "สถานที่",
+          "description": "รายละเอียดกิจกรรม",
           "is_highlight": false
         }
       ]
@@ -112,11 +100,17 @@ export async function POST(req: Request) {
           ];
         }
 
-        const aiResponse = await ai.models.generateContent({
+        // Add 7-second timeout race so generation never hangs Vercel serverless function
+        const aiPromise = ai.models.generateContent({
           model: "gemini-1.5-flash",
           contents: promptPayload,
           config: { responseMimeType: "application/json" }
         });
+        const timeoutPromise = new Promise((_, reject) =>
+          setTimeout(() => reject(new Error("Gemini AI request timed out")), 7000)
+        );
+
+        const aiResponse: any = await Promise.race([aiPromise, timeoutPromise]);
 
         if (aiResponse?.text) {
           const parsed = safeJsonParse(aiResponse.text);
@@ -125,7 +119,7 @@ export async function POST(req: Request) {
           }
         }
       } catch (aiErr) {
-        console.warn("Gemini generation failed, falling back to verified landmark database:", aiErr);
+        console.warn("Gemini generation failed or timed out, falling back to verified landmark database:", aiErr);
       }
     }
 
@@ -148,6 +142,9 @@ export async function POST(req: Request) {
     }
 
     // 5. Save Plan to Database
+    const startDateObj = data.startDate && !isNaN(new Date(data.startDate).getTime()) ? new Date(data.startDate) : new Date();
+    const endDateObj = data.endDate && !isNaN(new Date(data.endDate).getTime()) ? new Date(data.endDate) : new Date(startDateObj.getTime() + duration * 86400000);
+
     const plan = await prisma.tourPlan.create({
       data: {
         customer_id: customer.id,
@@ -156,8 +153,8 @@ export async function POST(req: Request) {
         country: data.country,
         main_city: data.mainCity,
         secondary_city: data.secondaryCity || "",
-        start_date: data.startDate && !isNaN(new Date(data.startDate).getTime()) ? new Date(data.startDate) : new Date(),
-        end_date: data.endDate && !isNaN(new Date(data.endDate).getTime()) ? new Date(data.endDate) : new Date(Date.now() + duration * 86400000),
+        start_date: startDateObj,
+        end_date: endDateObj,
         duration: duration,
         trip_type: data.tripType || "Private Tour",
         theme: data.theme || "Nature",
@@ -171,7 +168,7 @@ export async function POST(req: Request) {
         profit_amount: finalTotalSellingPrice - (marketEstimate.costPerPerson * pax),
         profit_percent: 22,
         status: "Draft",
-        customer_note: data.customerNote,
+        customer_note: data.customerNote || "",
         hero_image_url: heroImageUrl,
         airline: aiPlan.airline || "Thai Airways / Greater Bay Airlines",
         flight_route: aiPlan.flight_route || `BKK - ${data.mainCity} - BKK`,
@@ -183,11 +180,15 @@ export async function POST(req: Request) {
     // 6. Save Days and Activities
     if (aiPlan.itinerary && Array.isArray(aiPlan.itinerary)) {
       for (const dayData of aiPlan.itinerary) {
+        const dayActualDate = dayData.date && !isNaN(new Date(dayData.date).getTime())
+          ? new Date(dayData.date)
+          : new Date(startDateObj.getTime() + (dayData.day_number - 1) * 24 * 60 * 60 * 1000);
+
         const day = await prisma.tourDay.create({
           data: {
             tour_plan_id: plan.id,
             day_number: dayData.day_number,
-            actual_date: dayData.date ? new Date(dayData.date) : new Date(new Date(data.startDate || Date.now()).getTime() + (dayData.day_number - 1) * 24 * 60 * 60 * 1000),
+            actual_date: dayActualDate,
             day_title: dayData.daily_theme,
             city: data.mainCity,
             hotel_name: dayData.hotel_name_suggestion,
@@ -205,9 +206,9 @@ export async function POST(req: Request) {
               data: {
                 tour_day_id: day.id,
                 time_text: activity.time_period || activity.time_start || "",
-                activity_title: activity.activity_title || activity.location_name,
-                activity_description: activity.description,
-                location_name: activity.location_name,
+                activity_title: activity.activity_title || activity.location_name || "",
+                activity_description: activity.description || "",
+                location_name: activity.location_name || "",
                 is_highlight: activity.is_highlight ?? false,
                 sort_order: i + 1,
               }
