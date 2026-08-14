@@ -8,6 +8,7 @@ import CoverDesignerTab from "@/components/builder/CoverDesignerTab";
 import DailyImageGallery from "@/components/images/DailyImageGallery";
 import StatusSelector from "@/components/builder/StatusSelector";
 import HeroCoverUploader from "@/components/builder/HeroCoverUploader";
+import TripComBenchmarkWidget from "@/components/builder/TripComBenchmarkWidget";
 import { POI_PRESETS } from "@/lib/presetLibrary";
 
 const TABS = [
@@ -15,6 +16,7 @@ const TABS = [
   { id: "itinerary", label: "แผนรายวัน" },
   { id: "conditions", label: "เงื่อนไข" },
   { id: "cost", label: "ต้นทุนและราคา" },
+  { id: "benchmark", label: "📊 เปรียบเทียบ Trip.com" },
   { id: "images", label: "รูปภาพรายวัน" },
   { id: "cover", label: "ออกแบบหน้าปก" },
 ];
@@ -520,6 +522,24 @@ export default function TourBuilderClient({ initialPlan }: { initialPlan: any })
             planId={plan.id}
             travelerCount={plan.traveler_count || 1}
             duration={plan.duration || 1}
+            city={plan.main_city || "คุนหมิง"}
+            country={plan.country || "จีน"}
+            hotelLevel={plan.hotel_level || "4 ดาว"}
+            sellingPricePerPerson={plan.selling_price_per_person || 0}
+          />
+        </div>
+      )}
+
+      {/* Tab: เปรียบเทียบ Trip.com */}
+      {activeTab === "benchmark" && (
+        <div className="card">
+          <TripComBenchmarkWidget
+            city={plan.main_city || "คุนหมิง"}
+            country={plan.country || "จีน"}
+            duration={plan.duration || 4}
+            hotelLevel={plan.hotel_level || "4 ดาว"}
+            currentSellingPrice={plan.selling_price_per_person || 0}
+            travelerCount={plan.traveler_count || 2}
           />
         </div>
       )}

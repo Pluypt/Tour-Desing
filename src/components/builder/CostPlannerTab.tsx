@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { formatCurrency } from "@/lib/pricing";
+import TripComBenchmarkWidget from "./TripComBenchmarkWidget";
 
 type CostItem = {
   id: string;
@@ -47,7 +48,23 @@ const CURRENCIES: Record<string, { label: string; rate: number }> = {
   TWD: { label: "TWD (ดอลลาร์ไต้หวัน)", rate: 1.15 },
 };
 
-export default function CostPlannerTab({ planId, travelerCount, duration }: { planId: string; travelerCount: number; duration: number }) {
+export default function CostPlannerTab({
+  planId,
+  travelerCount,
+  duration,
+  city = "คุนหมิง",
+  country = "จีน",
+  hotelLevel = "4 ดาว",
+  sellingPricePerPerson = 0
+}: {
+  planId: string;
+  travelerCount: number;
+  duration: number;
+  city?: string;
+  country?: string;
+  hotelLevel?: string;
+  sellingPricePerPerson?: number;
+}) {
   const [costs, setCosts] = useState<CostItem[]>([]);
   const [pricing, setPricing] = useState<PricingSummary | null>(null);
   const [pricingMethod, setPricingMethod] = useState("percent");
@@ -349,6 +366,16 @@ export default function CostPlannerTab({ planId, travelerCount, duration }: { pl
           {saving && <p style={{ color: "var(--pr-text-muted)", fontSize: "0.85rem", marginTop: "10px" }}>กำลังบันทึก...</p>}
         </div>
       )}
+
+      {/* Trip.com Market Benchmark Widget */}
+      <TripComBenchmarkWidget
+        city={city}
+        country={country}
+        duration={duration}
+        hotelLevel={hotelLevel}
+        currentSellingPrice={pricing?.sellingPricePerPerson || sellingPricePerPerson}
+        travelerCount={travelerCount}
+      />
     </div>
   );
 }
