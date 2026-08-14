@@ -100,17 +100,11 @@ export async function POST(req: Request) {
           ];
         }
 
-        // Add 7-second timeout race so generation never hangs Vercel serverless function
-        const aiPromise = ai.models.generateContent({
+        const aiResponse = await ai.models.generateContent({
           model: "gemini-1.5-flash",
           contents: promptPayload,
           config: { responseMimeType: "application/json" }
         });
-        const timeoutPromise = new Promise((_, reject) =>
-          setTimeout(() => reject(new Error("Gemini AI request timed out")), 7000)
-        );
-
-        const aiResponse: any = await Promise.race([aiPromise, timeoutPromise]);
 
         if (aiResponse?.text) {
           const parsed = safeJsonParse(aiResponse.text);

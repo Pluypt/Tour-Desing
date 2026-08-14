@@ -20,10 +20,13 @@ export const ai = {
       if (!genAI) {
         throw new Error("GEMINI_API_KEY environment variable is missing");
       }
-      const model = genAI.getGenerativeModel({
-        model: options.model || "gemini-1.5-flash",
-        generationConfig: options.config?.responseMimeType ? { responseMimeType: options.config.responseMimeType } : undefined,
-      });
+      const model = genAI.getGenerativeModel(
+        {
+          model: options.model || "gemini-1.5-flash",
+          generationConfig: options.config?.responseMimeType ? { responseMimeType: options.config.responseMimeType } : undefined,
+        },
+        { timeout: 5000 }
+      );
 
       let promptPayload: any = options.contents;
       if (Array.isArray(options.contents)) {
