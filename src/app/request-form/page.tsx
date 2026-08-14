@@ -252,8 +252,18 @@ export default function TourRequestForm() {
         <h2 style={{ marginBottom: "15px", borderBottom: "1px solid var(--border-color)", paddingBottom: "10px" }}>ราคาและงบประมาณ</h2>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px" }}>
           <div className="form-group">
-            <label className="form-label">งบประมาณต่อคน</label>
-            <input type="number" className="form-control" name="budgetPerPerson" value={formData.budgetPerPerson} onChange={handleChange} />
+            <label className="form-label">งบประมาณต่อคน (บาท)</label>
+            <input
+              type="number"
+              className="form-control"
+              name="budgetPerPerson"
+              placeholder="เว้นว่างเพื่อให้ระบบประเมินราคาตลาดจริงให้อัตโนมัติ"
+              value={formData.budgetPerPerson}
+              onChange={handleChange}
+            />
+            <span style={{ fontSize: "0.78rem", color: "var(--pr-text-muted)", marginTop: "4px", display: "block" }}>
+              💡 หากไม่ได้ระบุราคา ระบบจะตรวจสอบราคาที่ควรตั้งให้ลูกค้าตามเนื้อจริงและราคาตลาดให้อัตโนมัติ
+            </span>
           </div>
           <div className="form-group">
             <label className="form-label">งบรวมทั้งกรุ๊ป (Auto Calculate)</label>
@@ -261,8 +271,8 @@ export default function TourRequestForm() {
               (() => {
                 const budget = parseFloat(formData.budgetPerPerson || "0");
                 const count = parseInt(formData.travelerCount || "0");
-                if (!budget || !count || isNaN(budget) || isNaN(count)) return "0";
-                return (budget * count).toLocaleString();
+                if (!budget || !count || isNaN(budget) || isNaN(count)) return "ระบบจะประเมินให้อัตโนมัติ";
+                return (budget * count).toLocaleString() + " บาท";
               })()
             } readOnly />
           </div>

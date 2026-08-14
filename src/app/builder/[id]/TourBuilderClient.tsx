@@ -75,11 +75,35 @@ export default function TourBuilderClient({ initialPlan }: { initialPlan: any })
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(plan),
       });
-      if (res.ok) { alert("Saved successfully!"); router.refresh(); }
-      else { alert("Failed to save changes"); }
+      if (res.ok) {
+        alert("บันทึกข้อมูลเรียบร้อยแล้ว!");
+        router.refresh();
+      } else {
+        alert("บันทึกข้อมูลไม่สำเร็จ");
+      }
     } catch (e) {
       console.error(e);
-      alert("Error saving plan");
+      alert("เกิดข้อผิดพลาดในการบันทึกข้อมูล");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleNavigatePreview = async () => {
+    setSaving(true);
+    try {
+      const res = await fetch(`/api/tour-plans/${plan.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(plan),
+      });
+      if (res.ok) {
+        router.refresh();
+      }
+      router.push(`/preview/${plan.id}`);
+    } catch (e) {
+      console.error(e);
+      router.push(`/preview/${plan.id}`);
     } finally {
       setSaving(false);
     }
@@ -139,7 +163,14 @@ export default function TourBuilderClient({ initialPlan }: { initialPlan: any })
           >
             ✨ Gen เนื้อหาใหม่ทั้งหมด
           </button>
-          <Link href={`/preview/${plan.id}`} className="btn-secondary">พรีวิว & ดาวน์โหลด</Link>
+          <button
+            className="btn-secondary"
+            onClick={handleNavigatePreview}
+            disabled={saving}
+            style={{ display: "flex", alignItems: "center", gap: "6px" }}
+          >
+            👁️ พรีวิว & ดาวน์โหลด
+          </button>
           <button className="btn-primary" onClick={handleSave} disabled={saving}>
             {saving ? "กำลังบันทึก..." : "บันทึกข้อมูล"}
           </button>

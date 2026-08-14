@@ -100,28 +100,100 @@ export const POI_PRESETS: POIPreset[] = [
     description: "โรงแรมระดับ 4 ดาว ย่านศูนย์กลางโตเกียว เดินทางสะดวกใกล้สถานีรถไฟใหญ่",
   },
 
-  // CHENGDU CHINA
+  // MACAO & HONG KONG (LEMON8 TRENDS)
   {
-    city: "Chengdu",
-    country: "China",
+    city: "Macao",
+    country: "Macao",
     category: "Attraction",
-    title: "ศูนย์อนุรักษ์หมีแพนด้าเฉิงตู (Chengdu Panda Base)",
-    description: "นำท่านเยี่ยมชม **ศูนย์อนุรักษ์หมีแพนด้าเฉิงตู** ชมความน่ารักของหมีแพนด้ายักษ์และแพนด้าแดงในบรรยากาศป่าไผ่ธรรมชาติอันร่มรื่น",
-    recommendedTime: "เช้า"
+    title: "เดอะลอนดอนเนอร์ มาเก๊า (The Londoner Macao) มุมถ่ายรูปบิ๊กเบนจำลอง",
+    description: "นำท่านถ่ายภาพมุมไวรัลยอดฮิตใน Lemon8 **The Londoner Macao** สถาปัตยกรรมสไตล์อังกฤษสุดหรู หอนาฬิกาบิ๊กเบน และตู้โทรศัพท์สีแดงสุดคลาสสิก",
+    recommendedTime: "บ่าย | เย็น"
   },
   {
-    city: "Chengdu",
-    country: "China",
+    city: "Macao",
+    country: "Macao",
     category: "Attraction",
-    title: "ถนนโบราณจิ๋นหลี่ (Jinli Ancient Street)",
-    description: "สัมผัสบรรยากาศย่านเมืองเก่าสามก๊ก **ถนนโบราณจิ๋นหลี่** ชมโคมไฟสไตล์โบราณ ชิมหมาล่าเสียบไม้ และของกินพื้นเมืองเสฉวน",
+    title: "หมู่บ้านไทปา (Taipa Village) ตึกพาสเทล & คาเฟ่สุดชิค",
+    description: "เดินเล่น **หมู่บ้านไทปา (Taipa Village)** ถ่ายรูปตรอกซอกซอยตึกโคโลเนียลสีพาสเทล ชิมทาร์ตไข่ Lord Stow's และแวะคาเฟ่สไตล์มินิมอล",
+    recommendedTime: "บ่าย"
+  },
+  {
+    city: "Hong Kong",
+    country: "Hong Kong",
+    category: "Attraction",
+    title: "West Kowloon Art Park & พิพิธภัณฑ์ M+ จุดชมวิวริมอ่าวสุด Aesthetic",
+    description: "นำท่านเช็คอินแลนด์มาร์กศิลปะริมน้ำ **West Kowloon Art Park** นั่งปิคนิคชมวิวอ่าววิคตอเรีย และถ่ายรูปสถาปัตยกรรมสุดมินิมอล ณ **พิพิธภัณฑ์ M+**",
     recommendedTime: "เย็น"
   },
   {
+    city: "Hong Kong",
+    country: "Hong Kong",
+    category: "Shopping",
+    title: "K11 MUSEA ห้างศิลปะริมอ่าว & จุดเช็คอิน Lemon8",
+    description: "เดินเล่น **K11 MUSEA** ศูนย์การค้าริมอ่าวที่ผสานศิลปะและแฟชั่นระดับโลก ถ่ายรูปมุมบันไดวน The Oculus สุดอลังการ",
+    recommendedTime: "บ่าย | เย็น"
+  },
+
+  // TOKYO JAPAN (LEMON8 TRENDS)
+  {
+    city: "Tokyo",
+    country: "Japan",
+    category: "Attraction",
+    title: "จุดชมวิวพาโนรามา Shibuya Sky (Shibuya Scramble Square)",
+    description: "ขึ้นชมวิวมหานครโตเกียวแบบ 360 องศาบนดาดฟ้ากระจกใส **Shibuya Sky** จุดถ่ายรูปพาโนรามาสุดไวรัลอันดับ 1 ใน Lemon8 มองเห็นวิวภูเขาไฟฟูจิและห้าแยกชิบูย่า",
+    recommendedTime: "เย็น | ค่ำ"
+  },
+  {
+    city: "Tokyo",
+    country: "Japan",
+    category: "Attraction",
+    title: "โอโมเตะซันโด & Cat Street คาเฟ่ฮอปปิ้ง & แฟชั่นสตรีท",
+    description: "เดินเล่นย่านสถาปัตยกรรมระดับโลก **Omotesando** และถนนสายแฟชั่น **Cat Street** แวะจิบกาแฟในคาเฟ่ดีไซน์ชิค",
+    recommendedTime: "บ่าย"
+  },
+
+  // CHENGDU & CHONGQING (LEMON8 TRENDS)
+  {
     city: "Chengdu",
     country: "China",
-    category: "Hotel",
-    title: "Chengdu Holiday Inn Express / Shangri-La Chengdu",
-    description: "โรงแรมระดับ 4-5 ดาว สไตล์โมเดิร์น สัมผัสความสบายระดับพรีเมียม",
+    category: "Attraction",
+    title: "หมีแพนด้ายักษ์ปีนตึก IFS Chengdu & ไท่กู่หลี่ (Taikoo Li)",
+    description: "ถ่ายรูปกับ **ประติมากรรมหมีแพนด้ายักษ์ปีนตึก IFS** แลนด์มาร์กอันดับหนึ่งของเฉิงตู และช้อปปิ้งย่านโมเดิร์น **ไท่กู่หลี่ (Taikoo Li)**",
+    recommendedTime: "บ่าย"
+  },
+  {
+    city: "Chongqing",
+    country: "China",
+    category: "Attraction",
+    title: "หงหยาต้ง (Hongyadong) แสงสีทองเมืองไซเบอร์พังก์ยามค่ำคืน",
+    description: "ชมความงามตระการตาของ **หงหยาต้ง (Hongyadong)** อาคารไม้โบราณ 11 ชั้นริมหน้าผาเปิดไฟสีทองสว่างไสว ดุจหลุดเข้าไปในโลกแอนิเมชัน Spirited Away",
+    recommendedTime: "ค่ำ"
+  },
+  {
+    city: "Chongqing",
+    country: "China",
+    category: "Attraction",
+    title: "สถานีรถไฟหลี่จื่อป้า (Liziba Station) รถไฟโมโนเรลวิ่งทะลุตึก",
+    description: "นำท่านถ่ายรูปจุดไวรัลระดับโลก **รถไฟโมโนเรลวิ่งทะลุตึกอพาร์ตเมนต์สถานีหลี่จื่อป้า** สัมผัสความมหัศจรรย์ของเมือง 3 มิติ",
+    recommendedTime: "เช้า | บ่าย"
+  },
+
+  // KUNMING & YUNNAN (LEMON8 TRENDS)
+  {
+    city: "Kunming",
+    country: "China",
+    category: "Attraction",
+    title: "ตลาดดอกไม้สดโต่วหนาน (Dounan Flower Market) ทะเลดอกไม้สุดอลังการ",
+    description: "สัมผัสบรรยากาศ **ตลาดดอกไม้โต่วหนาน** ตลาดดอกไม้สดที่ใหญ่ที่สุดในเอเชีย สวรรค์ของสายคอนเทนต์และคนรักดอกไม้ ถ่ายรูปมุมสดใสสไตล์ Lemon8",
+    recommendedTime: "เย็น | ค่ำ"
+  },
+  {
+    city: "Kunming",
+    country: "China",
+    category: "Attraction",
+    title: "ซุ้มประตูม้าทองไก่หยก & ถนนคนเดินหนานผิง (Nanping Street)",
+    description: "ถ่ายรูปคู่กับ **ซุ้มประตูม้าทองไก่หยก** แลนด์มาร์กประวัติศาสตร์ใจกลางเมือง และเดินชิลล์ **ถนนคนเดินหนานผิง** ลิ้มลองสตรีทฟู้ดและชานมไข่มุกยูนนาน",
+    recommendedTime: "เย็น"
   }
 ];
+

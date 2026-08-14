@@ -8,6 +8,9 @@ import InclusionExclusionSection from "@/components/proposal/InclusionExclusionS
 import DailyItinerarySection from "@/components/proposal/DailyItinerarySection";
 import PackagePriceSection from "@/components/proposal/PackagePriceSection";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export default async function ProposalPreviewPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
 
@@ -15,6 +18,10 @@ export default async function ProposalPreviewPage({ params }: { params: Promise<
     where: { id },
     include: {
       customer: true,
+      CoverDesigns: {
+        orderBy: { updated_at: "desc" },
+        take: 1,
+      },
       TourDays: {
         orderBy: { sort_order: "asc" },
         include: {
@@ -32,7 +39,8 @@ export default async function ProposalPreviewPage({ params }: { params: Promise<
 
   if (!plan) return notFound();
 
-  const heroImageUrl = plan.hero_image_url;
+  const coverDesign = plan.CoverDesigns?.[0];
+  const heroImageUrl = plan.hero_image_url || coverDesign?.background_url || null;
 
   return (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center" }}>
@@ -59,7 +67,9 @@ export default async function ProposalPreviewPage({ params }: { params: Promise<
       <div style={{ width: "100%", maxWidth: "820px", display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
         <h1 className="page-title" style={{ margin: 0 }}>พรีวิวเอกสาร</h1>
         <div style={{ display: "flex", gap: "10px" }}>
-          <Link href={`/builder/${plan.id}`} className="btn-secondary">แก้ไขแพลน</Link>
+          <Link href={`/builder/${plan.id}`} className="btn-secondary" prefetch={false}>
+            ← กลับไปแก้ไขแพลน
+          </Link>
           <ExportButtons title={plan.title || "Final_Itinerary"} />
         </div>
       </div>
@@ -92,6 +102,13 @@ export default async function ProposalPreviewPage({ params }: { params: Promise<
           flightRoute={plan.flight_route}
           customerName={plan.customer?.name}
           heroImageUrl={heroImageUrl}
+          subheadline={coverDesign?.subheadline}
+          badgeText={coverDesign?.badge_text}
+          highlightText={coverDesign?.highlight_text}
+          priceText={coverDesign?.price_text}
+          travelDateText={coverDesign?.travel_date_text}
+          themeColor={coverDesign?.theme_color}
+          overlayStyle={coverDesign?.overlay_style}
         />
 
         {/* 2. Package & Price */}
@@ -99,7 +116,7 @@ export default async function ProposalPreviewPage({ params }: { params: Promise<
           sellingPricePerPerson={plan.selling_price_per_person}
           totalSellingPrice={plan.total_selling_price}
           travelerCount={plan.traveler_count}
-          depositAmount={null}
+          depositAmount={plan.deposit_amount || null}
         />
 
         {/* 3. Short Itinerary Table */}

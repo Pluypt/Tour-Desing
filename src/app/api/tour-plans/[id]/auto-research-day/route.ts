@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { ai, buildFallbackPlan } from "@/lib/ai";
+import { ai, safeJsonParse, buildFallbackPlan } from "@/lib/ai";
 
 export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -13,6 +13,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
 
     const city = plan.main_city || plan.country || "Macao";
     const country = plan.country || "China";
+    const duration = plan.duration || 4;
 
     let researchedActivities: Array<{
       time_period: string;
@@ -21,18 +22,73 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
       description: string;
     }> = [];
 
-    // Always build from authoritative landmark database for maximum accuracy & unique daily activities
-    const fullFallback = buildFallbackPlan(city, country, Math.max(dayNumber, 4), new Date().toISOString());
-    const dayIdx = Math.min(dayNumber - 1, fullFallback.itinerary.length - 1);
-    const dayData = fullFallback.itinerary[dayIdx];
+    // Try Gemini AI first if API key is available
+    if (process.env.GEMINI_API_KEY) {
+      try {
+        const isFirstDay = dayNumber === 1;
+        const isLastDay = dayNumber === duration;
 
-    if (dayData && dayData.activities) {
-      researchedActivities = dayData.activities.map(act => ({
-        time_period: act.time_period || "เช้า",
-        activity_title: act.activity_title || `ท่องเที่ยว ${city}`,
-        location_name: act.location_name || city,
-        description: act.description || `นำท่านชม **${city}**`
-      }));
+        let ruleInstruction = "";
+        if (isFirstDay) {
+          ruleInstruction = "นี่คือวันแรกของทริป: ต้องเน้นกิจกรรมการเดินทางเท่านั้น (นัดหมายสนามบินสุวรรณภูมิ, เที่ยวบิน, ผ่านตม., รับสัมภาระ, เข้าสู่ที่พัก, พักผ่อน) ห้ามใส่สถานที่ท่องเที่ยว";
+        } else if (isLastDay) {
+          ruleInstruction = "นี่คือวันสุดท้ายของทริป: ต้องเน้นกิจกรรมการเดินทางกลับเท่านั้น (รับประทานอาหารเช้า, เช็คเอาท์โรงแรม, เดินทางสู่สนามบิน, เช็คอินโหลดสัมภาระ, บินกลับกรุงเทพฯ) ห้ามใส่สถานที่ท่องเที่ยว";
+        } else {
+          ruleInstruction = "นี่คือวันระหว่างทริป: สกัดแลนด์มาร์กใหม่ มุมถ่ายรูปยอดฮิต คาเฟ่ aesthetic จุดเช็คอินสไตล์ Lemon8 / Xiaohongshu / Instagram ที่กำลังเป็นไวรัลและเป็นของจริงในเมืองนั้น มีเน้นตัวหนา **[ชื่อสถานที่]**";
+        }
+
+        const prompt = `คุณคือผู้เชี่ยวชาญด้านโปรแกรมทัวร์และ Content Creator สไตล์ Lemon8
+กรุณาสร้างรายการกิจกรรม (activities) สำหรับวันที่ ${dayNumber} ของทริปเมือง ${city}, ${country} (ระยะเวลารวม ${duration} วัน)
+
+[กฎสำหรับวันนี้]
+${ruleInstruction}
+
+ส่งออกเฉพาะ JSON อาร์เรย์ของ activities รูปแบบ:
+[
+  {
+    "time_period": "เช้า / บ่าย / เย็น / เวลา",
+    "activity_title": "ชื่อกิจกรรม",
+    "location_name": "ชื่อสถานที่",
+    "description": "คำบรรยายรายละเอียด",
+    "is_highlight": true
+  }
+]`;
+
+        const aiResponse = await ai.models.generateContent({
+          model: "gemini-1.5-flash",
+          contents: prompt,
+          config: { responseMimeType: "application/json" }
+        });
+
+        if (aiResponse?.text) {
+          const parsed = safeJsonParse<any[]>(aiResponse.text);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            researchedActivities = parsed.map(act => ({
+              time_period: act.time_period || "เช้า",
+              activity_title: act.activity_title || act.location_name || `ท่องเที่ยว ${city}`,
+              location_name: act.location_name || city,
+              description: act.description || `นำท่านชม **${city}**`,
+            }));
+          }
+        }
+      } catch (err) {
+        console.warn("AI research day failed, falling back to database:", err);
+      }
+    }
+
+    if (researchedActivities.length === 0) {
+      const fullFallback = buildFallbackPlan(city, country, Math.max(dayNumber, duration), new Date().toISOString());
+      const dayIdx = Math.min(dayNumber - 1, fullFallback.itinerary.length - 1);
+      const dayData = fullFallback.itinerary[dayIdx];
+
+      if (dayData && dayData.activities) {
+        researchedActivities = dayData.activities.map(act => ({
+          time_period: act.time_period || "เช้า",
+          activity_title: act.activity_title || `ท่องเที่ยว ${city}`,
+          location_name: act.location_name || city,
+          description: act.description || `นำท่านชม **${city}**`
+        }));
+      }
     }
 
     // Replace activities in database for this day
