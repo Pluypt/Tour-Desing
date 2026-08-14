@@ -5,8 +5,51 @@ import fs from 'fs';
 
 let app: admin.app.App;
 
-// Encoded service account fallback for cloud deployment (Vercel)
-const embeddedB64 = "ewogICJ0eXBlIjogInNlcnZpY2VfYWNjb3VudCIsCiAgInByb2plY3RfaWQiOiAidG91ci1kZXNpbmciLAogICJwcml2YXRlX2tleV9pZCI6ICI0MWY2NWM4YWU2OTU3NDVjYjM5NmI0YTU3NTQ1OGVmYzA2NGYzMTE2IiwKICAicHJpdmF0ZV9rZXkiOiAiLS0tLS1CRUdJTiBQUklWQVRFIEtFWS0tLS0tXG5NSUlFdlFJQkFEQU5CZ2txaGtpRzl3MEJBUUVGQUFTQ0JLY3dnZ1NqQWdFQUFvSUJBUURCT0tvVlM2Qk45K1crXG4zZFZwNU5JQXJkTW0yRkxxL1VqVWZIbm84NHdRUHF2Z1NGZHhCcFFWSXJ2OXc0R3JVL05OYXdqSTNwR0hvc3lwXG40a3FqYlVMVW1OZUtINDY4bkROaHZYV2tJMExvOWMrWlhOZUpETE95QndTQytVTWU2ek5ybjhLZUpIbVlSWVI3XG5BN0tMU05NMDVtNUFlT0plRUkvR3gvdFJoVHdlTUFUeWRUdDJjSmNiV0s3ekcwTW9ocmtOV05TNjdDc0lFaFRGXG5CdlRERHRmYmtFdmtHaUp6Z0g3Q1cwVmUzVDB1ZXJVUUVjL2tEeGlBOFVIWWllR0xtUUdyUnJydWdoQklLNjRpXG5zN2RtaUROazhVRGQvc3ZZMVBwZTRsbmJmandjVTFKa0xPSDdzR1dKbGo4eG9WQ0dSWGNFRjRocmFmSGFDeWNZXG5wRU4rMzRGekFnTUJBQUVDZ2dFQUZidjEwY3NUSDBJU2F6dW1aN0RGVGRpVS9FcHdCVWtlcjBiSWdHNGVKQU9tXG5CTHY1R0szSWxzUzBuYnVuU0g5N0g0c1BKQko1RHp5VG0wdStObytIUHNVVWdFL0N3cTkvK01TOWMyR1lyZjRIXG5HZC8vZEpzNC9xa0Z3US9MRk4xdHNzajMzM1JkNHhyS3ZLV2RVMGZmK0w3YUh2d2FCbTBFSnpRcExseDNkek9nXG5lVEFIYVU4R3RxNEhzSWVGanZncVNOa1JnSW5Ha3ZtNWpWaHZkUXFHaXpKeXcyT3ByT1NtakczeFFlQ1huRlNaXG5oTlZ5ZDdRQ3dEM1dyQjN3V0Vna0FtbCt3aXYrbjU4NVdyT0ZUQ2lUbGpVMXpMcFJzdGRadDV3VXZNQkVucGtNXG5GTUFjS0svU1dBajArRFdUcXowNC9valRNZ3BDUVhpbGNDT1ZkUmVISFFLQmdRRHFEMGVJVUY3Y25qRGJJSlQvXG5KT25OWHNOaWJXV2tPYlZqV3ZHczEzQng4WDVZSGdhVEVCRmt2cnJDTW5VMVlVTU5VK3dkMHF5WWE2QVByT08rXG41a0FqR1EwZFV3MkRJc0lOQmN3c0twS3owTnE4VUllenY1cTNHT2xodCtVdGY5dkQrbDY3bFZ0L3JlSG9jd1lHXG5tN3I3MHZsVHNWQ0ZNTXByWjVIT2NOclU5d0tCZ1FEVFZXT1dKdFhkVVlmQXk3cGh1U0kxNWY3Vi9QWVlFakRCXG54S3lVcmMrOGNodFVjUHllN3JleHRhTURGQlJuTFBVbHFCT0wwU0tjUmN4bDR0RTRsR3NZdmhRN2JjbGNlbkpJXG5iZG5qK09aeENvM0g1VkJreVh6SHB6YnFaS0VlUVNXdENhdE1qZHpxY25kUlpZclpqdXlFdERCY0xtYWZsZlEzXG5RMGJmdkM5a1pRS0JnR3RneXg1Y1VNakJ3Z1FsZEhXQkI4bngrWTBFUnljS1dvN1VRQjlkVHZiWEpYRmpoUHllXG4ySHZ4akZoZk1hcGxqbzlrdXVRTHJLYllhVHdId3d2bk1mRm9JcjRiUmcydE9uMGk5Y0lsWGR3a3F0VE4xUk8vXG5pVWtLb3JiejJLNEJCRjlxVTErWGE3eXRsd0EvRkxxZll5NzRZTzNtWU54WnYrTjZSa2dCT2tPTkFvR0JBSkJRXG5BaFpaNUxjaVlySjhMSVZwRi94NFY0SW5JS0lsWWRnZ0JyM3N4eXZuTzlSNDUzbGNpR0k1SjkwRlREMThqTmN2XG5KRkhZK1dwL20ybUQ3dDFWTktFTHcrTWxRRmovWUtVbkpxQ3ZxaVZOVUs1TllJM0NyWXZsR3ZJS3o1OUtXNEVEXG5WaytMbkcwWXgzUDFCRkUyY1RyWmxTQ05xeFNWSU5UUUEwanJSKzJsQW9HQUJQU1oxQzJvWi9Ja1pyTHozbEtuXG5ycmhuZ0hUWEdheWM3Vmg1TGdNd0Q0c1Zmd2o0ZjR4cFE0V0pWdm9EakRLdmtuT2k1ekFiNjVKNHh2MXRsUTgwXG5sVmVBeU9seEkrb2pnSjJ3RmRZME10WWN2MHNOSktRMFFETWFkVHd0Q0w5dXlHV2VmT3AyN2xKYXVSWVJMUnllXG5VZExEN2dBYmp1VVVDdFQ2SUE3K1ZDWT1cbi0tLS0tRU5EIFBSSVZBVEUgS0VZLS0tLS1cbiIsCiAgImNsaWVudF9lbWFpbCI6ICJmaXJlYmFzZS1hZG1pbnNkay1mYnN2Y0B0b3VyLWRlc2luZy5pYW0uZ3NlcnZpY2VhY2NvdW50LmNvbSIsCiAgImNsaWVudF9pZCI6ICIxMDkxOTg3MDMzMTc3NjIzNTQ0OTgiLAogICJhdXRoX3VyaSI6ICJodHRwczovL2FjY291bnRzLmdvb2dsZS5jb20vby9vYXV0aDIvYXV0aCIsCiAgInRva2VuX3VyaSI6ICJodHRwczovL29hdXRoMi5nb29nbGVhcGlzLmNvbS90b2tlbiIsCiAgImF1dGhfcHJvdmlkZXJfeDUwOV9jZXJ0X3VybCI6ICJodHRwczovL3d3dy5nb29nbGVhcGlzLmNvbS9vYXV0aDIvdjEvY2VydHMiLAogICJjbGllbnRfeDUwOV9jZXJ0X3VybCI6ICJodHRwczovL3d3dy5nb29nbGVhcGlzLmNvbS9yb2JvdC92MS9tZXRhZGF0YS94NTA5L2ZpcmViYXNlLWFkbWluc2RrLWZic3ZjJTQwdG91ci1kZXNpbmcuaWFt.Z3NlcnZpY2VhY2NvdW50LmNvbSIsCiAgInVuaXZlcnNlX2RvbWFpbiI6ICJnb29nbGVhcGlzLmNvbSIKfQ==";
+// Direct service account object for production deployment (Vercel)
+const pKey = [
+  "-----BEGIN PRIVATE KEY-----\n",
+  "MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDBOKoVS6BN9+W+\n",
+  "3dVp5NIArdMm2FLq/UjUfHno84wQPqvgSFdxBpQVIrv9w4GrU/NNawjI3pGHosyp\n",
+  "4kqjbULUmNeKH468nDNhvXWkI0Lo9c+ZXNeJDLOyBwSC+UMe6zNrn8KeJHmYRYR7\n",
+  "A7KLSNM05m5AeOJeEI/Gx/tRhTweMATydTt2cJcbWK7zG0MohrkNWNS67CsIEhTF\n",
+  "BvTDDtfbkEvkGiJzgH7CW0Ve3T0uerUQEc/kDxiA8UHYieGLmQGrRrrughBIK64i\n",
+  "s7dmiDNk8UDd/svY1Ppe4lnbfjwcU1JkLOH7sGWJlj8xoVCGRXcEF4hrafHaCycY\n",
+  "pEN+34FzAgMBAAECggEAFbv10csTH0ISazumZ7DFTdiU/EpwBUker0bIgG4eJAOm\n",
+  "BLv5GK3IlsS0nbunSH97H4sPJBJ5DzyTm0u+No+HPsUUgE/Cwq9/+MS9c2GYrf4H\n",
+  "Gd//dJs4/qkFwQ/LFN1tssj333Rd4xrKvKWdU0ff+L7aHvwaBm0EJzQpLlx3dzOg\n",
+  "eTAHaU8Gtq4HsIeFjvgqSNkRgInGkvm5jVhvdQqGizJyw2OprOSmjG3xQeCXnFSZ\n",
+  "hNVyd7QCwD3WrB3wWEgkAml+wiv+n585WrOFTCiTljU1zLpRstdZt5wUvMBEnpkM\n",
+  "FMAcKK/SWAj0+DWTqz04/ojTMgpCQXilcCOVdReHHQKBgQDqD0eIUF7cnjDbIJT/\n",
+  "JOnNXsNibWWkObVjWvGs13Bx8X5YHgaTEBFkvrrCMnU1YUMNU+wd0qyYa6APrOO+\n",
+  "5kAjGQ0dUw2DIsINBcwsKpKz0Nq8UIezv5q3GOlht+Utf9vD+l67lVt/reHocwYG\n",
+  "m7r70vlTsVCFMMprZ5HOcNrU9wKBgQDTVWOWJtXdUYfAy7phuSI15f7V/PYYEjDB\n",
+  "xKyUrc+8chtUcPye7rextaMDFBRnLPUlqBOL0SKcRcxl4tE4lGsYvhQ7bclcenJI\n",
+  "bdnj+OZxCo3H5VBkyXzHpzbqZKEeQSWtCatMjdzqcndRZYrZjuyEtDBcLmaflfQ3\n",
+  "Q0bfvC9kZQKBgGtgyx5cUMjBwgQldHWBB8nx+Y0ERycKWo7UQB9dTvbXJXFjhPye\n",
+  "2HvxjFhfMapljo9kuuQLrKbYaTwHwwvnMfFoIr4bRg2tOn0i9cIlXdwkqtTN1RO/\n",
+  "iUkKorbz2K4BBF9qU1+Xa7ytlwA/FLqfYy74YO3mYNxZv+N6RkgBOkONAoGBAJBQ\n",
+  "AhZZ5LciYrJ8LIVpF/x4V4InIKIlYdggBr3sxyvnO9R453lciGI5J90FTD18jNcv\n",
+  "JFHY+Wp/m2mD7t1VNKELw+MlQFj/YKUnJqCvqiVNUK5NYI3CrYvlGvIKz59KW4ED\n",
+  "Vk+LnG0Yx3P1BFE2cTrZlSCNqxSVINTQA0jrR+2lAoGABPSZ1C2oZ/IkZrLz3lKn\n",
+  "rrhngHTXGayc7Vh5LgMwD4sVfwj4f4xpQ4WJVvoDjDKvknOi5zAb65J4xv1tlQ80\n",
+  "lVeAyOlxI+ojgJ2wFdY0MtYcv0sNJKQ0QDMadTwtCL9uyGWefOp27lJauRYRLRye\n",
+  "UdLD7gAbjuUUCtT6IA7+VCY=\n",
+  "-----END PRIVATE KEY-----\n"
+].join("");
+
+const fallbackServiceAccount = {
+  type: "service_account",
+  project_id: "tour-desing",
+  private_key_id: "41f65c8ae695745cb396b4a575458efc064f3116",
+  private_key: pKey,
+  client_email: "firebase-adminsdk-fbsvc@tour-desing.iam.gserviceaccount.com",
+  client_id: "109198703317762354498",
+  auth_uri: "https://accounts.google.com/o/oauth2/auth",
+  token_uri: "https://oauth2.googleapis.com/token",
+  auth_provider_x509_cert_url: "https://www.googleapis.com/oauth2/v1/certs",
+  client_x509_cert_url: "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-fbsvc%40tour-desing.iam.gserviceaccount.com",
+  universe_domain: "googleapis.com"
+};
 
 if (!admin.apps.length) {
   try {
@@ -30,15 +73,7 @@ if (!admin.apps.length) {
     }
 
     if (!serviceAccount) {
-      try {
-        serviceAccount = JSON.parse(Buffer.from(embeddedB64, "base64").toString("utf-8"));
-      } catch (e) {
-        console.error('Failed to parse embedded B64 service account:', e);
-      }
-    }
-
-    if (serviceAccount && typeof serviceAccount.private_key === 'string' && serviceAccount.private_key.includes('\\n')) {
-      serviceAccount.private_key = serviceAccount.private_key.replace(/\\n/g, '\n');
+      serviceAccount = fallbackServiceAccount;
     }
 
     app = admin.initializeApp({
