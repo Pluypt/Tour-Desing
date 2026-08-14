@@ -27,8 +27,8 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
         flight_route: body.flight_route ?? undefined,
         outbound_flight: body.outbound_flight ?? undefined,
         return_flight: body.return_flight ?? undefined,
-        start_date: body.start_date ? new Date(body.start_date) : undefined,
-        end_date: body.end_date ? new Date(body.end_date) : undefined,
+        start_date: body.start_date && !isNaN(new Date(body.start_date).getTime()) ? new Date(body.start_date) : undefined,
+        end_date: body.end_date && !isNaN(new Date(body.end_date).getTime()) ? new Date(body.end_date) : undefined,
         hotel_level: body.hotel_level ?? undefined,
         hero_image_url: body.hero_image_url ?? undefined,
         selling_price_per_person: sellingPricePerPerson,
@@ -94,7 +94,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
             breakfast_included: Boolean(day.breakfast_included),
             lunch_included: Boolean(day.lunch_included),
             dinner_included: Boolean(day.dinner_included),
-            actual_date: day.actual_date ? new Date(day.actual_date) : undefined,
+            actual_date: day.actual_date && !isNaN(new Date(day.actual_date).getTime()) ? new Date(day.actual_date) : undefined,
           }
         });
 

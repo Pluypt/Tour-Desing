@@ -444,7 +444,7 @@ const tourDayAdapter = {
     const now = new Date();
     const ref = adminDb.collection('tour_plans').doc(planId).collection('days').doc(id);
     const data = { ...args.data, id, created_at: now, updated_at: now };
-    await ref.set(data, { merge: true });
+    await ref.set(cleanData(data), { merge: true });
     return asObject(data);
   },
 
@@ -453,7 +453,7 @@ const tourDayAdapter = {
     if (!day) throw new Error('TourDay not found');
 
     const dayRef = adminDb.collection('tour_plans').doc(day.tour_plan_id).collection('days').doc(day.id);
-    await dayRef.set({ ...args.data, updated_at: new Date() }, { merge: true });
+    await dayRef.set(cleanData({ ...args.data, updated_at: new Date() }), { merge: true });
     return this.findUnique({ where: { id: day.id } });
   },
 
@@ -490,7 +490,7 @@ const tourActivityAdapter = {
 
     const actRef = adminDb.collection('tour_plans').doc(day.tour_plan_id).collection('days').doc(dayId).collection('activities').doc(actId);
     const data = { ...args.data, id: actId, created_at: new Date(), updated_at: new Date() };
-    await actRef.set(data, { merge: true });
+    await actRef.set(cleanData(data), { merge: true });
     return asObject(data);
   },
 
@@ -502,7 +502,7 @@ const tourActivityAdapter = {
         const actRef = dayDoc.ref.collection('activities').doc(args.where.id);
         const actDoc = await actRef.get();
         if (actDoc.exists) {
-          await actRef.set({ ...args.data, updated_at: new Date() }, { merge: true });
+          await actRef.set(cleanData({ ...args.data, updated_at: new Date() }), { merge: true });
           const updated = await actRef.get();
           return { id: updated.id, ...asObject(updated.data()) };
         }
