@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { ai, safeJsonParse, validateAIPlan, buildFallbackPlan } from "@/lib/ai";
+import { ai, safeJsonParse, validateAIPlan, buildFallbackPlan, sanitizeHotelName } from "@/lib/ai";
 import { estimateMarketPrice } from "@/lib/pricing";
 
 export const maxDuration = 60;
@@ -53,6 +53,7 @@ export async function POST(req: Request) {
 2. วันสุดท้าย (Day ${duration}): ต้องเน้นกิจกรรมการเดินทางกลับเท่านั้น (รับประทานอาหารเช้า, เช็คเอาท์โรงแรม, เดินทางสู่สนามบิน, เช็คอินสัมภาระ, บินกลับกรุงเทพฯ สุวรรณภูมิ) ห้ามใส่สถานที่ท่องเที่ยวในวันสุดท้ายเด็ดขาด
 3. วันระหว่างทริป (Day 2 ถึง Day ${duration - 1}): สกัดแลนด์มาร์กใหม่ มุมถ่ายรูปยอดฮิต คาเฟ่ aesthetic จุดเช็คอินสไตล์ Lemon8 / Xiaohongshu / Instagram ที่กำลังเป็นไวรัลและเป็นของจริงในเมืองนั้น มีเน้นตัวหนา **[ชื่อสถานที่]**
 4. ทุกวันต้องไม่ซ้ำกัน และมีโครงสร้างครบถ้วน
+5. ระดับโรงแรมใน "hotel_name_suggestion" ต้องตรงตามระดับโรงแรมที่ลูกค้าเลือกคือ "${data.hotelLevel || "3 ดาว"}" โดยระบุชื่อโรงแรมตามด้วย "หรือเทียบเท่า ${data.hotelLevel || "3 ดาว"}" เท่านั้น (ห้ามระบุระดับดาวอื่นขัดกับที่ลูกค้าเลือกเด็ดขาด)
 
 ส่งออกเป็น JSON Object รูปแบบ:
 {
@@ -118,7 +119,7 @@ export async function POST(req: Request) {
     }
 
     if (!aiPlan) {
-      aiPlan = buildFallbackPlan(data.mainCity, data.country, duration, data.startDate || new Date().toISOString());
+      aiPlan = buildFallbackPlan(data.mainCity, data.country, duration, data.startDate || new Date().toISOString(), data.hotelLevel);
     }
 
     // 4. Hero image fallback / generation
@@ -185,7 +186,7 @@ export async function POST(req: Request) {
             actual_date: dayActualDate,
             day_title: dayData.daily_theme,
             city: data.mainCity,
-            hotel_name: dayData.hotel_name_suggestion,
+            hotel_name: sanitizeHotelName(dayData.hotel_name_suggestion, data.hotelLevel),
             breakfast_included: dayData.breakfast_included ?? (dayData.day_number > 1),
             lunch_included: dayData.lunch_included ?? (dayData.day_number > 1 && dayData.day_number < duration),
             dinner_included: dayData.dinner_included ?? (dayData.day_number < duration),

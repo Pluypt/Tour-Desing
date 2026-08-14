@@ -21,7 +21,7 @@ const initialFormData = {
   tourCode: "",
   title: "",
   theme: "Nature",
-  hotelLevel: "4 Star",
+  hotelLevel: "3 ดาว",
   budgetPerPerson: "",
 };
 
@@ -265,10 +265,10 @@ export default function TourRequestForm() {
         <div className="form-group">
           <label className="form-label">ระดับโรงแรม</label>
           <select className="form-control" name="hotelLevel" value={formData.hotelLevel} onChange={handleChange}>
-            <option value="3 Star">3 ดาว</option>
-            <option value="4 Star">4 ดาว</option>
-            <option value="5 Star">5 ดาว</option>
-            <option value="Luxury">Luxury</option>
+            <option value="3 ดาว">3 ดาว หรือเทียบเท่า</option>
+            <option value="4 ดาว">4 ดาว หรือเทียบเท่า</option>
+            <option value="5 ดาว">5 ดาว หรือเทียบเท่า</option>
+            <option value="5 ดาว (Luxury)">Luxury (5 ดาว)</option>
           </select>
         </div>
         <div className="form-group">

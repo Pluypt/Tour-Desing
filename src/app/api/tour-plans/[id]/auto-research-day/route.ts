@@ -77,7 +77,7 @@ ${ruleInstruction}
     }
 
     if (researchedActivities.length === 0) {
-      const fullFallback = buildFallbackPlan(city, country, Math.max(dayNumber, duration), new Date().toISOString());
+      const fullFallback = buildFallbackPlan(city, country, Math.max(dayNumber, duration), new Date().toISOString(), plan.hotel_level);
       const dayIdx = Math.min(dayNumber - 1, fullFallback.itinerary.length - 1);
       const dayData = fullFallback.itinerary[dayIdx];
 

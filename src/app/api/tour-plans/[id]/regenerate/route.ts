@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { ai, safeJsonParse, validateAIPlan, buildFallbackPlan } from "@/lib/ai";
+import { ai, safeJsonParse, validateAIPlan, buildFallbackPlan, sanitizeHotelName } from "@/lib/ai";
 
 export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -31,6 +31,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
 1. วันแรก (DAY 1): ต้องเน้นการเดินทางเท่านั้น (นัดหมายสนามบินสุวรรณภูมิ, เที่ยวบิน, ผ่านตม., รับกระเป๋า, เข้าสู่ที่พัก, พักผ่อน) **ห้ามใส่สถานที่ท่องเที่ยวในวันแรก**
 2. วันสุดท้าย (LAST DAY): ต้องเน้นการเดินทางกลับเท่านั้น (อาหารเช้า, เช็คเอาท์, เดินทางสู่สนามบิน, เช็คอินโหลดกระเป๋า, บินกลับกรุงเทพฯ สุวรรณภูมิ) **ห้ามใส่สถานที่ท่องเที่ยวในวันสุดท้าย**
 3. วันระหว่างทริป (DAY 2 ถึง DAY ${duration - 1}): จัดเต็มแลนด์มาร์กใหม่ มุมถ่ายรูปยอดฮิต คาเฟ่ aesthetic จุดเช็คอินสไตล์ Lemon8 / Xiaohongshu / Instagram ที่เป็นไฮไลต์จริงของเมืองนั้นๆ มีเน้นตัวหนา **[ชื่อสถานที่/คาเฟ่]**
+4. ระดับโรงแรมใน "hotel_name_suggestion" ต้องตรงตามระดับโรงแรมที่ลูกค้าเลือกคือ "${plan.hotel_level || "3 ดาว"}" โดยระบุชื่อโรงแรมตามด้วย "หรือเทียบเท่า ${plan.hotel_level || "3 ดาว"}" เท่านั้น (ห้ามระบุระดับดาวอื่นขัดกับที่ลูกค้าเลือกเด็ดขาด)
 
 [รูปแบบ JSON OUTPUT SCHEMA]
 {
@@ -80,7 +81,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     }
 
     if (!aiPlan) {
-      aiPlan = buildFallbackPlan(mainCity, country, duration, startDateStr);
+      aiPlan = buildFallbackPlan(mainCity, country, duration, startDateStr, plan.hotel_level);
     }
 
     // 2. Update Plan metadata
@@ -118,7 +119,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
             actual_date: dayData.date ? new Date(dayData.date) : new Date(new Date(startDateStr).getTime() + (dayData.day_number - 1) * 24 * 60 * 60 * 1000),
             day_title: dayData.daily_theme,
             city: mainCity,
-            hotel_name: dayData.hotel_name_suggestion || `โรงแรมระดับ 4 ดาว เมือง ${mainCity}`,
+            hotel_name: sanitizeHotelName(dayData.hotel_name_suggestion, plan.hotel_level),
             breakfast_included: dayData.breakfast_included ?? (dayData.day_number > 1),
             lunch_included: dayData.lunch_included ?? (dayData.day_number > 1 && dayData.day_number < duration),
             dinner_included: dayData.dinner_included ?? (dayData.day_number < duration),

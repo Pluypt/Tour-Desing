@@ -616,11 +616,73 @@ const DESTINATION_DATA: Record<string, {
  * - Last Day: Pure travel / return (No tourist spots)
  * - Middle Days: Trendy Lemon8 / modern aesthetic highlights
  */
+export function formatHotelByLevel(cityKey: string, hotelLevelInput?: string | null): string {
+  const levelStr = (hotelLevelInput || "3 ดาว").toString().trim();
+  const is3Star = levelStr.includes("3");
+  const is5Star = levelStr.includes("5") || levelStr.toLowerCase().includes("luxury");
+  const starLabel = is3Star ? "3 ดาว" : is5Star ? "5 ดาว" : "4 ดาว";
+
+  const key = cityKey.toLowerCase();
+  if (key.includes("kunming") || key.includes("คุนหมิง") || key.includes("ลี่เจียง")) {
+    if (is3Star) return "Holiday Inn Express Kunming / IBIS Kunming Center หรือเทียบเท่า 3 ดาว";
+    if (is5Star) return "InterContinental Kunming / Grand Hyatt Kunming หรือเทียบเท่า 5 ดาว";
+    return "Kunming Grand Park Hotel / Delta Hotels by Marriott Kunming หรือเทียบเท่า 4 ดาว";
+  }
+
+  if (key.includes("chengdu") || key.includes("เฉิงตู") || key.includes("ฉงชิ่ง")) {
+    if (is3Star) return "Ibis Chengdu Chunxi Road / Holiday Inn Express Chengdu หรือเทียบเท่า 3 ดาว";
+    if (is5Star) return "Shangri-La Chengdu / Grand Hyatt Chengdu หรือเทียบเท่า 5 ดาว";
+    return "Chengdu Tianfu Sunshine Hotel / Holiday Inn Chengdu Oriental Plaza หรือเทียบเท่า 4 ดาว";
+  }
+
+  if (key.includes("macao") || key.includes("macau") || key.includes("มาเก๊า") || key.includes("ฮ่องกง")) {
+    if (is3Star) return "Hotel Sintra Macao / Harbourview Hotel Macao หรือเทียบเท่า 3 ดาว";
+    if (is5Star) return "The Venetian Macao / The Parisian Macao หรือเทียบเท่า 5 ดาว";
+    return "The Kowloon Hotel / Hotel Royal Macau หรือเทียบเท่า 4 ดาว";
+  }
+
+  if (key.includes("tokyo") || key.includes("โตเกียว") || key.includes("ญี่ปุ่น")) {
+    if (is3Star) return "APA Hotel Shinjuku / Hotel Villa Fontaine Tokyo หรือเทียบเท่า 3 ดาว";
+    if (is5Star) return "Grand Hyatt Tokyo / The Ritz-Carlton Tokyo หรือเทียบเท่า 5 ดาว";
+    return "Shinagawa Prince Hotel / Shinjuku Washington Hotel หรือเทียบเท่า 4 ดาว";
+  }
+
+  if (is3Star) return `Hotel Standard City Center หรือเทียบเท่า 3 ดาว`;
+  if (is5Star) return `Grand Luxury Hotel & Resort หรือเทียบเท่า 5 ดาว`;
+  return `Grand Hotel City Center หรือเทียบเท่า ${starLabel}`;
+}
+
+export function sanitizeHotelName(hotelName: string | undefined, hotelLevelInput?: string | null): string {
+  const targetLevel = (hotelLevelInput || "3 ดาว").toString().trim();
+  if (!hotelName) return formatHotelByLevel("", targetLevel);
+
+  const is3Star = targetLevel.includes("3");
+  const is4Star = targetLevel.includes("4");
+  const is5Star = targetLevel.includes("5") || targetLevel.toLowerCase().includes("luxury");
+
+  if (is3Star) {
+    if (hotelName.includes("4 ดาว") || hotelName.includes("5 ดาว")) {
+      return hotelName.replace(/4 ดาว|5 ดาว|4 Star|5 Star/g, "3 ดาว");
+    }
+  } else if (is4Star) {
+    if (hotelName.includes("3 ดาว") || hotelName.includes("5 ดาว")) {
+      return hotelName.replace(/3 ดาว|5 ดาว|3 Star|5 Star/g, "4 ดาว");
+    }
+  } else if (is5Star) {
+    if (hotelName.includes("3 ดาว") || hotelName.includes("4 ดาว")) {
+      return hotelName.replace(/3 ดาว|4 ดาว|3 Star|4 Star/g, "5 ดาว");
+    }
+  }
+
+  return hotelName;
+}
+
 export function buildFallbackPlan(
   mainCity: string,
   country: string,
   duration: number,
-  startDate: string
+  startDate: string,
+  hotelLevel?: string
 ): AIPlan {
   const cityInput = (mainCity || country || "").toLowerCase();
   
@@ -631,6 +693,8 @@ export function buildFallbackPlan(
     (k === "macao" && (cityInput.includes("มาเก๊า") || cityInput.includes("ฮ่องกง") || cityInput.includes("macau") || cityInput.includes("macao"))) ||
     (k === "tokyo" && (cityInput.includes("โตเกียว") || cityInput.includes("ญี่ปุ่น") || cityInput.includes("tokyo") || cityInput.includes("japan")))
   );
+
+  const selectedHotel = formatHotelByLevel(matchKey || mainCity, hotelLevel);
 
   if (matchKey && DESTINATION_DATA[matchKey]) {
     const preset = DESTINATION_DATA[matchKey];
@@ -646,7 +710,7 @@ export function buildFallbackPlan(
           day_number: 1,
           date: date.toISOString().split("T")[0],
           daily_theme: preset.days[0].theme,
-          hotel_name_suggestion: preset.hotel,
+          hotel_name_suggestion: selectedHotel,
           breakfast_included: false,
           lunch_included: true,
           dinner_included: true,
@@ -661,7 +725,7 @@ export function buildFallbackPlan(
           day_number: dayNo,
           date: date.toISOString().split("T")[0],
           daily_theme: lastDayPreset.theme,
-          hotel_name_suggestion: preset.hotel,
+          hotel_name_suggestion: selectedHotel,
           breakfast_included: true,
           lunch_included: false,
           dinner_included: false,
@@ -677,7 +741,7 @@ export function buildFallbackPlan(
         day_number: dayNo,
         date: date.toISOString().split("T")[0],
         daily_theme: midPreset.theme,
-        hotel_name_suggestion: preset.hotel,
+        hotel_name_suggestion: selectedHotel,
         breakfast_included: true,
         lunch_included: true,
         dinner_included: true,
