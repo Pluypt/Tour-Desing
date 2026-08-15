@@ -188,7 +188,10 @@ export default function DailyItinerarySection({ days, hotelLevel }: { days: Tour
               </div>
               <div>
                 <strong style={{ color: PR_BLUE }}>🏨 ที่พัก:</strong>{" "}
-                {day.hotel_name || "โรงแรมระดับมาตรฐาน"} {hotelLevel ? `(หรือเทียบเท่า ${hotelLevel})` : ""}
+                {day.hotel_name || "โรงแรมระดับมาตรฐาน"}{" "}
+                {hotelLevel && !day.hotel_name?.includes("หรือเทียบเท่า") && !day.hotel_name?.includes(hotelLevel)
+                  ? `(หรือเทียบเท่า ${hotelLevel})`
+                  : ""}
               </div>
             </div>
 

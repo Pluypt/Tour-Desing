@@ -184,7 +184,9 @@ export default function ShortItinerarySection({
                   {day.hotel_name ? (
                     <div>
                       <div style={{ fontWeight: 600, color: "#1565C0" }}>{day.hotel_name}</div>
-                      {hotelLevel && <div style={{ color: "#777", fontSize: "10px" }}>หรือเทียบเท่า ({hotelLevel})</div>}
+                      {hotelLevel && !day.hotel_name?.includes("หรือเทียบเท่า") && !day.hotel_name?.includes(hotelLevel) && (
+                        <div style={{ color: "#777", fontSize: "10px" }}>หรือเทียบเท่า ({hotelLevel})</div>
+                      )}
                     </div>
                   ) : (
                     <span style={{ color: "#999" }}>-</span>
