@@ -110,7 +110,7 @@ export function validateAIPlan(plan: unknown): plan is AIPlan {
  * Comprehensive real landmark and trendy itinerary database following:
  * 1. Day 1: Pure travel, flights, airport meetup, customs, hotel check-in, rest (NO tourist spots)
  * 2. Last Day: Pure travel, hotel check-out, airport transfer, departure back to Bangkok (NO tourist spots)
- * 3. Middle Days: Modern, trendy Lemon8 / Xiaohongshu / Instagram viral check-ins and highlights
+ * 3. Middle Days: Modern, trendy landmark check-ins, top photo spots and highlights
  */
 const DESTINATION_DATA: Record<string, {
   tourName: string;
@@ -125,7 +125,7 @@ const DESTINATION_DATA: Record<string, {
   }>;
 }> = {
   kunming: {
-    tourName: "มหัศจรรย์ คุนหมิง ลี่เจียง แชงกรีล่า & มุมถ่ายรูปสุดชิคสไตล์ Lemon8",
+    tourName: "มหัศจรรย์ คุนหมิง ลี่เจียง แชงกรีล่า & จุดเช็คอินแลนด์มาร์กสุดฮิต",
     hotel: "Kunming Grand Park Hotel หรือเทียบเท่า 4 ดาว",
     airline: "China Eastern Airlines (MU) / Thai Airways (TG)",
     flightRoute: "BKK - KMG - BKK",
@@ -157,7 +157,7 @@ const DESTINATION_DATA: Record<string, {
         ]
       },
       {
-        theme: "คุนหมิง - อุทยานป่าหินมรดกโลก - จุดเช็คอินยอดฮิต Lemon8 ซุ้มประตูม้าทองไก่หยก & ถนนคนเดินหนานผิง",
+        theme: "คุนหมิง - อุทยานมรดกโลกป่าหิน - เช็คอินแลนด์มาร์กดัง ซุ้มประตูม้าทองไก่หยก & ถนนคนเดินหนานผิง",
         activities: [
           {
             time_period: "เช้า",
@@ -213,7 +213,7 @@ const DESTINATION_DATA: Record<string, {
           },
           {
             time_period: "เย็น",
-            activity_title: "จุดถ่ายรูปยอดฮิต Lemon8 ตลาดดอกไม้สดโต่วหนาน (Dounan Flower Market)",
+            activity_title: "จุดถ่ายรูปยอดฮิต ตลาดดอกไม้สดโต่วหนาน (Dounan Flower Market)",
             location_name: "ตลาดดอกไม้โต่วหนาน (Dounan Flower Market)",
             description: "นำท่านสู่ **ตลาดดอกไม้โต่วหนาน** ตลาดดอกไม้สดที่ใหญ่ที่สุดในเอเชีย สวรรค์ของสายถ่ายรูปและทำคอนเทนต์ ชมทะเลดอกไม้นานาพรรณหลากสีสันสุดอลังการ",
             is_highlight: true
@@ -246,7 +246,7 @@ const DESTINATION_DATA: Record<string, {
     ]
   },
   macao: {
-    tourName: "ฮิตติดเทรนด์ มาเก๊า & ฮ่องกง เช็คอินแลนด์มาร์กใหม่ ไหว้พระเสริมเฮง ถ่ายรูปสไตล์ Lemon8",
+    tourName: "ฮิตติดเทรนด์ มาเก๊า & ฮ่องกง เช็คอินแลนด์มาร์กใหม่ ไหว้พระเสริมเฮง ถ่ายรูปมุมสวยยอดฮิต",
     hotel: "The Venetian Macao / The Kowloon Hotel หรือเทียบเท่า 4 ดาว",
     airline: "Greater Bay Airlines (HB) / Cathay Pacific (CX)",
     flightRoute: "BKK - HKG - BKK",
@@ -282,7 +282,7 @@ const DESTINATION_DATA: Record<string, {
         activities: [
           {
             time_period: "เช้า",
-            activity_title: "จุดเช็คอินยอดฮิต Lemon8 ซากโบสถ์เซนต์พอล (Ruins of St. Paul's) & เซนาโด้สแควร์",
+            activity_title: "จุดเช็คอินยอดฮิต ซากโบสถ์เซนต์พอล (Ruins of St. Paul's) & เซนาโด้สแควร์",
             location_name: "ซากโบสถ์เซนต์พอล & เซนาโด้สแควร์ (Senado Square)",
             description: "นำท่านถ่ายรูปมุมไวรัล **ซากโบสถ์เซนต์พอล (Ruins of St. Paul's)** และเดินเล่น **เซนาโด้สแควร์ (Senado Square)** ตึกโคโลเนียลสีพาสเทล มรดกโลก UNESCO",
             is_highlight: true
@@ -367,7 +367,7 @@ const DESTINATION_DATA: Record<string, {
     ]
   },
   tokyo: {
-    tourName: "เจแปนอินเทรนด์ โตเกียว ฟูจิ ชิบูย่าสกาย คาเฟ่ฮิต & จุดเช็คอินไวรัล Lemon8",
+    tourName: "เจแปนอินเทรนด์ โตเกียว ฟูจิ ชิบูย่าสกาย คาเฟ่ฮิต & จุดเช็คอินแลนด์มาร์กดัง",
     hotel: "Shinagawa Prince Hotel / Shinjuku Washington Hotel หรือเทียบเท่า 4 ดาว",
     airline: "Thai Airways (TG) / Japan Airlines (JL)",
     flightRoute: "BKK - NRT - BKK",
@@ -423,7 +423,7 @@ const DESTINATION_DATA: Record<string, {
           },
           {
             time_period: "เย็น",
-            activity_title: "จุดเช็คอินอันดับ 1 ใน Lemon8 จุดชมวิว Shibuya Sky & ห้าแยกชิบูย่า",
+            activity_title: "จุดเช็คอินอันดับ 1 จุดชมวิว Shibuya Sky & ห้าแยกชิบูย่า",
             location_name: "Shibuya Sky & ชิบูย่า (Shibuya)",
             description: "ขึ้นชมวิวมหานครโตเกียวแบบ 360 องศาบนดาดฟ้า **Shibuya Sky** จุดถ่ายรูปพาโนรามาสุดไวรัล และถ่ายรูปคู่กับรูปปั้นฮาจิโกะ",
             is_highlight: true
@@ -537,7 +537,7 @@ const DESTINATION_DATA: Record<string, {
           },
           {
             time_period: "บ่าย",
-            activity_title: "จุดเช็คอินไวรัล Lemon8 แพนด้ายักษ์ปีนตึก IFS & ช้อปปิ้งถนนคนเดินไท่กู่หลี่ (Taikoo Li)",
+            activity_title: "จุดเช็คอินยอดฮิต แพนด้ายักษ์ปีนตึก IFS & ช้อปปิ้งถนนคนเดินไท่กู่หลี่ (Taikoo Li)",
             location_name: "ตึก IFS Chengdu & ถนนไท่กู่หลี่ (Taikoo Li)",
             description: "ขึ้นดาดฟ้าถ่ายรูปกับ **แพนด้ายักษ์ปีนตึก IFS** แลนด์มาร์กอันดับหนึ่งของเฉิงตู และเดินเล่น **ไท่กู่หลี่ (Taikoo Li)** ย่านการค้าสถาปัตยกรรมโบราณผสมผสานความโมเดิร์น",
             is_highlight: true
@@ -614,7 +614,7 @@ const DESTINATION_DATA: Record<string, {
  * Build dynamic itinerary guaranteeing:
  * - Day 1: Pure travel / transit (No tourist spots)
  * - Last Day: Pure travel / return (No tourist spots)
- * - Middle Days: Trendy Lemon8 / modern aesthetic highlights
+ * - Middle Days: Trendy landmark check-ins & modern aesthetic highlights
  */
 export function formatHotelByLevel(cityKey: string, hotelLevelInput?: string | null): string {
   const levelStr = (hotelLevelInput || "3 ดาว").toString().trim();
@@ -751,7 +751,7 @@ export function buildFallbackPlan(
 
     return {
       tour_name: `${preset.tourName} ${totalDays} วัน ${totalDays - 1} คืน`,
-      summary: `โปรแกรมท่องเที่ยวสุดอินเทรนด์ สัมผัสแลนด์มาร์กใหม่และมุมถ่ายรูปสไตล์ Lemon8 เมือง ${mainCity} ${totalDays} วัน`,
+      summary: `โปรแกรมท่องเที่ยวสุดอินเทรนด์ สัมผัสแลนด์มาร์กใหม่และมุมถ่ายรูปสุดฮิต เมือง ${mainCity} ${totalDays} วัน`,
       airline: preset.airline,
       flight_route: preset.flightRoute,
       outbound_flight: preset.outboundFlight,
@@ -823,7 +823,7 @@ export function buildFallbackPlan(
       return {
         day_number: dayNo,
         date: date.toISOString().split("T")[0],
-        daily_theme: `ไฮไลต์แลนด์มาร์กใหม่ & จุดเช็คอินถ่ายรูปไวรัล Lemon8 เมือง ${city} (วันที่ ${dayNo})`,
+        daily_theme: `ไฮไลต์แลนด์มาร์กใหม่ & จุดเช็คอินถ่ายรูปยอดฮิต เมือง ${city} (วันที่ ${dayNo})`,
         hotel_name_suggestion: `โรงแรมระดับ 4 ดาว ใจกลางเมือง ${city}`,
         breakfast_included: true,
         lunch_included: true,
@@ -846,7 +846,7 @@ export function buildFallbackPlan(
             time_period: "บ่าย",
             activity_title: `เดินเล่นย่านศิลปะร่วมสมัย & คาเฟ่ฮอปปิ้งสุดชิค ${city}`,
             location_name: `ย่านครีเอทีฟและคาเฟ่ ${city}`,
-            description: `นำท่านสู่ **ย่านครีเอทีฟและคาเฟ่ดีไซน์มินิมอลเมือง ${city}** พักผ่อนจิบเครื่องดื่มและถ่ายรูปมุมสวยสไตล์ Lemon8`,
+            description: `นำท่านสู่ **ย่านครีเอทีฟและคาเฟ่ดีไซน์มินิมอลเมือง ${city}** พักผ่อนจิบเครื่องดื่มและถ่ายรูปมุมสวยสไตล์มินิมอล`,
             is_highlight: true
           },
           {

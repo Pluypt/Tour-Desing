@@ -13,24 +13,24 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     const duration = plan.duration || 4;
     const startDateStr = plan.start_date ? new Date(plan.start_date).toISOString().split('T')[0] : new Date().toISOString().split('T')[0];
 
-    // 1. Try Gemini AI with strict rules (Day 1 & Last Day pure travel, Middle days Lemon8 trendy spots)
+    // 1. Try Gemini AI with strict rules (Day 1 & Last Day pure travel, Middle days landmark highlights)
     let aiPlan: any = null;
 
     if (process.env.GEMINI_API_KEY) {
       try {
-        const systemPrompt = `คุณคือผู้เชี่ยวชาญด้านการจัดโปรแกรมทัวร์ต่างประเทศระดับพรีเมียม และ Content Creator สไตล์ Lemon8 หน้าที่ของคุณคือการสร้างแผนการเดินทางใหม่ทั้งหมดสำหรับทริปนี้
+        const systemPrompt = `คุณคือผู้เชี่ยวชาญด้านการจัดโปรแกรมทัวร์ต่างประเทศระดับพรีเมียม หน้าที่ของคุณคือการสร้างแผนการเดินทางใหม่ทั้งหมดสำหรับทริปนี้
 
 [ตัวแปรข้อมูลเข้า]
 จุดหมายปลายทาง: ${country}, ${mainCity} ${plan.secondary_city ? `และ ${plan.secondary_city}` : ""}
 ระยะเวลา: ${duration} วัน
 จำนวนผู้เดินทาง: ${plan.traveler_count || 2} ท่าน
-ธีมการท่องเที่ยว: ${plan.theme || "ท่องเที่ยวไฮไลต์ คาเฟ่ชิค มุมถ่ายรูปสไตล์ Lemon8"}
+ธีมการท่องเที่ยว: ${plan.theme || "ท่องเที่ยวไฮไลต์ คาเฟ่ชิค จุดเช็คอินแลนด์มาร์กดัง"}
 ระดับโรงแรม: ${plan.hotel_level || "4 ดาว"}
 
 [กฎเหล็กในการสร้างเนื้อหา]
 1. วันแรก (DAY 1): ต้องเน้นการเดินทางเท่านั้น (นัดหมายสนามบินสุวรรณภูมิ, เที่ยวบิน, ผ่านตม., รับกระเป๋า, เข้าสู่ที่พัก, พักผ่อน) **ห้ามใส่สถานที่ท่องเที่ยวในวันแรก**
 2. วันสุดท้าย (LAST DAY): ต้องเน้นการเดินทางกลับเท่านั้น (อาหารเช้า, เช็คเอาท์, เดินทางสู่สนามบิน, เช็คอินโหลดกระเป๋า, บินกลับกรุงเทพฯ สุวรรณภูมิ) **ห้ามใส่สถานที่ท่องเที่ยวในวันสุดท้าย**
-3. วันระหว่างทริป (DAY 2 ถึง DAY ${duration - 1}): จัดเต็มแลนด์มาร์กใหม่ มุมถ่ายรูปยอดฮิต คาเฟ่ aesthetic จุดเช็คอินสไตล์ Lemon8 / Xiaohongshu / Instagram ที่เป็นไฮไลต์จริงของเมืองนั้นๆ มีเน้นตัวหนา **[ชื่อสถานที่/คาเฟ่]**
+3. วันระหว่างทริป (DAY 2 ถึง DAY ${duration - 1}): จัดเต็มแลนด์มาร์กใหม่ มุมถ่ายรูปยอดฮิต คาเฟ่ aesthetic จุดเช็คอินยอดนิยมที่เป็นไฮไลต์จริงของเมืองนั้นๆ มีเน้นตัวหนา **[ชื่อสถานที่/คาเฟ่]**
 4. ระดับโรงแรมใน "hotel_name_suggestion" ต้องตรงตามระดับโรงแรมที่ลูกค้าเลือกคือ "${plan.hotel_level || "3 ดาว"}" โดยระบุชื่อโรงแรมตามด้วย "หรือเทียบเท่า ${plan.hotel_level || "3 ดาว"}" เท่านั้น (ห้ามระบุระดับดาวอื่นขัดกับที่ลูกค้าเลือกเด็ดขาด)
 
 [รูปแบบ JSON OUTPUT SCHEMA]

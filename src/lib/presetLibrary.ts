@@ -100,13 +100,13 @@ export const POI_PRESETS: POIPreset[] = [
     description: "โรงแรมระดับ 4 ดาว ย่านศูนย์กลางโตเกียว เดินทางสะดวกใกล้สถานีรถไฟใหญ่",
   },
 
-  // MACAO & HONG KONG (LEMON8 TRENDS)
+  // MACAO & HONG KONG (TRENDY LANDMARKS)
   {
     city: "Macao",
     country: "Macao",
     category: "Attraction",
     title: "เดอะลอนดอนเนอร์ มาเก๊า (The Londoner Macao) มุมถ่ายรูปบิ๊กเบนจำลอง",
-    description: "นำท่านถ่ายภาพมุมไวรัลยอดฮิตใน Lemon8 **The Londoner Macao** สถาปัตยกรรมสไตล์อังกฤษสุดหรู หอนาฬิกาบิ๊กเบน และตู้โทรศัพท์สีแดงสุดคลาสสิก",
+    description: "นำท่านถ่ายภาพมุมไวรัลยอดฮิต **The Londoner Macao** สถาปัตยกรรมสไตล์อังกฤษสุดหรู หอนาฬิกาบิ๊กเบน และตู้โทรศัพท์สีแดงสุดคลาสสิก",
     recommendedTime: "บ่าย | เย็น"
   },
   {
@@ -129,18 +129,18 @@ export const POI_PRESETS: POIPreset[] = [
     city: "Hong Kong",
     country: "Hong Kong",
     category: "Shopping",
-    title: "K11 MUSEA ห้างศิลปะริมอ่าว & จุดเช็คอิน Lemon8",
+    title: "K11 MUSEA ห้างศิลปะริมอ่าว & จุดเช็คอินแลนด์มาร์กดัง",
     description: "เดินเล่น **K11 MUSEA** ศูนย์การค้าริมอ่าวที่ผสานศิลปะและแฟชั่นระดับโลก ถ่ายรูปมุมบันไดวน The Oculus สุดอลังการ",
     recommendedTime: "บ่าย | เย็น"
   },
 
-  // TOKYO JAPAN (LEMON8 TRENDS)
+  // TOKYO JAPAN (TRENDY LANDMARKS)
   {
     city: "Tokyo",
     country: "Japan",
     category: "Attraction",
     title: "จุดชมวิวพาโนรามา Shibuya Sky (Shibuya Scramble Square)",
-    description: "ขึ้นชมวิวมหานครโตเกียวแบบ 360 องศาบนดาดฟ้ากระจกใส **Shibuya Sky** จุดถ่ายรูปพาโนรามาสุดไวรัลอันดับ 1 ใน Lemon8 มองเห็นวิวภูเขาไฟฟูจิและห้าแยกชิบูย่า",
+    description: "ขึ้นชมวิวมหานครโตเกียวแบบ 360 องศาบนดาดฟ้ากระจกใส **Shibuya Sky** จุดถ่ายรูปพาโนรามาสุดไวรัลอันดับ 1 มองเห็นวิวภูเขาไฟฟูจิและห้าแยกชิบูย่า",
     recommendedTime: "เย็น | ค่ำ"
   },
   {
@@ -152,7 +152,7 @@ export const POI_PRESETS: POIPreset[] = [
     recommendedTime: "บ่าย"
   },
 
-  // CHENGDU & CHONGQING (LEMON8 TRENDS)
+  // CHENGDU & CHONGQING (TRENDY LANDMARKS)
   {
     city: "Chengdu",
     country: "China",
@@ -178,13 +178,13 @@ export const POI_PRESETS: POIPreset[] = [
     recommendedTime: "เช้า | บ่าย"
   },
 
-  // KUNMING & YUNNAN (LEMON8 TRENDS)
+  // KUNMING & YUNNAN (TRENDY LANDMARKS)
   {
     city: "Kunming",
     country: "China",
     category: "Attraction",
     title: "ตลาดดอกไม้สดโต่วหนาน (Dounan Flower Market) ทะเลดอกไม้สุดอลังการ",
-    description: "สัมผัสบรรยากาศ **ตลาดดอกไม้โต่วหนาน** ตลาดดอกไม้สดที่ใหญ่ที่สุดในเอเชีย สวรรค์ของสายคอนเทนต์และคนรักดอกไม้ ถ่ายรูปมุมสดใสสไตล์ Lemon8",
+    description: "สัมผัสบรรยากาศ **ตลาดดอกไม้โต่วหนาน** ตลาดดอกไม้สดที่ใหญ่ที่สุดในเอเชีย สวรรค์ของสายคอนเทนต์และคนรักดอกไม้ ถ่ายรูปมุมสดใสสไตล์มินิมอล",
     recommendedTime: "เย็น | ค่ำ"
   },
   {
