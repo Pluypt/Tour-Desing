@@ -18,20 +18,26 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
 
     if (process.env.GEMINI_API_KEY) {
       try {
-        const systemPrompt = `คุณคือผู้เชี่ยวชาญด้านการจัดโปรแกรมทัวร์ต่างประเทศระดับพรีเมียม หน้าที่ของคุณคือการสร้างแผนการเดินทางใหม่ทั้งหมดสำหรับทริปนี้
+        const userPromptContent = (plan.customer_note && plan.customer_note.trim().length > 0)
+          ? `\n=======================================================\n[คำสั่งและข้อมูลตั้งต้นหลักจากผู้ใช้ (USER PROMPT DIRECTIVE)]\n${plan.customer_note.trim()}\n=======================================================\n`
+          : "";
+
+        const systemPrompt = `คุณคือ AI ผู้เชี่ยวชาญด้านการจัดโปรแกรมทัวร์ต่างประเทศระดับพรีเมียม (PR Travel Itinerary Architect)
+หน้าที่ของคุณคือการนำข้อมูลและคำสั่งจากผู้ใช้มาประมวลผล สร้างเป็นโปรแกรมทัวร์ฉบับสมบูรณ์
 
 [ตัวแปรข้อมูลเข้า]
 จุดหมายปลายทาง: ${country}, ${mainCity} ${plan.secondary_city ? `และ ${plan.secondary_city}` : ""}
 ระยะเวลา: ${duration} วัน
 จำนวนผู้เดินทาง: ${plan.traveler_count || 2} ท่าน
 ธีมการท่องเที่ยว: ${plan.theme || "ท่องเที่ยวไฮไลต์ คาเฟ่ชิค จุดเช็คอินแลนด์มาร์กดัง"}
-ระดับโรงแรม: ${plan.hotel_level || "4 ดาว"}
-
-[กฎเหล็กในการสร้างเนื้อหา]
-1. วันแรก (DAY 1): ต้องเน้นการเดินทางเท่านั้น (นัดหมายสนามบินสุวรรณภูมิ, เที่ยวบิน, ผ่านตม., รับกระเป๋า, เข้าสู่ที่พัก, พักผ่อน) **ห้ามใส่สถานที่ท่องเที่ยวในวันแรก**
-2. วันสุดท้าย (LAST DAY): ต้องเน้นการเดินทางกลับเท่านั้น (อาหารเช้า, เช็คเอาท์, เดินทางสู่สนามบิน, เช็คอินโหลดกระเป๋า, บินกลับกรุงเทพฯ สุวรรณภูมิ) **ห้ามใส่สถานที่ท่องเที่ยวในวันสุดท้าย**
-3. วันระหว่างทริป (DAY 2 ถึง DAY ${duration - 1}): จัดเต็มแลนด์มาร์กใหม่ มุมถ่ายรูปยอดฮิต คาเฟ่ aesthetic จุดเช็คอินยอดนิยมที่เป็นไฮไลต์จริงของเมืองนั้นๆ มีเน้นตัวหนา **[ชื่อสถานที่/คาเฟ่]**
-4. ระดับโรงแรมใน "hotel_name_suggestion" ต้องตรงตามระดับโรงแรมที่ลูกค้าเลือกคือ "${plan.hotel_level || "3 ดาว"}" โดยระบุชื่อโรงแรมตามด้วย "หรือเทียบเท่า ${plan.hotel_level || "3 ดาว"}" เท่านั้น (ห้ามระบุระดับดาวอื่นขัดกับที่ลูกค้าเลือกเด็ดขาด)
+ระดับโรงแรม: ${plan.hotel_level || "3 ดาว"}
+${userPromptContent}
+[กฎและหลักการประมวลผลข้อมูล (สำคัญสูงสุด)]
+1. ช่อง "USER PROMPT DIRECTIVE (คำสั่งและข้อมูลตั้งต้นหลัก)" ด้านบนเปรียบเสมือน Master Prompt จากผู้ใช้:
+   - หากผู้ใช้ระบุแผนรายวัน (เช่น DAY 1, DAY 2, DAY 3, DAY 4...), รายชื่อสถานที่, กิจกรรม, ร้านอาหาร, ข้อกำหนดเวลา หรือเงื่อนไขใดๆ ให้คุณนำข้อมูลทุกบรรทัดมาประมวลผลและบรรจุลงในแผนการเดินทาง (itinerary) ให้ครบถ้วน 100% ห้ามตัดทิ้ง ห้ามตกหล่น
+   - หากใน USER PROMPT มีระบุสถานที่ท่องเที่ยว/ช้อปปิ้งในวันแรกหรือวันสุดท้าย ให้จัดกิจกรรมตามที่ผู้ใช้ระบุไว้ทันที
+2. ทุกกิจกรรมต้องมี "time_period", "activity_title", "location_name", "description" ที่เขียนบรรยายอย่างมืออาชีพ น่าดึงดูด และเน้นชื่อสถานที่ด้วยตัวหนา **[ชื่อสถานที่]**
+3. ระดับโรงแรมใน "hotel_name_suggestion" ต้องตรงตามระดับโรงแรมคือ "${plan.hotel_level || "3 ดาว"}" โดยระบุชื่อโรงแรมตามด้วย "หรือเทียบเท่า ${plan.hotel_level || "3 ดาว"}" เท่านั้น
 
 [รูปแบบ JSON OUTPUT SCHEMA]
 {
@@ -46,7 +52,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
       "day_number": 1,
       "date": "YYYY-MM-DD",
       "daily_theme": "คอนเซปต์ของวัน",
-      "hotel_name_suggestion": "ชื่อโรงแรมจริง 4 ดาว",
+      "hotel_name_suggestion": "ชื่อโรงแรมที่พัก หรือเทียบเท่า ${plan.hotel_level || "3 ดาว"}",
       "breakfast_included": false,
       "lunch_included": true,
       "dinner_included": true,
@@ -81,7 +87,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     }
 
     if (!aiPlan) {
-      aiPlan = buildFallbackPlan(mainCity, country, duration, startDateStr, plan.hotel_level);
+      aiPlan = buildFallbackPlan(mainCity, country, duration, startDateStr, plan.hotel_level, plan.customer_note || undefined);
     }
 
     // 2. Update Plan metadata

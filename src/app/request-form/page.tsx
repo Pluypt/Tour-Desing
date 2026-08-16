@@ -275,8 +275,18 @@ export default function TourRequestForm() {
           </select>
         </div>
         <div className="form-group">
-          <label className="form-label">หมายเหตุเพิ่มเติม (ความต้องการอื่นๆ, สถานที่ที่อยากไป/ไม่อยากไป, ข้อจำกัดอาหาร)</label>
-          <textarea className="form-control" name="customerNote" value={formData.customerNote} onChange={handleChange} rows={5}></textarea>
+          <label className="form-label" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <span>🎯 หมายเหตุ & Master Prompt (ใส่แผนรายวัน, สถานที่เฉพาะ, กิจกรรม เพื่อให้ AI สกัดข้อมูลและประมวลผลเป็นแผนทัวร์จริง 100%)</span>
+            <span style={{ fontSize: "0.8rem", color: "var(--accent-color, #2563eb)", fontWeight: 500 }}>✨ AI Prompt Directive</span>
+          </label>
+          <textarea 
+            className="form-control" 
+            name="customerNote" 
+            value={formData.customerNote} 
+            onChange={handleChange} 
+            rows={8}
+            placeholder={`สามารถพิมพ์หรือวาง Prompt รายละเอียดแผนทัวร์ได้ที่นี่ เช่น:\nDAY 1 — 1 พ.ย. | กรุงเทพฯ → คุนหมิง\n* เดินทางจากกรุงเทพฯ → คุนหมิง รับกรุ๊ปที่สนามบิน เข้าโรงแรม 3-4 ดาว\n* เย็นเที่ยวถนนคนเดินหนานผิงเจีย & ซุ้มประตูม้าทองไก่หยก\n\nDAY 2 — 2 พ.ย. | Stone Forest UNESCO ⭐\n* 07.30 น. เดินทางไปอุทยานป่าหิน Stone Forest เต็มวัน (ค่าบัตร 130 หยวน)...`}
+          ></textarea>
         </div>
       </div>
 

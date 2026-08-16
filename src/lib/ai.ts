@@ -677,13 +677,109 @@ export function sanitizeHotelName(hotelName: string | undefined, hotelLevelInput
   return hotelName;
 }
 
+export function parseCustomerNoteToItinerary(
+  customerNote: string,
+  mainCity: string,
+  startDate: string,
+  hotelLevel?: string
+): Array<{
+  day_number: number;
+  date: string;
+  daily_theme: string;
+  hotel_name_suggestion: string;
+  breakfast_included: boolean;
+  lunch_included: boolean;
+  dinner_included: boolean;
+  activities: Array<{ time_period: string; activity_title: string; location_name: string; description: string; is_highlight: boolean }>;
+}> | null {
+  if (!customerNote || !customerNote.trim()) return null;
+  const note = customerNote.trim();
+
+  // Check if note has DAY 1 / Day 1 markers
+  const dayPattern = /(?:DAY|Day|วัน(?:ที่)?)\s*(\d+)[\s—\-\|:]*([^\n]*)/gi;
+  const matches = [...note.matchAll(dayPattern)];
+  if (matches.length === 0) return null;
+
+  const days: any[] = [];
+  const hotel = formatHotelByLevel(mainCity, hotelLevel);
+
+  for (let i = 0; i < matches.length; i++) {
+    const match = matches[i];
+    const dayNo = parseInt(match[1]) || (i + 1);
+    const dayTitle = match[2]?.trim() || `ท่องเที่ยวเมือง ${mainCity} วันที่ ${dayNo}`;
+    
+    const startIndex = match.index! + match[0].length;
+    const nextMatch = matches[i + 1];
+    const endIndex = nextMatch ? nextMatch.index! : note.length;
+    const dayBody = note.slice(startIndex, endIndex).trim();
+
+    // Extract bullet points or non-empty lines
+    const rawLines = dayBody.split('\n')
+      .map(l => l.replace(/^[\*\-\•\d\.]+\s*/, '').trim())
+      .filter(l => l.length > 0);
+
+    const activities = rawLines.map((line, idx) => {
+      const timeMatch = line.match(/^(\d{1,2}[\.:]\d{2}\s*(?:น\.|AM|PM)?)/i);
+      const timePeriod = timeMatch ? timeMatch[1] : (idx === 0 ? "เช้า" : idx === 1 ? "กลางวัน" : idx === rawLines.length - 1 ? "เย็น" : "บ่าย");
+      const title = line.replace(/^(\d{1,2}[\.:]\d{2}\s*(?:น\.|AM|PM)?[\s\-—]*)/i, '').trim() || line;
+      
+      return {
+        time_period: timePeriod,
+        activity_title: title.slice(0, 60),
+        location_name: title.slice(0, 40),
+        description: line.startsWith("**") ? line : `นำท่าน **${title}** ตามความต้องการพิเศษของโปรแกรม`,
+        is_highlight: idx === 0 || idx === 1 || title.includes("UNESCO") || title.includes("ไฮไลท์")
+      };
+    });
+
+    const date = new Date(new Date(startDate).getTime() + (dayNo - 1) * 24 * 60 * 60 * 1000);
+
+    days.push({
+      day_number: dayNo,
+      date: date.toISOString().split('T')[0],
+      daily_theme: dayTitle,
+      hotel_name_suggestion: hotel,
+      breakfast_included: dayNo > 1,
+      lunch_included: true,
+      dinner_included: true,
+      activities: activities.length > 0 ? activities : [
+        {
+          time_period: "ตลอดวัน",
+          activity_title: dayTitle,
+          location_name: mainCity,
+          description: `ท่องเที่ยว **${dayTitle}** ตามหมายเหตุที่กำหนด`,
+          is_highlight: true
+        }
+      ]
+    });
+  }
+
+  return days.length > 0 ? days : null;
+}
+
 export function buildFallbackPlan(
   mainCity: string,
   country: string,
   duration: number,
   startDate: string,
-  hotelLevel?: string
+  hotelLevel?: string,
+  customerNote?: string
 ): AIPlan {
+  if (customerNote) {
+    const parsedDays = parseCustomerNoteToItinerary(customerNote, mainCity, startDate, hotelLevel);
+    if (parsedDays && parsedDays.length > 0) {
+      return {
+        tour_name: `โปรแกรมท่องเที่ยว ${mainCity} (${country}) ${parsedDays.length} วัน ${parsedDays.length - 1} คืน (ตามความต้องการลูกค้า)`,
+        summary: `โปรแกรมท่องเที่ยวสร้างขึ้นตามหมายเหตุและความต้องการพิเศษของลูกค้า เมือง ${mainCity} ${parsedDays.length} วัน`,
+        airline: "China Eastern Airlines / Thai Airways",
+        flight_route: `BKK - ${mainCity} - BKK`,
+        outbound_flight: `ออกเดินทางจากกรุงเทพฯ สู่ ${mainCity}`,
+        return_flight: `ออกเดินทางจาก ${mainCity} กลับสู่กรุงเทพฯ`,
+        itinerary: parsedDays
+      };
+    }
+  }
+
   const cityInput = (mainCity || country || "").toLowerCase();
   
   const matchKey = Object.keys(DESTINATION_DATA).find(k => 

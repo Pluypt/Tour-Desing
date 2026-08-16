@@ -39,25 +39,40 @@ export async function POST(req: Request) {
     });
 
     // 3. AI Itinerary Generation Prompt
-    const systemPrompt = `คุณคือผู้เชี่ยวชาญด้านการจัดโปรแกรมทัวร์ต่างประเทศระดับพรีเมียม
-กรุณาสร้างแผนการเดินทางสำหรับลูกค้า: ${data.customerName}
-ปลายทาง: ${data.mainCity}, ${data.country}
-จำนวนผู้เดินทาง: ${pax} คน
-ระยะเวลา: ${duration} วัน (${duration - 1} คืน)
-ประเภททริป: ${data.tripType || "Private Tour"}
-ระดับโรงแรม: ${data.hotelLevel || "4 ดาว"}
-ความต้องการเพิ่มเติม: ${data.customerNote || "ไม่มี"}
+    const userPromptContent = (data.customerNote && data.customerNote.trim().length > 0)
+      ? `\n=======================================================\n[คำสั่งและข้อมูลตั้งต้นหลักจากผู้ใช้ (USER PROMPT DIRECTIVE)]\n${data.customerNote.trim()}\n=======================================================\n`
+      : "";
 
-[กฎเหล็กในการสร้างแผนการเดินทาง]
-1. สำคัญที่สุด: หากผู้ใช้ระบุ "ความต้องการเพิ่มเติม" (customerNote) เช่น รายละเอียดแผนรายวัน, สถานที่ท่องเที่ยวเฉพาะ, ร้านอาหาร หรือลำดับกิจกรรมในแต่ละวัน ให้ถือเอาข้อมูลใน customerNote เป็นความสำคัญสูงสุดอันดับ 1 และต้องจัดแผนกิจกรรมให้ครบถ้วนทุกสถานที่ตามที่ลูกค้าต้องการ
-2. วันแรก (Day 1) และ วันสุดท้าย (Day ${duration}): เน้นกิจกรรมการเดินทาง (สนามบิน/เช็คอิน/เช็คเอาท์) เป็นหลัก เว้นแต่ถ้าใน customerNote มีการระบุสถานที่ท่องเที่ยว/ช้อปปิ้ง/ร้านอาหารสำหรับวันแรกหรือวันสุดท้ายไว้ ให้ใส่กิจกรรมตามที่ลูกค้าต้องการในวันนั้นด้วย
-3. วันระหว่างทริป: จัดสถานที่ท่องเที่ยวและแลนด์มาร์กให้สอดคล้องกับ customerNote หรือสกัดจุดเช็คอินยอดนิยมของเมืองนั้น โดยเน้นตัวหนา **[ชื่อสถานที่]**
-4. ทุกวันต้องมีโครงสร้างกิจกรรมชัดเจน สอดคล้องกับระยะเวลาเดินทาง
-5. ระดับโรงแรมใน "hotel_name_suggestion" ต้องตรงตามระดับโรงแรมที่ลูกค้าเลือกคือ "${data.hotelLevel || "3 ดาว"}" โดยระบุชื่อโรงแรมตามด้วย "หรือเทียบเท่า ${data.hotelLevel || "3 ดาว"}" เท่านั้น
+    const systemPrompt = `คุณคือ AI ผู้เชี่ยวชาญด้านการจัดโปรแกรมทัวร์ต่างประเทศระดับพรีเมียม (PR Travel Itinerary Architect)
+หน้าที่ของคุณคือการนำข้อมูลและคำสั่งจากผู้ใช้มาประมวลผล สร้างเป็นโปรแกรมทัวร์ฉบับสมบูรณ์ พร้อมออกเอกสารเสนอขายลูกค้าทันที
 
-ส่งออกเป็น JSON Object รูปแบบ:
+[ข้อมูลการเดินทางพื้นฐาน]
+- ชื่อลูกค้า: ${data.customerName || "ลูกค้าทั่วไป"}
+- ประเทศปลายทาง: ${data.country}
+- เมืองหลัก: ${data.mainCity} ${data.secondaryCity ? `และ ${data.secondaryCity}` : ""}
+- จำนวนผู้เดินทาง: ${pax} ท่าน
+- ระยะเวลาของทริป: ${duration} วัน (${duration - 1} คืน)
+- วันที่เริ่มต้น: ${data.startDate || "2026-11-01"}
+- ประเภททริป: ${data.tripType || "Private Tour"}
+- ระดับโรงแรมที่ต้องการ: ${data.hotelLevel || "3 ดาว"}
+${userPromptContent}
+[กฎและหลักการประมวลผลข้อมูล (สำคัญสูงสุด)]
+1. ช่อง "USER PROMPT DIRECTIVE (คำสั่งและข้อมูลตั้งต้นหลัก)" ด้านบนเปรียบเสมือน Master Prompt จากผู้ใช้:
+   - หากผู้ใช้ระบุแผนรายวัน (เช่น DAY 1, DAY 2, DAY 3, DAY 4...), รายชื่อสถานที่, กิจกรรม, ร้านอาหาร, ข้อกำหนดเวลา, ค่าตั๋ว/ค่าเข้าชม หรือเงื่อนไขใดๆ ในช่องนี้ ให้คุณนำข้อมูลทุกบรรทัดมาประมวลผลและบรรจุลงในแผนการเดินทาง (itinerary) ให้ครบถ้วน 100% ห้ามตัดทิ้ง ห้ามตกหล่น และห้ามแทนที่ด้วยข้อมูลอื่น
+   - หากใน USER PROMPT มีระบุสถานที่ท่องเที่ยว/ช้อปปิ้งในวันแรกหรือวันสุดท้าย ให้จัดกิจกรรมตามที่ผู้ใช้ระบุไว้ทันที
+   - หากใน USER PROMPT ไม่ได้ระบุแผนรายวันเฉพาะมา ให้คุณใช้ความเชี่ยวชาญสร้างแผนการเดินทางระดับพรีเมียมที่รวบรวมแลนด์มาร์กยอดฮิต คาเฟ่สวย จุดถ่ายรูป Aesthetic และร้านอาหารชื่อดังของเมืองนั้น
+2. การสร้างกิจกรรม (activities):
+   - ทุกกิจกรรมต้องมี "time_period" (เช่น เช้า, กลางวัน, บ่าย, เย็น หรือระบุเวลา เช่น 07.30 น.), "activity_title", "location_name", "description" ที่เขียนบรรยายอย่างมืออาชีพ น่าดึงดูด และเน้นชื่อสถานที่ด้วยตัวหนา **[ชื่อสถานที่]**
+   - ใส่ข้อมูลที่เป็นประโยชน์ เช่น ข้อมูลมรดกโลก UNESCO, ไฮไลต์, ราคาบัตรเข้าชมหรือเวลาเปิด-ปิด (ถ้ามีใน Prompt)
+3. ระดับโรงแรม:
+   - ในช่อง "hotel_name_suggestion" ต้องระบุชื่อโรงแรมจริงตามด้วย "หรือเทียบเท่า ${data.hotelLevel || "3 ดาว"}"
+4. สายการบินและเที่ยวบิน:
+   - สกัดหรือเลือกสายการบินและรหัสเที่ยวบินที่เป็นของจริงสำหรับเส้นทางบิน BKK - ${data.mainCity} - BKK
+
+ส่งออกเฉพาะ JSON Object ตามโครงสร้างนี้:
 {
-  "tour_name": "ชื่อโปรแกรมทัวร์สุดหรูและน่าดึงดูด",
+  "tour_name": "ชื่อโปรแกรมทัวร์สุดหรู น่าสนใจและดึงดูดลูกค้า",
+  "summary": "บทสรุปจุดเด่นของทริป",
   "airline": "ชื่อสายการบิน (เช่น China Eastern Airlines / Greater Bay Airlines / Cathay Pacific)",
   "flight_route": "เส้นทางบิน (เช่น BKK - KMG - BKK)",
   "outbound_flight": "เที่ยวบินขาไป (เช่น MU748 BKK 15:55 - 19:30 KMG)",
@@ -66,17 +81,17 @@ export async function POST(req: Request) {
     {
       "day_number": 1,
       "date": "${data.startDate || "2026-10-01"}",
-      "daily_theme": "ธีมของวัน",
-      "hotel_name_suggestion": "ชื่อโรงแรมที่พัก",
+      "daily_theme": "หัวข้อ/ธีมของวัน",
+      "hotel_name_suggestion": "ชื่อโรงแรมที่พัก หรือเทียบเท่า ${data.hotelLevel || "3 ดาว"}",
       "breakfast_included": false,
       "lunch_included": true,
       "dinner_included": true,
       "activities": [
         {
-          "time_period": "13.00 น.",
+          "time_period": "ช่วงเวลา (เช่น 08.00 น. หรือ เช้า)",
           "activity_title": "ชื่อกิจกรรม",
           "location_name": "สถานที่",
-          "description": "รายละเอียดกิจกรรม",
+          "description": "คำบรรยายรายละเอียดกิจกรรม",
           "is_highlight": false
         }
       ]
@@ -129,7 +144,7 @@ export async function POST(req: Request) {
     }
 
     if (!aiPlan) {
-      aiPlan = buildFallbackPlan(data.mainCity, data.country, duration, data.startDate || new Date().toISOString(), data.hotelLevel);
+      aiPlan = buildFallbackPlan(data.mainCity, data.country, duration, data.startDate || new Date().toISOString(), data.hotelLevel, data.customerNote);
     }
 
     // 4. Hero image fallback / generation
