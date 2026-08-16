@@ -59,82 +59,86 @@ export default function ShortItinerarySection({
   };
 
   return (
-    <div style={{ marginBottom: "36px", pageBreakInside: "avoid" }}>
-      {/* 1. Header Banner */}
-      <div
-        style={{
-          background: `linear-gradient(135deg, ${PR_BLUE} 0%, #1565C0 100%)`,
-          color: "white",
-          borderRadius: "12px 12px 0 0",
-          padding: "16px 20px",
-          textAlign: "center",
-          boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
-        }}
-      >
-        <div style={{ fontSize: "22px", fontWeight: 800, letterSpacing: "1px", color: "#FFD54F" }}>
-          {title || "โปรแกรมท่องเที่ยว"}
-        </div>
-        <div style={{ fontSize: "13px", opacity: 0.9, marginTop: "4px" }}>
-          {duration ? `${duration} วัน ${nights} คืน` : ""} {formatDateRange() ? `| ${formatDateRange()}` : ""}
-        </div>
-      </div>
-
-      {/* 2. Flight & Luggage Info Bar */}
-      <div
-        style={{
-          backgroundColor: "#FFF8E1",
-          border: "1px solid #FFE082",
-          padding: "10px 16px",
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          fontSize: "12px",
-          color: "#5D4037",
-        }}
-      >
-        <div style={{ display: "flex", alignItems: "center", gap: "8px", fontWeight: 600 }}>
-          <span>✈️ สายการบิน:</span>
-          <span style={{ color: PR_BLUE, fontWeight: 700 }}>{airline || "Thai Airways / สายการบินชั้นนำ"}</span>
-        </div>
-        <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-          <span>🧳 น้ำหนักกระเป๋า 20 Kg</span>
-          {flightRoute && <span>📍 เส้นทาง: {flightRoute}</span>}
-        </div>
-      </div>
-
-      {/* Flight Detail Boxes */}
-      {(outboundFlight || returnFlight) && (
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", backgroundColor: "#FFF3E0", padding: "8px 12px", borderLeft: "1px solid #FFE082", borderRight: "1px solid #FFE082", fontSize: "11px" }}>
-          <div style={{ backgroundColor: "#E65100", color: "white", borderRadius: "6px", padding: "6px 12px", display: "flex", justifyContent: "space-between" }}>
-            <span>🛫 ขาไป ({outboundFlight || "BKK - HKG"})</span>
+    <div className="short-itinerary-section" style={{ marginBottom: "28px", breakInside: "auto", pageBreakInside: "auto" }}>
+      {/* 1. Header & Flight Group */}
+      <div className="page-break-avoid" style={{ breakInside: "avoid", pageBreakInside: "avoid", breakAfter: "avoid", pageBreakAfter: "avoid" }}>
+        {/* Header Banner */}
+        <div
+          style={{
+            background: `linear-gradient(135deg, ${PR_BLUE} 0%, #1565C0 100%)`,
+            color: "white",
+            borderRadius: "10px 10px 0 0",
+            padding: "14px 18px",
+            textAlign: "center",
+            boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+          }}
+        >
+          <div style={{ fontSize: "18px", fontWeight: 800, letterSpacing: "0.5px", color: "#FFD54F" }}>
+            {title || "โปรแกรมท่องเที่ยว"}
           </div>
-          <div style={{ backgroundColor: "#E65100", color: "white", borderRadius: "6px", padding: "6px 12px", display: "flex", justifyContent: "space-between" }}>
-            <span>🛬 ขากลับ ({returnFlight || "HKG - BKK"})</span>
+          <div style={{ fontSize: "12px", opacity: 0.9, marginTop: "3px" }}>
+            {duration ? `${duration} วัน ${nights} คืน` : ""} {formatDateRange() ? `| ${formatDateRange()}` : ""}
           </div>
         </div>
-      )}
+
+        {/* 2. Flight & Luggage Info Bar */}
+        <div
+          style={{
+            backgroundColor: "#FFF8E1",
+            border: "1px solid #FFE082",
+            borderTop: "none",
+            padding: "8px 14px",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            fontSize: "11.5px",
+            color: "#5D4037",
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: "6px", fontWeight: 600 }}>
+            <span>✈️ สายการบิน:</span>
+            <span style={{ color: PR_BLUE, fontWeight: 700 }}>{airline || "Thai Airways / สายการบินชั้นนำ"}</span>
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
+            <span>🧳 น้ำหนักกระเป๋า 20-23 Kg</span>
+            {flightRoute && <span>📍 เส้นทาง: {flightRoute}</span>}
+          </div>
+        </div>
+
+        {/* Flight Detail Boxes */}
+        {(outboundFlight || returnFlight) && (
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px", backgroundColor: "#FFF3E0", padding: "6px 10px", borderLeft: "1px solid #FFE082", borderRight: "1px solid #FFE082", fontSize: "10.5px" }}>
+            <div style={{ backgroundColor: "#E65100", color: "white", borderRadius: "4px", padding: "5px 10px", display: "flex", justifyContent: "space-between" }}>
+              <span>🛫 ขาไป: {outboundFlight || "BKK - KMG"}</span>
+            </div>
+            <div style={{ backgroundColor: "#E65100", color: "white", borderRadius: "4px", padding: "5px 10px", display: "flex", justifyContent: "space-between" }}>
+              <span>🛬 ขากลับ: {returnFlight || "KMG - BKK"}</span>
+            </div>
+          </div>
+        )}
+      </div>
 
       {/* 3. Summary Overview Table */}
       <table
         style={{
           width: "100%",
           borderCollapse: "collapse",
-          fontSize: "12px",
+          fontSize: "11.5px",
           backgroundColor: "white",
           border: "1px solid #BBDEFB",
-          borderRadius: "0 0 12px 12px",
+          borderRadius: "0 0 10px 10px",
           overflow: "hidden",
         }}
       >
-        <thead>
+        <thead style={{ breakInside: "avoid", breakAfter: "avoid" }}>
           <tr style={{ backgroundColor: PR_BLUE, color: "white", textTransform: "uppercase" }}>
-            <th style={{ padding: "10px 8px", width: "45px", textAlign: "center", borderRight: "1px solid #1976D2" }}>วัน</th>
-            <th style={{ padding: "10px 12px", textAlign: "left", borderRight: "1px solid #1976D2" }}>โปรแกรมท่องเที่ยว</th>
-            <th style={{ padding: "10px 4px", width: "120px", textAlign: "center", borderRight: "1px solid #1976D2" }}>
+            <th style={{ padding: "8px 6px", width: "40px", textAlign: "center", borderRight: "1px solid #1976D2" }}>วัน</th>
+            <th style={{ padding: "8px 10px", textAlign: "left", borderRight: "1px solid #1976D2" }}>โปรแกรมท่องเที่ยว</th>
+            <th style={{ padding: "8px 4px", width: "100px", textAlign: "center", borderRight: "1px solid #1976D2" }}>
               <div>อาหาร</div>
-              <div style={{ fontSize: "10px", fontWeight: 400, marginTop: "2px", opacity: 0.9 }}>B | L | D</div>
+              <div style={{ fontSize: "9px", fontWeight: 400, marginTop: "1px", opacity: 0.9 }}>B | L | D</div>
             </th>
-            <th style={{ padding: "10px 12px", width: "180px", textAlign: "left" }}>โรงแรมที่พัก</th>
+            <th style={{ padding: "8px 10px", width: "170px", textAlign: "left" }}>โรงแรมที่พัก</th>
           </tr>
         </thead>
         <tbody>
@@ -151,7 +155,7 @@ export default function ShortItinerarySection({
             const programText = day.day_title || poiList || `ท่องเที่ยวเมือง ${day.city || ""}`;
 
             return (
-              <tr key={day.day_number} style={{ backgroundColor: rowBg, borderBottom: "1px solid #E3F2FD" }}>
+              <tr key={day.day_number} className="page-break-avoid" style={{ backgroundColor: rowBg, borderBottom: "1px solid #E3F2FD", breakInside: "avoid", pageBreakInside: "avoid" }}>
                 {/* Day No */}
                 <td style={{ padding: "12px 6px", textAlign: "center", fontWeight: 800, color: PR_BLUE, borderRight: "1px solid #E3F2FD" }}>
                   {day.day_number}

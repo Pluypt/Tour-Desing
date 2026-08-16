@@ -43,14 +43,62 @@ export default async function ProposalPreviewPage({ params }: { params: Promise<
   const heroImageUrl = plan.hero_image_url || coverDesign?.background_url || null;
 
   return (
-    <div style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center" }}>
+    <div style={{ minHeight: "100%", width: "100%", display: "flex", flexDirection: "column", alignItems: "center" }}>
       <style>{`
         #proposal-document.hide-dates .date-display { display: none !important; }
         #proposal-document.hide-dates .date-display-row { display: none !important; }
+
+        .proposal-paper {
+          width: 210mm;
+          max-width: 100%;
+          box-sizing: border-box;
+          background-color: #ffffff;
+          box-shadow: 0 0 20px rgba(0,0,0,0.1);
+          padding: 14mm 14mm;
+          color: #333333;
+          font-family: 'Inter', 'Sarabun', sans-serif;
+          font-size: 12px;
+          line-height: 1.55;
+          margin-bottom: 40px;
+          min-height: 0;
+          height: auto;
+        }
+
+        @page {
+          size: A4 portrait;
+          margin: 12mm 14mm 14mm 14mm;
+        }
+
         @media print {
-          @page { size: A4; margin: 15mm 18mm; }
-          body { margin: 0; }
-          #proposal-document { box-shadow: none !important; width: 100% !important; margin: 0 !important; padding: 0 !important; }
+          html, body {
+            margin: 0 !important;
+            padding: 0 !important;
+            background: #ffffff !important;
+            height: auto !important;
+            min-height: 0 !important;
+            overflow: visible !important;
+          }
+          aside, nav, .toolbar-container, .no-print, header {
+            display: none !important;
+          }
+          main {
+            padding: 0 !important;
+            margin: 0 !important;
+            overflow: visible !important;
+            height: auto !important;
+            min-height: 0 !important;
+            flex: none !important;
+          }
+          .proposal-paper, #proposal-document {
+            box-shadow: none !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            box-sizing: border-box !important;
+            height: auto !important;
+            min-height: 0 !important;
+          }
           * {
             -webkit-print-color-adjust: exact !important;
             print-color-adjust: exact !important;
@@ -58,13 +106,20 @@ export default async function ProposalPreviewPage({ params }: { params: Promise<
           }
           img {
             max-width: 100% !important;
-            page-break-inside: avoid;
+          }
+          .page-break-avoid {
+            break-inside: avoid !important;
+            page-break-inside: avoid !important;
+          }
+          .pdf-footer {
+            break-inside: avoid !important;
+            page-break-inside: avoid !important;
           }
         }
       `}</style>
 
       {/* Toolbar */}
-      <div style={{ width: "100%", maxWidth: "820px", display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
+      <div className="toolbar-container no-print" style={{ width: "100%", maxWidth: "820px", display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
         <h1 className="page-title" style={{ margin: 0 }}>พรีวิวเอกสาร</h1>
         <div style={{ display: "flex", gap: "10px" }}>
           <Link href={`/builder/${plan.id}`} className="btn-secondary" prefetch={false}>
@@ -77,17 +132,7 @@ export default async function ProposalPreviewPage({ params }: { params: Promise<
       {/* A4 Document */}
       <div
         id="proposal-document"
-        style={{
-          width: "210mm",
-          backgroundColor: "white",
-          boxShadow: "0 0 20px rgba(0,0,0,0.1)",
-          padding: "20mm 18mm",
-          color: "#333",
-          fontFamily: "'Inter', 'Sarabun', sans-serif",
-          fontSize: "13px",
-          lineHeight: "1.6",
-          marginBottom: "40px",
-        }}
+        className="proposal-paper"
       >
         {/* 1. Cover Page */}
         <ProposalCover
@@ -143,7 +188,7 @@ export default async function ProposalPreviewPage({ params }: { params: Promise<
         <DailyItinerarySection days={plan.TourDays} hotelLevel={plan.hotel_level} />
 
         {/* Footer */}
-        <div style={{ marginTop: "40px", paddingTop: "16px", borderTop: "1px solid #eee", textAlign: "center", fontSize: "11px", color: "#aaa" }}>
+        <div className="pdf-footer page-break-avoid" style={{ marginTop: "24px", paddingTop: "12px", borderTop: "1px solid #eee", textAlign: "center", fontSize: "10.5px", color: "#999", breakInside: "avoid", pageBreakInside: "avoid" }}>
           PR Global Travel Group Co., Ltd. | เอกสารนี้จัดทำโดยทีมงาน PR Travel สำหรับลูกค้าเท่านั้น
         </div>
       </div>

@@ -55,19 +55,26 @@ function renderRichText(text: string | null) {
 
 export default function DailyItinerarySection({ days, hotelLevel }: { days: TourDay[]; hotelLevel?: string | null }) {
   return (
-    <div style={{ pageBreakBefore: "always" }}>
-      <h2 style={{ color: PR_BLUE, fontSize: "18px", fontWeight: 800, borderBottom: `3px solid ${PR_RED}`, paddingBottom: "8px", marginBottom: "28px" }}>
+    <div className="daily-itinerary-container" style={{ breakInside: "auto", pageBreakInside: "auto" }}>
+      <h2
+        className="page-break-avoid"
+        style={{
+          color: PR_BLUE,
+          fontSize: "16px",
+          fontWeight: 800,
+          borderBottom: `2px solid ${PR_RED}`,
+          paddingBottom: "6px",
+          marginBottom: "20px",
+          breakInside: "avoid",
+          pageBreakInside: "avoid",
+          breakAfter: "avoid",
+          pageBreakAfter: "avoid",
+        }}
+      >
         📌 กำหนดการเดินทางรายวัน (Detailed Daily Itinerary)
       </h2>
 
-      {days.map((day, index) => {
-        const previousDay = index > 0 ? days[index - 1] : null;
-        const isPrevDaySmall = previousDay 
-          ? (previousDay.TourActivities.length <= 3 && (!previousDay.TourDayImages || previousDay.TourDayImages.filter(img => img.is_selected).length === 0))
-          : false;
-        
-        const shouldBreakPage = day.day_number > 1 && !isPrevDaySmall;
-
+      {days.map((day) => {
         const meals = [
           day.breakfast_included ? "เช้า" : null,
           day.lunch_included ? "กลางวัน" : null,
@@ -92,78 +99,81 @@ export default function DailyItinerarySection({ days, hotelLevel }: { days: Tour
         const selectedImages = day.TourDayImages ? day.TourDayImages.filter(img => img.is_selected) : [];
 
         return (
-          <div key={day.id} style={{ pageBreakBefore: shouldBreakPage ? "always" : "auto", marginBottom: "32px" }}>
-            {/* Header Red Banner Pill */}
-            <div style={{ marginBottom: "12px" }}>
-              <div style={{
-                display: "inline-block",
-                backgroundColor: PR_RED,
-                color: "white",
-                borderRadius: "20px",
-                padding: "6px 18px",
-                fontWeight: 800,
-                fontSize: "14px",
-                boxShadow: "0 2px 6px rgba(211,47,47,0.25)",
-              }}>
-                DAY {day.day_number} : {day.day_title || `ท่องเที่ยวเมือง ${day.city || ""}`}
+          <div key={day.id} className="day-section" style={{ marginBottom: "26px", breakInside: "auto", pageBreakInside: "auto" }}>
+            {/* Header Group: Day Pill + Date + Highlights + Hero Image (Kept together, never orphaned) */}
+            <div className="day-header-group page-break-avoid" style={{ breakInside: "avoid", pageBreakInside: "avoid", breakAfter: "avoid", pageBreakAfter: "avoid", marginBottom: "10px" }}>
+              {/* Header Red Banner Pill */}
+              <div style={{ marginBottom: "6px" }}>
+                <div style={{
+                  display: "inline-block",
+                  backgroundColor: PR_RED,
+                  color: "white",
+                  borderRadius: "16px",
+                  padding: "5px 14px",
+                  fontWeight: 800,
+                  fontSize: "13px",
+                  boxShadow: "0 2px 4px rgba(211,47,47,0.2)",
+                }}>
+                  DAY {day.day_number} : {day.day_title || `ท่องเที่ยวเมือง ${day.city || ""}`}
+                </div>
+                {dateStr && <div style={{ fontSize: "11px", color: "#777", marginTop: "3px", paddingLeft: "8px" }}>{dateStr}</div>}
               </div>
-              {dateStr && <div style={{ fontSize: "11px", color: "#888", marginTop: "4px", paddingLeft: "10px" }}>{dateStr}</div>}
+
+              {/* Highlights Red Secondary Pill */}
+              {highlightsPill && (
+                <div style={{
+                  backgroundColor: "#FFF3E0",
+                  border: "1px solid #FFE082",
+                  borderRadius: "12px",
+                  padding: "5px 12px",
+                  fontSize: "11.5px",
+                  fontWeight: 600,
+                  color: "#D84315",
+                  marginBottom: "10px",
+                  display: "inline-block",
+                  width: "100%",
+                }}>
+                  🎯 สถานที่ไฮไลท์: {highlightsPill}
+                </div>
+              )}
+
+              {/* Main Daily Images Hero — Controlled height 42mm */}
+              {selectedImages.length > 0 && (
+                <div style={{ marginBottom: "8px" }}>
+                  <div
+                    style={{
+                      width: "100%",
+                      height: "42mm",
+                      backgroundImage: `url(${selectedImages[0].image_url})`,
+                      backgroundSize: "cover",
+                      backgroundPosition: "center",
+                      borderRadius: "8px",
+                      boxShadow: "0 2px 6px rgba(0,0,0,0.06)",
+                    }}
+                  />
+                </div>
+              )}
             </div>
 
-            {/* Highlights Red Secondary Pill */}
-            {highlightsPill && (
-              <div style={{
-                backgroundColor: "#FFF3E0",
-                border: "1px solid #FFE082",
-                borderRadius: "16px",
-                padding: "6px 14px",
-                fontSize: "12px",
-                fontWeight: 600,
-                color: "#D84315",
-                marginBottom: "16px",
-                display: "inline-block",
-                width: "100%",
-              }}>
-                🎯 สถานที่ไฮไลท์: {highlightsPill}
-              </div>
-            )}
-
-            {/* Main Daily Images Hero */}
-            {selectedImages.length > 0 && (
-              <div style={{ marginBottom: "16px", pageBreakInside: "avoid" }}>
-                <div
-                  style={{
-                    width: "100%",
-                    height: "65mm",
-                    backgroundImage: `url(${selectedImages[0].image_url})`,
-                    backgroundSize: "cover",
-                    backgroundPosition: "center",
-                    borderRadius: "14px",
-                    boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-                  }}
-                />
-              </div>
-            )}
-
             {/* Activities Timeline & Storytelling Narrative */}
-            <div style={{ paddingLeft: "16px", borderLeft: `3px solid #E0E0E0`, marginLeft: "8px", marginBottom: "16px" }}>
+            <div className="timeline" style={{ paddingLeft: "14px", borderLeft: `3px solid #E0E0E0`, marginLeft: "8px", marginBottom: "10px", breakInside: "auto", pageBreakInside: "auto" }}>
               {day.TourActivities.map(activity => (
-                <div key={activity.id} style={{ marginBottom: "14px", position: "relative", pageBreakInside: "avoid" }}>
-                  <div style={{ position: "absolute", left: "-22px", top: "5px", width: "9px", height: "9px", borderRadius: "50%", backgroundColor: PR_RED, border: "2px solid white" }} />
+                <div key={activity.id} className="timeline-item page-break-avoid" style={{ marginBottom: "10px", position: "relative", breakInside: "avoid", pageBreakInside: "avoid" }}>
+                  <div style={{ position: "absolute", left: "-20px", top: "5px", width: "9px", height: "9px", borderRadius: "50%", backgroundColor: PR_RED, border: "2px solid white" }} />
                   
-                  <div style={{ display: "flex", gap: "8px", alignItems: "baseline" }}>
+                  <div style={{ display: "flex", gap: "6px", alignItems: "baseline" }}>
                     {activity.time_text && (
-                      <span style={{ color: PR_RED, fontWeight: 800, fontSize: "12px", minWidth: "55px", flexShrink: 0 }}>
+                      <span style={{ color: PR_RED, fontWeight: 800, fontSize: "11.5px", minWidth: "55px", flexShrink: 0 }}>
                         {activity.time_text}
                       </span>
                     )}
-                    <span style={{ fontWeight: 700, fontSize: "13px", color: PR_BLUE }}>
+                    <span style={{ fontWeight: 700, fontSize: "12.5px", color: PR_BLUE }}>
                       {activity.activity_title}
                     </span>
                   </div>
 
                   {activity.activity_description && (
-                    <div style={{ color: "#444", fontSize: "12px", lineHeight: "1.7", marginTop: "4px", paddingLeft: activity.time_text ? "63px" : "0" }}>
+                    <div style={{ color: "#444", fontSize: "11.5px", lineHeight: "1.6", marginTop: "2px", paddingLeft: activity.time_text ? "61px" : "0" }}>
                       {renderRichText(activity.activity_description)}
                     </div>
                   )}
@@ -171,17 +181,21 @@ export default function DailyItinerarySection({ days, hotelLevel }: { days: Tour
               ))}
             </div>
 
-            {/* Meals & Hotel Info Footer Box */}
-            <div style={{
-              backgroundColor: "#F5F5F5",
+            {/* Meals & Hotel Info Footer Box (Compact summary block, kept attached to day) */}
+            <div className="meals-hotel-box summary-block page-break-avoid" style={{
+              backgroundColor: "#F8F9FA",
               borderLeft: `4px solid ${PR_BLUE}`,
-              borderRadius: "0 8px 8px 0",
-              padding: "10px 14px",
-              fontSize: "12px",
+              borderRadius: "0 6px 6px 0",
+              padding: "8px 12px",
+              fontSize: "11.5px",
               display: "grid",
               gridTemplateColumns: "1fr 1fr",
-              gap: "10px",
+              gap: "8px",
+              boxSizing: "border-box",
+              breakInside: "avoid",
               pageBreakInside: "avoid",
+              breakBefore: "avoid",
+              pageBreakBefore: "avoid",
             }}>
               <div>
                 <strong style={{ color: PR_RED }}>🍽️ อาหาร:</strong> {meals}
@@ -197,16 +211,16 @@ export default function DailyItinerarySection({ days, hotelLevel }: { days: Tour
 
             {/* Additional Sub-images grid if more than 1 image */}
             {selectedImages.length > 1 && (
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "10px", marginTop: "12px", pageBreakInside: "avoid" }}>
+              <div className="page-break-avoid" style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "8px", marginTop: "10px", breakInside: "avoid", pageBreakInside: "avoid" }}>
                 {selectedImages.slice(1, 3).map(img => (
                   <div
                     key={img.id}
                     style={{
-                      height: "40mm",
+                      height: "36mm",
                       backgroundImage: `url(${img.image_url})`,
                       backgroundSize: "cover",
                       backgroundPosition: "center",
-                      borderRadius: "10px",
+                      borderRadius: "8px",
                     }}
                   />
                 ))}

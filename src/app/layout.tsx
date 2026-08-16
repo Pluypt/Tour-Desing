@@ -15,17 +15,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <div style={{ display: "flex", height: "100vh" }}>
+        <div className="app-root-layout">
           {/* Sidebar */}
-          <aside style={{
-            width: "250px",
-            background: "var(--pr-white)",
-            borderRight: "1px solid var(--border-color)",
-            display: "flex",
-            flexDirection: "column",
-            boxShadow: "var(--shadow-sm)",
-            zIndex: 10,
-          }}>
+          <aside className="app-sidebar no-print">
             <div style={{
               padding: "20px",
               borderBottom: "1px solid var(--border-color)",
@@ -72,7 +64,7 @@ export default function RootLayout({
           </aside>
 
           {/* Main Content Area */}
-          <main style={{ flex: 1, overflowY: "auto", padding: "30px" }}>
+          <main className="app-main-content">
             {children}
           </main>
         </div>

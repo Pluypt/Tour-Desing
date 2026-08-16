@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 
 export default function ExportButtons({ title }: { title: string }) {
   const [hideDates, setHideDates] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
 
   useEffect(() => {
     const doc = document.getElementById('proposal-document');
@@ -13,35 +14,46 @@ export default function ExportButtons({ title }: { title: string }) {
     }
   }, [hideDates]);
 
+  const handlePrint = () => {
+    window.print();
+  };
+
   const handleExportPDF = async () => {
-    // Dynamically import html2pdf so it only loads on the client side
     try {
+      setIsExporting(true);
       const html2pdf = (await import('html2pdf.js')).default;
       const element = document.getElementById('proposal-document');
       if (!element) { alert("ไม่พบเอกสาร"); return; }
       
       const opt = {
-        margin:       [15, 0] as [number, number], // เว้นขอบบนล่าง 15mm (ซ้ายขวาปล่อยเป็น 0 เพราะใน element มี padding อยู่แล้ว 18mm)
+        margin:       [10, 0, 12, 0] as [number, number, number, number],
         filename:     `${title || 'Tour_Proposal'}.pdf`,
-        image:        { type: 'jpeg' as const, quality: 1.0 },
-        pagebreak:    { mode: ['css', 'legacy'] }, // ให้เคารพคำสั่ง page-break-inside: avoid จะได้ไม่ตัดตัวอักษรหรือจุดขาดครึ่ง
+        image:        { type: 'jpeg' as const, quality: 0.98 },
+        pagebreak:    { 
+          mode: ['css', 'legacy'],
+          avoid: ['.page-break-avoid', '.timeline-item', '.meals-hotel-box', '.day-header-group', 'tr', '.cover-page', '.summary-block']
+        },
         html2canvas:  { 
-          scale: 3, 
+          scale: 2.5, 
           useCORS: true,
+          logging: false,
           onclone: (clonedDoc: Document) => {
             const doc = clonedDoc.getElementById('proposal-document');
             if (doc) {
-              doc.style.boxShadow = 'none'; // ลบเงาออกตอนแปลงเป็น PDF อย่างเดียว ไม่ต้องยุ่งกับ padding/width เพื่อกันปัญหาขอบแหว่ง
+              doc.style.boxShadow = 'none';
+              doc.style.margin = '0 auto';
             }
           }
         },
         jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' as const }
       };
 
-      html2pdf().set(opt).from(element).save();
+      await html2pdf().set(opt).from(element).save();
     } catch (e) {
       console.error("Failed to export PDF", e);
       alert("Failed to export PDF. Please try again.");
+    } finally {
+      setIsExporting(false);
     }
   };
 
@@ -64,8 +76,12 @@ export default function ExportButtons({ title }: { title: string }) {
       <button className="btn-secondary" onClick={handleCopyCustomerLink} style={{ backgroundColor: "#E3F2FD", color: "#1976D2", borderColor: "#90CAF9" }}>
         🔗 ลิงก์เว็บส่งลูกค้า
       </button>
-      <button className="btn-secondary" onClick={handleExportDOCX}>ดาวน์โหลด DOCX</button>
-      <button className="btn-primary" onClick={handleExportPDF}>ดาวน์โหลด PDF</button>
+      <button className="btn-secondary" onClick={handlePrint} title="สั่งพิมพ์เอกสาร หรือ Save as PDF ผ่านเบราว์เซอร์">
+        🖨️ พิมพ์ / บันทึก PDF (Browser)
+      </button>
+      <button className="btn-primary" onClick={handleExportPDF} disabled={isExporting}>
+        {isExporting ? "กำลังประมวลผล PDF..." : "📥 ดาวน์โหลด PDF"}
+      </button>
     </div>
   );
 }

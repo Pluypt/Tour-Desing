@@ -19,8 +19,8 @@ export default function PackagePriceSection({
     n != null ? n.toLocaleString("th-TH") + " บาท" : "-";
 
   return (
-    <div style={{ marginBottom: "32px" }}>
-      <h2 style={{ color: PR_RED, fontSize: "16px", fontWeight: 700, borderBottom: `2px solid ${PR_RED}`, paddingBottom: "8px", marginBottom: "16px" }}>
+    <div className="page-break-avoid" style={{ marginBottom: "24px", breakInside: "avoid", pageBreakInside: "avoid" }}>
+      <h2 style={{ color: PR_RED, fontSize: "15px", fontWeight: 700, borderBottom: `2px solid ${PR_RED}`, paddingBottom: "6px", marginBottom: "12px" }}>
         แพ็กเกจและราคา
       </h2>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: "14px" }}>

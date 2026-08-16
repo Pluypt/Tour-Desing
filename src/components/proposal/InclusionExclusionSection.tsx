@@ -32,8 +32,8 @@ export default function InclusionExclusionSection({
   const excList = exclusions.length > 0 ? exclusions.map(e => e.item_text) : DEFAULT_EXCLUSIONS;
 
   return (
-    <div style={{ marginBottom: "32px" }}>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "24px", marginBottom: "20px" }}>
+    <div className="page-break-avoid" style={{ marginBottom: "24px", breakInside: "avoid", pageBreakInside: "avoid" }}>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px", marginBottom: "12px", border: "1px solid #eee", borderRadius: "8px", padding: "14px 18px", backgroundColor: "#fafafa" }}>
         {/* Inclusions */}
         <div>
           <h3 style={{ color: PR_RED, fontSize: "14px", fontWeight: 700, marginBottom: "10px", display: "flex", alignItems: "center", gap: "6px" }}>
