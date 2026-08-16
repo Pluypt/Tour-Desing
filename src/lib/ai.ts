@@ -25,7 +25,7 @@ export const ai = {
           model: options.model || "gemini-1.5-flash",
           generationConfig: options.config?.responseMimeType ? { responseMimeType: options.config.responseMimeType } : undefined,
         },
-        { timeout: 5000 }
+        { timeout: 30000 }
       );
 
       let promptPayload: any = options.contents;

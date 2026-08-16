@@ -108,11 +108,14 @@ export default function TourRequestForm() {
       if (!res.ok) {
         const text = await res.text();
         console.error("API Response Error:", res.status, text);
-        let msg = "เกิดข้อผิดพลาดในการสร้างแผนทัวร์ กรุณาลองใหม่อีกครั้ง";
+        let msg = `เกิดข้อผิดพลาดในการสร้างแผนทัวร์ (${res.status})`;
         try {
           const parsed = JSON.parse(text);
           if (parsed.error) msg = parsed.error;
-        } catch (_) {}
+          else if (parsed.message) msg = parsed.message;
+        } catch (_) {
+          if (text) msg += `: ${text.slice(0, 100)}`;
+        }
         alert(msg);
         return;
       }

@@ -90,15 +90,25 @@ export async function POST(req: Request) {
       try {
         let promptPayload: any = systemPrompt;
         if (data.originalPlanFile && data.originalPlanFile.data) {
-          promptPayload = [
-            { text: systemPrompt + "\n\n[ข้อมูลแนบ] ผู้ใช้ได้แนบไฟล์ข้อมูลหรือแพลนต้นแบบมาด้วย กรุณาสกัดข้อมูลและปรับให้ตรงตามกฎเหล็กข้างต้น" },
-            {
-              inlineData: {
-                data: data.originalPlanFile.data,
-                mimeType: data.originalPlanFile.mimeType
-              }
+          if (data.originalPlanFile.mimeType === "text/plain") {
+            let extractedText = "";
+            try {
+              extractedText = Buffer.from(data.originalPlanFile.data, "base64").toString("utf-8");
+            } catch (_) {
+              extractedText = data.originalPlanFile.data;
             }
-          ];
+            promptPayload = `${systemPrompt}\n\n[ข้อมูลแนบจากแพลนต้นแบบ]:\n${extractedText.slice(0, 12000)}`;
+          } else {
+            promptPayload = [
+              { text: systemPrompt + "\n\n[ข้อมูลแนบ] ผู้ใช้ได้แนบไฟล์ข้อมูลหรือแพลนต้นแบบมาด้วย กรุณาสกัดข้อมูลและปรับให้ตรงตามกฎเหล็กข้างต้น" },
+              {
+                inlineData: {
+                  data: data.originalPlanFile.data,
+                  mimeType: data.originalPlanFile.mimeType
+                }
+              }
+            ];
+          }
         }
 
         const aiResponse = await ai.models.generateContent({
