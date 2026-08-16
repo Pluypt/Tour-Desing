@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { adminDb } from "@/lib/firebaseAdmin";
 import { prisma } from "@/lib/prisma";
 
 export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -6,7 +7,8 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
     const { id } = await params;
     const body = await req.json();
 
-    // 1. Update Plan details
+    const planRef = adminDb.collection("tour_plans").doc(id);
+
     const sellingPricePerPerson = body.selling_price_per_person !== undefined && body.selling_price_per_person !== null && body.selling_price_per_person !== ""
       ? parseFloat(body.selling_price_per_person)
       : undefined;
@@ -15,130 +17,134 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
       ? parseFloat(body.total_selling_price)
       : (sellingPricePerPerson && body.traveler_count ? sellingPricePerPerson * parseInt(body.traveler_count) : undefined);
 
-    await prisma.tourPlan.update({
-      where: { id },
-      data: {
-        title: body.title ?? undefined,
-        tour_code: body.tour_code ?? undefined,
-        duration: body.duration ? parseInt(body.duration) : undefined,
-        traveler_count: body.traveler_count ? parseInt(body.traveler_count) : undefined,
-        trip_type: body.trip_type ?? undefined,
-        airline: body.airline ?? undefined,
-        flight_route: body.flight_route ?? undefined,
-        outbound_flight: body.outbound_flight ?? undefined,
-        return_flight: body.return_flight ?? undefined,
-        start_date: body.start_date && !isNaN(new Date(body.start_date).getTime()) ? new Date(body.start_date) : undefined,
-        end_date: body.end_date && !isNaN(new Date(body.end_date).getTime()) ? new Date(body.end_date) : undefined,
-        hotel_level: body.hotel_level ?? undefined,
-        hero_image_url: body.hero_image_url ?? undefined,
-        selling_price_per_person: sellingPricePerPerson,
-        total_selling_price: totalSellingPrice,
-        status: body.status || "Draft",
-        updated_at: new Date()
-      }
-    });
+    const planUpdateData: Record<string, any> = {
+      updated_at: new Date()
+    };
+    if (body.title !== undefined) planUpdateData.title = body.title;
+    if (body.tour_code !== undefined) planUpdateData.tour_code = body.tour_code;
+    if (body.duration !== undefined) planUpdateData.duration = parseInt(body.duration);
+    if (body.traveler_count !== undefined) planUpdateData.traveler_count = parseInt(body.traveler_count);
+    if (body.trip_type !== undefined) planUpdateData.trip_type = body.trip_type;
+    if (body.airline !== undefined) planUpdateData.airline = body.airline;
+    if (body.flight_route !== undefined) planUpdateData.flight_route = body.flight_route;
+    if (body.outbound_flight !== undefined) planUpdateData.outbound_flight = body.outbound_flight;
+    if (body.return_flight !== undefined) planUpdateData.return_flight = body.return_flight;
+    if (body.start_date && !isNaN(new Date(body.start_date).getTime())) planUpdateData.start_date = new Date(body.start_date);
+    if (body.end_date && !isNaN(new Date(body.end_date).getTime())) planUpdateData.end_date = new Date(body.end_date);
+    if (body.hotel_level !== undefined) planUpdateData.hotel_level = body.hotel_level;
+    if (body.hero_image_url !== undefined) planUpdateData.hero_image_url = body.hero_image_url;
+    if (sellingPricePerPerson !== undefined) planUpdateData.selling_price_per_person = sellingPricePerPerson;
+    if (totalSellingPrice !== undefined) planUpdateData.total_selling_price = totalSellingPrice;
+    if (body.status !== undefined) planUpdateData.status = body.status;
 
-    // 2. Handle Inclusions
-    if (body.Inclusions && Array.isArray(body.Inclusions)) {
-      const existingIncs = await prisma.inclusion.findMany({ where: { tour_plan_id: id } });
-      const currIncIds = body.Inclusions.filter((x: any) => !x.isNew).map((x: any) => x.id);
-      for (const toDelete of existingIncs.filter((x: any) => !currIncIds.includes(x.id))) {
-        await prisma.inclusion.delete({ where: { id: toDelete.id } });
+    // Fetch current inclusions, exclusions, and day activity collections in PARALLEL
+    const incSnapPromise = body.Inclusions ? planRef.collection("inclusions").get() : null;
+    const excSnapPromise = body.Exclusions ? planRef.collection("exclusions").get() : null;
+    const dayActsPromises = (body.TourDays && Array.isArray(body.TourDays))
+      ? body.TourDays.map((day: any) => planRef.collection("days").doc(day.id).collection("activities").get())
+      : [];
+
+    const [incSnap, excSnap, ...dayActsSnaps] = await Promise.all([
+      incSnapPromise,
+      excSnapPromise,
+      ...dayActsPromises
+    ]);
+
+    const batch = adminDb.batch();
+
+    // 1. Update main plan doc
+    batch.set(planRef, planUpdateData, { merge: true });
+
+    // 2. Inclusions
+    if (body.Inclusions && Array.isArray(body.Inclusions) && incSnap) {
+      const currIncIds = new Set(body.Inclusions.filter((x: any) => !x.isNew).map((x: any) => x.id));
+      for (const doc of incSnap.docs) {
+        if (!currIncIds.has(doc.id)) {
+          batch.delete(doc.ref);
+        }
       }
-      for (const idx in body.Inclusions) {
+      for (let idx = 0; idx < body.Inclusions.length; idx++) {
         const inc = body.Inclusions[idx];
-        if (inc.isNew) {
-          await prisma.inclusion.create({
-            data: { tour_plan_id: id, item_text: inc.item_text, sort_order: parseInt(idx) }
-          });
-        } else {
-          await prisma.inclusion.update({
-            where: { id: inc.id },
-            data: { item_text: inc.item_text, sort_order: parseInt(idx) }
-          });
-        }
+        const incId = inc.isNew || !inc.id ? planRef.collection("inclusions").doc().id : inc.id;
+        const incRef = planRef.collection("inclusions").doc(incId);
+        batch.set(incRef, {
+          tour_plan_id: id,
+          item_text: inc.item_text || "",
+          sort_order: idx,
+          updated_at: new Date()
+        }, { merge: true });
       }
     }
 
-    // 3. Handle Exclusions
-    if (body.Exclusions && Array.isArray(body.Exclusions)) {
-      const existingExcs = await prisma.exclusion.findMany({ where: { tour_plan_id: id } });
-      const currExcIds = body.Exclusions.filter((x: any) => !x.isNew).map((x: any) => x.id);
-      for (const toDelete of existingExcs.filter((x: any) => !currExcIds.includes(x.id))) {
-        await prisma.exclusion.delete({ where: { id: toDelete.id } });
+    // 3. Exclusions
+    if (body.Exclusions && Array.isArray(body.Exclusions) && excSnap) {
+      const currExcIds = new Set(body.Exclusions.filter((x: any) => !x.isNew).map((x: any) => x.id));
+      for (const doc of excSnap.docs) {
+        if (!currExcIds.has(doc.id)) {
+          batch.delete(doc.ref);
+        }
       }
-      for (const idx in body.Exclusions) {
+      for (let idx = 0; idx < body.Exclusions.length; idx++) {
         const exc = body.Exclusions[idx];
-        if (exc.isNew) {
-          await prisma.exclusion.create({
-            data: { tour_plan_id: id, item_text: exc.item_text, sort_order: parseInt(idx) }
-          });
-        } else {
-          await prisma.exclusion.update({
-            where: { id: exc.id },
-            data: { item_text: exc.item_text, sort_order: parseInt(idx) }
-          });
-        }
+        const excId = exc.isNew || !exc.id ? planRef.collection("exclusions").doc().id : exc.id;
+        const excRef = planRef.collection("exclusions").doc(excId);
+        batch.set(excRef, {
+          tour_plan_id: id,
+          item_text: exc.item_text || "",
+          sort_order: idx,
+          updated_at: new Date()
+        }, { merge: true });
       }
     }
 
-    // 4. Update Days and Activities
+    // 4. Tour Days & Activities
     if (body.TourDays && Array.isArray(body.TourDays)) {
-      for (const day of body.TourDays) {
-        await prisma.tourDay.update({
-          where: { id: day.id },
-          data: {
-            day_title: day.day_title,
-            city: day.city,
-            hotel_name: day.hotel_name,
-            breakfast_included: Boolean(day.breakfast_included),
-            lunch_included: Boolean(day.lunch_included),
-            dinner_included: Boolean(day.dinner_included),
-            actual_date: day.actual_date && !isNaN(new Date(day.actual_date).getTime()) ? new Date(day.actual_date) : undefined,
-          }
-        });
+      for (let dIdx = 0; dIdx < body.TourDays.length; dIdx++) {
+        const day = body.TourDays[dIdx];
+        const dayRef = planRef.collection("days").doc(day.id);
 
-        // Handle Activities (Delete, Update, Create)
+        batch.set(dayRef, {
+          day_title: day.day_title || "",
+          city: day.city || "",
+          hotel_name: day.hotel_name || "",
+          breakfast_included: Boolean(day.breakfast_included),
+          lunch_included: Boolean(day.lunch_included),
+          dinner_included: Boolean(day.dinner_included),
+          actual_date: day.actual_date && !isNaN(new Date(day.actual_date).getTime()) ? new Date(day.actual_date) : null,
+          updated_at: new Date()
+        }, { merge: true });
+
         if (day.TourActivities && Array.isArray(day.TourActivities)) {
-          const existingActivities = await prisma.tourActivity.findMany({ where: { tour_day_id: day.id } });
-          const currentActivityIds = day.TourActivities.filter((a: any) => !a.isNew).map((a: any) => a.id);
-          
-          // Delete removed activities
-          const activitiesToDelete = existingActivities.filter((a: any) => !currentActivityIds.includes(a.id));
-          for (const toDelete of activitiesToDelete) {
-            await prisma.tourActivity.delete({ where: { id: toDelete.id } });
-          }
-
-          // Upsert current activities
-          for (const idx in day.TourActivities) {
-            const act = day.TourActivities[idx];
-            if (act.isNew) {
-              await prisma.tourActivity.create({
-                data: {
-                  tour_day_id: day.id,
-                  time_text: act.time_text || "",
-                  activity_title: act.activity_title || "",
-                  activity_description: act.activity_description || "",
-                  location_name: act.location_name || act.activity_title || "",
-                  sort_order: parseInt(idx),
-                }
-              });
-            } else {
-              await prisma.tourActivity.update({
-                where: { id: act.id },
-                data: {
-                  time_text: act.time_text || "",
-                  activity_title: act.activity_title || "",
-                  activity_description: act.activity_description || "",
-                  location_name: act.location_name || act.activity_title || "",
-                  sort_order: parseInt(idx),
-                }
-              });
+          const actSnap = dayActsSnaps[dIdx];
+          if (actSnap) {
+            const currActIds = new Set(day.TourActivities.filter((a: any) => !a.isNew).map((a: any) => a.id));
+            for (const doc of actSnap.docs) {
+              if (!currActIds.has(doc.id)) {
+                batch.delete(doc.ref);
+              }
             }
           }
+
+          for (let aIdx = 0; aIdx < day.TourActivities.length; aIdx++) {
+            const act = day.TourActivities[aIdx];
+            const actId = act.isNew || !act.id ? dayRef.collection("activities").doc().id : act.id;
+            const actRef = dayRef.collection("activities").doc(actId);
+            batch.set(actRef, {
+              tour_day_id: day.id,
+              time_text: act.time_text || "",
+              activity_title: act.activity_title || "",
+              activity_description: act.activity_description || "",
+              location_name: act.location_name || act.activity_title || "",
+              sort_order: aIdx,
+              updated_at: new Date()
+            }, { merge: true });
+          }
         }
       }
     }
+
+    // Single atomic batch commit
+    await batch.commit();
 
     return NextResponse.json({ success: true });
   } catch (error) {
