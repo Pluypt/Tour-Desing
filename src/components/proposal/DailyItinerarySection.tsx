@@ -89,12 +89,19 @@ export default function DailyItinerarySection({ days, hotelLevel }: { days: Tour
             })()
           : "";
 
-        // Extract key POIs for highlight pill
+        // Extract key POIs for highlight pill cleanly
         const highlightsPill = day.TourActivities
-          .map(a => a.location_name || a.activity_title)
+          .map(a => {
+            const loc = (a.location_name || a.activity_title || "").trim();
+            if (loc.length > 40) {
+              const cleaned = loc.split(/[\s•—\-\|\:\.]+/).filter(Boolean);
+              return cleaned.slice(0, 3).join(" ");
+            }
+            return loc;
+          })
           .filter(Boolean)
-          .slice(0, 5)
-          .join(" - ");
+          .slice(0, 4)
+          .join(" • ");
 
         const selectedImages = day.TourDayImages ? day.TourDayImages.filter(img => img.is_selected) : [];
 
@@ -157,28 +164,35 @@ export default function DailyItinerarySection({ days, hotelLevel }: { days: Tour
 
             {/* Activities Timeline & Storytelling Narrative */}
             <div className="timeline" style={{ paddingLeft: "14px", borderLeft: `3px solid #E0E0E0`, marginLeft: "8px", marginBottom: "10px", breakInside: "auto", pageBreakInside: "auto" }}>
-              {day.TourActivities.map(activity => (
-                <div key={activity.id} className="timeline-item page-break-avoid" style={{ marginBottom: "10px", position: "relative", breakInside: "avoid", pageBreakInside: "avoid" }}>
-                  <div style={{ position: "absolute", left: "-20px", top: "5px", width: "9px", height: "9px", borderRadius: "50%", backgroundColor: PR_RED, border: "2px solid white" }} />
-                  
-                  <div style={{ display: "flex", gap: "6px", alignItems: "baseline" }}>
-                    {activity.time_text && (
-                      <span style={{ color: PR_RED, fontWeight: 800, fontSize: "11.5px", minWidth: "55px", flexShrink: 0 }}>
-                        {activity.time_text}
-                      </span>
-                    )}
-                    <span style={{ fontWeight: 700, fontSize: "12.5px", color: PR_BLUE }}>
-                      {activity.activity_title}
-                    </span>
-                  </div>
+              {day.TourActivities.map(activity => {
+                const titleStr = (activity.activity_title || "").trim();
+                const descStr = (activity.activity_description || "").trim();
+                const cleanDesc = descStr.replace(/^นำท่าน\s*\*\*/, '').replace(/\*\*/g, '').replace(/^นำท่าน\s*/, '').trim();
+                const isDuplicateDesc = descStr && titleStr && (descStr === titleStr || cleanDesc === titleStr);
 
-                  {activity.activity_description && (
-                    <div style={{ color: "#444", fontSize: "11.5px", lineHeight: "1.6", marginTop: "2px", paddingLeft: activity.time_text ? "61px" : "0" }}>
-                      {renderRichText(activity.activity_description)}
+                return (
+                  <div key={activity.id} className="timeline-item page-break-avoid" style={{ marginBottom: "10px", position: "relative", breakInside: "avoid", pageBreakInside: "avoid" }}>
+                    <div style={{ position: "absolute", left: "-20px", top: "5px", width: "9px", height: "9px", borderRadius: "50%", backgroundColor: PR_RED, border: "2px solid white" }} />
+                    
+                    <div style={{ display: "flex", gap: "6px", alignItems: "baseline" }}>
+                      {activity.time_text && (
+                        <span style={{ color: PR_RED, fontWeight: 800, fontSize: "11.5px", minWidth: "55px", flexShrink: 0 }}>
+                          {activity.time_text}
+                        </span>
+                      )}
+                      <span style={{ fontWeight: 700, fontSize: "12.5px", color: PR_BLUE }}>
+                        {activity.activity_title}
+                      </span>
                     </div>
-                  )}
-                </div>
-              ))}
+
+                    {activity.activity_description && !isDuplicateDesc && (
+                      <div style={{ color: "#444", fontSize: "11.5px", lineHeight: "1.6", marginTop: "2px", paddingLeft: activity.time_text ? "61px" : "0" }}>
+                        {renderRichText(activity.activity_description)}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
 
             {/* Meals & Hotel Info Footer Box (Compact summary block, kept attached to day) */}

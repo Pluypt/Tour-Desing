@@ -99,10 +99,11 @@ export type AIPlan = {
 /**
  * Validate that an AI-generated tour plan has the minimum required structure.
  */
-export function validateAIPlan(plan: unknown): plan is AIPlan {
+export function validateAIPlan(plan: unknown, expectedDuration?: number): plan is AIPlan {
   if (!plan || typeof plan !== "object") return false;
   const p = plan as Record<string, unknown>;
   if (!Array.isArray(p.itinerary) || p.itinerary.length === 0) return false;
+  if (expectedDuration && p.itinerary.length !== expectedDuration) return false;
   return true;
 }
 
@@ -727,7 +728,7 @@ export function parseCustomerNoteToItinerary(
         time_period: timePeriod,
         activity_title: title.slice(0, 60),
         location_name: title.slice(0, 40),
-        description: line.startsWith("**") ? line : `นำท่าน **${title}** ตามความต้องการพิเศษของโปรแกรม`,
+        description: line.startsWith("**") ? line : `นำท่าน **${title}**`,
         is_highlight: idx === 0 || idx === 1 || title.includes("UNESCO") || title.includes("ไฮไลท์")
       };
     });
