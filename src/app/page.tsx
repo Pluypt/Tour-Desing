@@ -4,19 +4,20 @@ import { prisma } from "@/lib/prisma";
 export const dynamic = "force-dynamic";
 
 export default async function Dashboard() {
-  // Fetch stats from DB
-  const totalPlans = await prisma.tourPlan.count();
-  const draftPlans = await prisma.tourPlan.count({ where: { status: "Draft" } });
-  const sentPlans = await prisma.tourPlan.count({ where: { status: "Sent to Customer" } });
-  const revisedPlans = await prisma.tourPlan.count({ where: { status: "Revised" } });
-  const confirmedPlans = await prisma.tourPlan.count({ where: { status: "Confirmed" } });
-  const depositPaid = await prisma.tourPlan.count({ where: { status: "Deposit Paid" } });
-
-  const recentPlans = await prisma.tourPlan.findMany({
-    take: 5,
+  // Fetch all plans in a single fast query
+  const allPlans = await prisma.tourPlan.findMany({
     orderBy: { updated_at: "desc" },
     include: { customer: true }
   });
+
+  const totalPlans = allPlans.length;
+  const draftPlans = allPlans.filter(p => p.status === "Draft" || !p.status).length;
+  const sentPlans = allPlans.filter(p => p.status === "Sent to Customer").length;
+  const revisedPlans = allPlans.filter(p => p.status === "Customer Requested Revision" || p.status === "Revised").length;
+  const confirmedPlans = allPlans.filter(p => p.status === "Confirmed" || p.status === "Completed").length;
+  const depositPaid = allPlans.filter(p => p.status === "Deposit Paid").length;
+
+  const recentPlans = allPlans.slice(0, 10);
 
   return (
     <div className="container" style={{ padding: 0 }}>
