@@ -614,6 +614,452 @@ const DESTINATION_DATA: Record<string, {
       }
     ]
   },
+  beijing: {
+    tourName: "มหัศจรรย์ ปักกิ่ง กำแพงเมืองจีน พระราชวังต้องห้าม & เช็คอินแลนด์มาร์กใหม่",
+    hotel: "Beijing Marriott Hotel / Grand Millennium Beijing หรือเทียบเท่า 4 ดาว",
+    airline: "Air China (CA) / Thai Airways (TG)",
+    flightRoute: "BKK - PEK - BKK",
+    outboundFlight: "CA960 BKK 19:15 - 01:10 (+1) PEK",
+    returnFlight: "CA959 PEK 13:40 - 18:00 BKK",
+    days: [
+      {
+        theme: "กรุงเทพฯ (สนามบินสุวรรณภูมิ) - นครปักกิ่ง (สนามบินเป่ยจิงแคปิตอล) - เช็คอินเข้าสู่ที่พัก",
+        activities: [
+          {
+            time_period: "16.30 น.",
+            activity_title: "พร้อมกัน ณ สนามบินสุวรรณภูมิ",
+            location_name: "สนามบินสุวรรณภูมิ (BKK)",
+            description: "คณะพร้อมกัน ณ **ท่าอากาศยานสุวรรณภูมิ** อาคารผู้โดยสารขาออก เช็คอินเคาน์เตอร์สายการบิน Air China"
+          },
+          {
+            time_period: "19.15 น.",
+            activity_title: "ออกเดินทางบินตรงสู่นครหลวงปักกิ่ง",
+            location_name: "สนามบินนานาชาติเป่ยจิงแคปิตอล (PEK)",
+            description: "ออกเดินทางสู่นครหลวงปักกิ่ง โดยเที่ยวบิน **CA960** เดินทางถึงปักกิ่งเวลา 01.10 น."
+          },
+          {
+            time_period: "01.10 น.",
+            activity_title: "เดินทางถึงปักกิ่ง - ผ่านพิธีการตรวจคนเข้าเมือง - เข้าสู่โรงแรมที่พัก",
+            location_name: "โรงแรมที่พักใจกลางนครปักกิ่ง",
+            description: "เดินทางถึง **สนามบินนานาชาติเป่ยจิงแคปิตอล** นำท่านเดินทางเข้าสู่โรงแรมที่พัก พักผ่อนเพื่อเตรียมตัวสำหรับวันถัดไป",
+            is_highlight: false
+          }
+        ]
+      },
+      {
+        theme: "ปักกิ่ง - จัตุรัสเทียนอันเหมิน - พระราชวังต้องห้ามกู้กง - หอฟ้าเทียนถาน - ถนนคนเดินหวังฝูจิ่ง",
+        activities: [
+          {
+            time_period: "เช้า",
+            activity_title: "ชมความยิ่งใหญ่ จัตุรัสเทียนอันเหมิน (Tiananmen Square) & พระราชวังต้องห้าม (Forbidden City)",
+            location_name: "จัตุรัสเทียนอันเหมิน & พระราชวังต้องห้าม",
+            description: "นำท่านชม **จัตุรัสเทียนอันเหมิน** จัตุรัสใจกลางเมืองที่ใหญ่ที่สุดในโลก จากนั้นลอดซุ้มประตูเข้าสู่ **พระราชวังต้องห้ามกู้กง (Forbidden City)** มรดกโลก UNESCO ชมท้องพระโรงทองคำและสถาปัตยกรรมราชวงศ์หมิงและชิง",
+            is_highlight: true
+          },
+          {
+            time_period: "กลางวัน",
+            activity_title: "รับประทานอาหารกลางวัน เมนูเป็ดปักกิ่งสูตรต้นตำรับชาววัง",
+            location_name: "ภัตตาคารเป็ดปักกิ่งชื่อดัง",
+            description: "ลิ้มลอง **เป็ดปักกิ่งแท้** หนังกรอบบาง ห่อแผ่นแป้งนุ่ม ราดซอสหวานสูตรพิเศษและเครื่องเคียง"
+          },
+          {
+            time_period: "บ่าย",
+            activity_title: "สักการะขอพร หอฟ้าเทียนถาน (Temple of Heaven)",
+            location_name: "หอฟ้าเทียนถาน (Temple of Heaven)",
+            description: "นำท่านชม **หอฟ้าเทียนถาน** สถานที่ประกอบพิธีบวงสรวงสวรรค์ของจักรพรรดิโบราณ ชมตำหนักกลมไม้ไร้ตะปูอันวิจิตรอลังการ",
+            is_highlight: true
+          },
+          {
+            time_period: "เย็น",
+            activity_title: "ช้อปปิ้งถนนคนเดินหวังฝูจิ่ง (Wangfujing) & ถ่ายรูปตึก CCTV",
+            location_name: "ถนนคนเดินหวังฝูจิ่ง (Wangfujing Street)",
+            description: "อิสระช้อปปิ้ง **ถนนคนเดินหวังฝูจิ่ง** แหล่งรวมสินค้าแฟชั่น ของฝาก และสตรีทฟู้ดปักกิ่ง",
+            is_highlight: true
+          }
+        ]
+      },
+      {
+        theme: "ปักกิ่ง - 1 ใน 7 สิ่งมหัศจรรย์ของโลก กำแพงเมืองจีน (ด่านมู่เถียนยวี่) - ชมสนามกีฬารังนกโอลิมปิก",
+        activities: [
+          {
+            time_period: "เช้า",
+            activity_title: "พิชิต 1 ใน 7 สิ่งมหัศจรรย์ กำแพงเมืองจีน ด่านมู่เถียนยวี่ (Mutianyu Great Wall)",
+            location_name: "กำแพงเมืองจีน ด่านมู่เถียนยวี่",
+            description: "นำท่านนั่งกระเช้าขึ้นสู่ **กำแพงเมืองจีน ด่านมู่เถียนยวี่** สัมผัสความยิ่งใหญ่ของแนวกำแพงหินทอดยาวบนสันเขาสลับซับซ้อน ทัศนียภาพงดงามตระการตา",
+            is_highlight: true
+          },
+          {
+            time_period: "กลางวัน",
+            activity_title: "รับประทานอาหารกลางวัน สุกี้หม้อไฟมองโกลปักกิ่ง",
+            location_name: "ภัตตาคารสุกี้มองโกล",
+            description: "รับประทาน **สุกี้หม้อไฟมองโกล** เนื้อแกะและเนื้อวัวสไลซ์บาง จุ่มในน้ำซุปสมุนไพรร้อนๆ"
+          },
+          {
+            time_period: "บ่าย",
+            activity_title: "เดินเล่นพระราชวังฤดูร้อน อี้เหอหยวน (Summer Palace)",
+            location_name: "พระราชวังฤดูร้อน อี้เหอหยวน",
+            description: "ชม **พระราชวังฤดูร้อนอี้เหอหยวน** อุทยานหลวงริมทะเลสาบคุนหมิง ชมระเบียงทางเดินไม้ยาวที่สุดในโลก และเรือหินอ่อนของพระนางซูสีไทเฮา",
+            is_highlight: true
+          },
+          {
+            time_period: "เย็น",
+            activity_title: "ถ่ายรูปเช็คอิน สนามกีฬาแห่งชาติรังนก (Bird's Nest) & Water Cube ยามค่ำคืน",
+            location_name: "สนามกีฬาแห่งชาติรังนก (Beijing National Stadium)",
+            description: "ชมแสงสีสุดตระการตาบริเวณ **สนามกีฬาแห่งชาติรังนก** และศูนย์กีฬาทางน้ำ **Water Cube** แลนด์มาร์กสถาปัตยกรรมโอลิมปิกระดับโลก",
+            is_highlight: true
+          }
+        ]
+      },
+      {
+        theme: "ปักกิ่ง - เช็คเอาท์โรงแรม - เดินทางสู่สนามบินเป่ยจิงแคปิตอล - กรุงเทพฯ (สนามบินสุวรรณภูมิ)",
+        activities: [
+          {
+            time_period: "09.00 น.",
+            activity_title: "รับประทานอาหารเช้า & เช็คเอาท์โรงแรม",
+            location_name: "โรงแรมที่พักในปักกิ่ง",
+            description: "รับประทานอาหารเช้า ณ ห้องอาหารของโรงแรม จากนั้นจัดเก็บสัมภาระและเช็คเอาท์เพื่อเดินทางสู่สนามบิน"
+          },
+          {
+            time_period: "11.00 น.",
+            activity_title: "เดินทางถึงสนามบินเป่ยจิงแคปิตอล - เช็คอินสัมภาระ",
+            location_name: "สนามบินนานาชาติเป่ยจิงแคปิตอล (PEK)",
+            description: "เดินทางถึงสนามบิน เช็คอินบัตรโดยสารและโหลดสัมภาระ ผ่านพิธีการตรวจคนเข้าเมือง"
+          },
+          {
+            time_period: "13.40 น.",
+            activity_title: "ออกเดินทางบินตรงกลับสู่กรุงเทพฯ",
+            location_name: "สนามบินสุวรรณภูมิ (BKK)",
+            description: "ออกเดินทางกลับสู่กรุงเทพฯ โดยเที่ยวบิน **CA959** ถึงสนามบินสุวรรณภูมิ เวลา 18.00 น. โดยสวัสดิภาพ"
+          }
+        ]
+      }
+    ]
+  },
+  guangzhou: {
+    tourName: "ไฮไลต์ กวางโจว เช็คอินแคนตันทาวเวอร์ ล่องเรือแม่น้ำจูเจียง ช้อปปิ้งถนนคนเดินเป่ยจิงลู่",
+    hotel: "Guangzhou Marriott Hotel / Crowne Plaza Guangzhou หรือเทียบเท่า 4 ดาว",
+    airline: "China Southern Airlines (CZ) / Thai Airways (TG)",
+    flightRoute: "BKK - CAN - BKK",
+    outboundFlight: "CZ3082 BKK 11:55 - 15:45 CAN",
+    returnFlight: "CZ3081 CAN 17:15 - 19:15 BKK",
+    days: [
+      {
+        theme: "กรุงเทพฯ (สุวรรณภูมิ) - กวางโจว (สนามบินไป๋อวิ๋น) - หอคอยแคนตันทาวเวอร์ - ล่องเรือแม่น้ำจูเจียง",
+        activities: [
+          {
+            time_period: "09.00 น.",
+            activity_title: "พร้อมกัน ณ สนามบินสุวรรณภูมิ",
+            location_name: "สนามบินสุวรรณภูมิ (BKK)",
+            description: "คณะพร้อมกัน ณ **สนามบินสุวรรณภูมิ** อาคารผู้โดยสารขาออก เช็คอินเคาน์เตอร์สายการบิน China Southern Airlines"
+          },
+          {
+            time_period: "11.55 น.",
+            activity_title: "ออกเดินทางบินตรงสู่นครกวางโจว",
+            location_name: "สนามบินนานาชาติกวางโจวไป๋อวิ๋น (CAN)",
+            description: "บินลัดฟ้าสู่นครกวางโจว โดยเที่ยวบิน **CZ3082** เดินทางถึงกวางโจวเวลา 15.45 น."
+          },
+          {
+            time_period: "เย็น",
+            activity_title: "ชมหอคอย Canton Tower & ล่องเรือสำราญชมแม่น้ำจูเจียง (Pearl River Cruise)",
+            location_name: "หอคอยแคนตันทาวเวอร์ & แม่น้ำจูเจียง",
+            description: "ชมความงามของ **หอคอย Canton Tower** หอคอยสูงระฟ้าแลนด์มาร์กของกวางโจว และล่องเรือสำราญชมแสงสีไฟนีออนสองฝั่ง **แม่น้ำจูเจียง (Pearl River)** ยามค่ำคืน",
+            is_highlight: true
+          }
+        ]
+      },
+      {
+        theme: "กวางโจว - อนุสาวรีย์แพะห้าตัว สวนเยว่ซิ่ว - คฤหาสน์ตระกูลเฉิน - ถนนคนเดินเป่ยจิงลู่",
+        activities: [
+          {
+            time_period: "เช้า",
+            activity_title: "ชมอนุสาวรีย์แพะห้าตัว สวนเยว่ซิ่ว (Yuexiu Park) & ซานฟางซีฟาง",
+            location_name: "สวนเยว่ซิ่ว (Yuexiu Park)",
+            description: "นำท่านสู่ **สวนเยว่ซิ่ว (Yuexiu Park)** ถ่ายรูปคู่กับ **อนุสาวรีย์แพะห้าตัว (Five Rams Sculpture)** สัญลักษณ์แห่งเมืองกวางโจว",
+            is_highlight: true
+          },
+          {
+            time_period: "กลางวัน",
+            activity_title: "รับประทานอาหารกลางวัน ติ่มซำกวางตุ้งชื่อดัง กวางโจว",
+            location_name: "ภัตตาคารติ่มซำกวางโจว",
+            description: "ลิ้มลองติ่มซำกวางตุ้งขนานแท้ ฮะเก๋ากุ้ง ขนมจีบหมู และก๋วยเตี๋ยวหลอดกุ้งกรอบ"
+          },
+          {
+            time_period: "บ่าย",
+            activity_title: "เข้าชมคฤหาสน์ตระกูลเฉิน (Chen Clan Ancestral Hall)",
+            location_name: "คฤหาสน์ตระกูลเฉิน (Chen Clan Ancestral Hall)",
+            description: "ชมสถาปัตยกรรมงานแกะสลักไม้ หิน อิฐ และกระเบื้องเคลือบสุดวิจิตร ณ **คฤหาสน์ตระกูลเฉิน** มรดกทางวัฒนธรรมอันล้ำค่า",
+            is_highlight: true
+          },
+          {
+            time_period: "เย็น",
+            activity_title: "ช้อปปิ้งถนนคนเดินเป่ยจิงลู่ (Beijing Road) & ชมถนนโบราณพันปี",
+            location_name: "ถนนคนเดินเป่ยจิงลู่ (Beijing Road)",
+            description: "ช้อปปิ้งสินค้าแฟชั่น เสื้อผ้า ของฝาก ณ **ถนนคนเดินเป่ยจิงลู่ (Beijing Road)** และชมร่องรอยถนนหินโบราณสมัยราชวงศ์ซ่งใต้กระจกใสใจกลางถนน",
+            is_highlight: true
+          }
+        ]
+      },
+      {
+        theme: "กวางโจว - เกาะซาเหมี่ยน (Shamian Island) - ตลาดค้าส่งเสื้อผ้าซาเหอ - ย่านถนนคนเดินซ่างเซี่ยจิ่ว",
+        activities: [
+          {
+            time_period: "เช้า",
+            activity_title: "เดินเล่นถ่ายรูปสไตล์ยุโรป เกาะซาเหมี่ยน (Shamian Island)",
+            location_name: "เกาะซาเหมี่ยน (Shamian Island)",
+            description: "นำท่านเดินเล่นถ่ายรูปบน **เกาะซาเหมี่ยน** ย่านตึกโบราณสไตล์โคโลเนียลยุโรปร่มรื่นไปด้วยต้นไม้ใหญ่ สวรรค์ของสายถ่ายรูป Portrait",
+            is_highlight: true
+          },
+          {
+            time_period: "กลางวัน",
+            activity_title: "รับประทานอาหารกลางวัน เมนูห่านย่างกวางโจวหนังกรอบ",
+            location_name: "ภัตตาคารห่านย่างชื่อดัง",
+            description: "รับประทานอาหารกลางวัน ลิ้มรสชาติ **ห่านย่างกวางโจว** เนื้อนุ่มหนังกรอบราดซอสบ๊วย"
+          },
+          {
+            time_period: "บ่าย / เย็น",
+            activity_title: "ช้อปปิ้งถนนคนเดินซ่างเซี่ยจิ่ว (Shangxiajiu Pedestrian Street)",
+            location_name: "ถนนคนเดินซ่างเซี่ยจิ่ว (Shangxiajiu)",
+            description: "อิสระช้อปปิ้งย่าน **ถนนคนเดินซ่างเซี่ยจิ่ว** ชมสถาปัตยกรรมอาคารสไตล์ฉีโหลว (Qilou) และลิ้มลองขนมหวานกวางตุ้งชื่อดัง",
+            is_highlight: true
+          }
+        ]
+      },
+      {
+        theme: "กวางโจว - เช็คเอาท์โรงแรม - เดินทางสู่สนามบินไป๋อวิ๋น - กรุงเทพฯ (สนามบินสุวรรณภูมิ)",
+        activities: [
+          {
+            time_period: "11.00 น.",
+            activity_title: "รับประทานอาหารเช้า & เช็คเอาท์โรงแรม",
+            location_name: "โรงแรมที่พักในกวางโจว",
+            description: "รับประทานอาหารเช้า ณ โรงแรมที่พัก จากนั้นจัดเก็บสัมภาระและเช็คเอาท์"
+          },
+          {
+            time_period: "14.00 น.",
+            activity_title: "เดินทางถึงสนามบินกวางโจวไป๋อวิ๋น - เช็คอินสัมภาระ",
+            location_name: "สนามบินนานาชาติกวางโจวไป๋อวิ๋น (CAN)",
+            description: "เดินทางถึงสนามบิน เช็คอินบัตรโดยสารและโหลดสัมภาระ ผ่านพิธีการตรวจคนเข้าเมือง"
+          },
+          {
+            time_period: "17.15 น.",
+            activity_title: "ออกเดินทางบินตรงกลับสู่กรุงเทพฯ",
+            location_name: "สนามบินสุวรรณภูมิ (BKK)",
+            description: "ออกเดินทางกลับกรุงเทพฯ โดยเที่ยวบิน **CZ3081** ถึงสนามบินสุวรรณภูมิ เวลา 19.15 น. โดยสวัสดิภาพ"
+          }
+        ]
+      }
+    ]
+  },
+  seoul: {
+    tourName: "สุดอินเทรนด์ โซล เกาหลีใต้ เช็คอินพระราชวังเคียงบกกุง ฮงแด เมียงดง & คาเฟ่สุดฮิต",
+    hotel: "L7 Myeongdong / Novotel Ambassador Seoul หรือเทียบเท่า 4 ดาว",
+    airline: "Korean Air (KE) / Asiana Airlines (OZ) / Thai Airways (TG)",
+    flightRoute: "BKK - ICN - BKK",
+    outboundFlight: "KE658 BKK 23:30 - 07:00 (+1) ICN",
+    returnFlight: "KE657 ICN 17:40 - 21:40 BKK",
+    days: [
+      {
+        theme: "กรุงเทพฯ (สุวรรณภูมิ) - โซล (สนามบินอินชอน) - เช็คอินเข้าโรงแรมที่พัก",
+        activities: [
+          {
+            time_period: "20.30 น.",
+            activity_title: "พร้อมกัน ณ สนามบินสุวรรณภูมิ",
+            location_name: "สนามบินสุวรรณภูมิ (BKK)",
+            description: "คณะพร้อมกัน ณ **ท่าอากาศยานสุวรรณภูมิ** อาคารผู้โดยสารขาออก เช็คอินเคาน์เตอร์สายการบิน Korean Air"
+          },
+          {
+            time_period: "23.30 น.",
+            activity_title: "ออกเดินทางบินตรงสู่กรุงโซล ประเทศเกาหลีใต้",
+            location_name: "สนามบินนานาชาติอินชอน (ICN)",
+            description: "ออกเดินทางสู่กรุงโซล โดยเที่ยวบิน **KE658** พักผ่อนบนเครื่องบิน"
+          },
+          {
+            time_period: "07.00 น.",
+            activity_title: "เดินทางถึงสนามบินอินชอน - ผ่านตม. - เข้าสู่กรุงโซล",
+            location_name: "สนามบินนานาชาติอินชอน & โรงแรมที่พัก",
+            description: "เดินทางถึง **สนามบินอินชอน** ผ่านพิธีการตรวจคนเข้าเมือง จากนั้นเดินทางเข้าสู่กรุงโซล ฝากสัมภาระและพักผ่อน",
+            is_highlight: false
+          }
+        ]
+      },
+      {
+        theme: "โซล - สวมชุดฮันบก พระราชวังเคียงบกกุง - หมู่บ้านบุกชอนฮันอก - ช้อปปิ้งย่านเมียงดง",
+        activities: [
+          {
+            time_period: "เช้า",
+            activity_title: "สวมชุดฮันบกเข้าชม พระราชวังเคียงบกกุง (Gyeongbokgung Palace)",
+            location_name: "พระราชวังเคียงบกกุง (Gyeongbokgung Palace)",
+            description: "สวมชุดฮันบกเกาหลีโบราณเข้าชม **พระราชวังเคียงบกกุง** พระราชวังหลวงที่ใหญ่ที่สุดในเกาหลี ชมพิธีเปลี่ยนเวรราชองครักษ์และถ่ายรูปมุมสวยสไตล์ย้อนยุค",
+            is_highlight: true
+          },
+          {
+            time_period: "กลางวัน",
+            activity_title: "รับประทานอาหารกลางวัน เมนูไก่ตุ๋นโสมเกาหลีโบราณ (Samgyetang)",
+            location_name: "ร้านไก่ตุ๋นโสมชื่อดังโซล",
+            description: "ลิ้มลอง **ไก่ตุ๋นโสมเกาหลี** อัดแน่นด้วยข้าวเหนียว โสมเกาหลี และสมุนไพรบำรุงสุขภาพ"
+          },
+          {
+            time_period: "บ่าย",
+            activity_title: "เดินเล่นหมู่บ้านโบราณ บุกชอนฮันอก (Bukchon Hanok Village) & ย่านคาเฟ่อิกซอนดง",
+            location_name: "หมู่บ้านบุกชอนฮันอก & อิกซอนดง",
+            description: "ถ่ายรูปบ้านเรือนเกาหลีโบราณ ณ **หมู่บ้านบุกชอนฮันอก** และเดินเล่นตรอกคาเฟ่สุดฮิป **ย่านอิกซอนดง (Ikseon-dong)**",
+            is_highlight: true
+          },
+          {
+            time_period: "เย็น",
+            activity_title: "ช้อปปิ้งย่านเมียงดง (Myeongdong) & ตระเวนชิม Street Food เกาหลี",
+            location_name: "ตลาดเมียงดง (Myeongdong)",
+            description: "อิสระช้อปปิ้งเครื่องสำอาง แฟชั่น และของฝาก ณ **ย่านเมียงดง** พร้อมลิ้มลองสตรีทฟู้ดเกาหลียอดฮิต ต๊อกบกกี คอร์นด็อก และชีสย่าง",
+            is_highlight: true
+          }
+        ]
+      },
+      {
+        theme: "โซล - หอคอย N Seoul Tower คล้องกุญแจคู่รัก - ช้อปปิ้งย่านวัยรุ่น ฮงแด (Hongdae)",
+        activities: [
+          {
+            time_period: "เช้า",
+            activity_title: "ชมวิวเมืองและจุดคล้องกุญแจคู่รัก N Seoul Tower (เขานัมซาน)",
+            location_name: "N Seoul Tower (หอคอยนัมซาน)",
+            description: "ขึ้นสู่ยอดเขานัมซานชม **N Seoul Tower** ชมทัศนียภาพกว้างไกลของกรุงโซล และเช็คอินจุดคล้องกุญแจคู่รักอันโด่งดัง",
+            is_highlight: true
+          },
+          {
+            time_period: "กลางวัน",
+            activity_title: "รับประทานอาหารกลางวัน หมูย่างเกาหลีบาร์บีคิว (Samgyeopsal)",
+            location_name: "ร้านหมูย่างเกาหลีพรีเมียม",
+            description: "รับประทาน **หมูย่างเกาหลีแท้** เสิร์ฟพร้อมผักสด กิมจิ และเครื่องเคียงเกาหลีไม่อั้น"
+          },
+          {
+            time_period: "บ่าย / เย็น",
+            activity_title: "ช้อปปิ้งและชมสตรีทเพอร์ฟอร์แมนซ์ ย่านฮงแด (Hongdae Street)",
+            location_name: "ย่านฮงแด (Hongdae Walking Street)",
+            description: "อิสระช้อปปิ้งย่านมหาวิทยาลัยฮงอิก **ฮงแด (Hongdae)** แหล่งรวมเสื้อผ้าอินเทรนด์ คาเฟ่เก๋ๆ และการแสดงเปิดหมวกของวัยรุ่นเกาหลี",
+            is_highlight: true
+          }
+        ]
+      },
+      {
+        theme: "โซล - ซุปเปอร์มาร์เก็ตละลายเงินวอน - สนามบินอินชอน - กรุงเทพฯ (สนามบินสุวรรณภูมิ)",
+        activities: [
+          {
+            time_period: "11.00 น.",
+            activity_title: "ช้อปปิ้งของฝาก ซุปเปอร์มาร์เก็ตละลายเงินวอน & เช็คเอาท์",
+            location_name: "Korean Duty Free / Local Supermarket",
+            description: "แวะซื้อของฝากยอดนิยม สาหร่ายเกาหลี ขนม บะหมี่กึ่งสำเร็จรูป และเครื่องสำอางก่อนเดินทางสู่สนามบิน"
+          },
+          {
+            time_period: "14.30 น.",
+            activity_title: "เดินทางถึงสนามบินนานาชาติอินชอน - เช็คอินสัมภาระ & Tax Refund",
+            location_name: "สนามบินนานาชาติอินชอน (ICN)",
+            description: "เดินทางถึงสนามบินอินชอน เช็คอินสัมภาระ ดำเนินการคืนภาษี (Tax Refund) และผ่านขั้นตอนตรวจคนเข้าเมือง"
+          },
+          {
+            time_period: "17.40 น.",
+            activity_title: "ออกเดินทางบินตรงกลับสู่กรุงเทพฯ",
+            location_name: "สนามบินสุวรรณภูมิ (BKK)",
+            description: "ออกเดินทางกลับสู่กรุงเทพฯ โดยเที่ยวบิน **KE657** เดินทางถึงสนามบินสุวรรณภูมิ เวลา 21.40 น. โดยสวัสดิภาพ"
+          }
+        ]
+      }
+    ]
+  },
+  singapore: {
+    tourName: "มหัศจรรย์ สิงคโปร์ มารีน่าเบย์แซนด์ส การ์เด้นส์บายเดอะเบย์ & น้ำตก Jewel Changi",
+    hotel: "Marina Bay Sands / Pan Pacific Singapore หรือเทียบเท่า 4 ดาว",
+    airline: "Singapore Airlines (SQ) / Thai Airways (TG)",
+    flightRoute: "BKK - SIN - BKK",
+    outboundFlight: "SQ705 BKK 09:40 - 13:05 SIN",
+    returnFlight: "SQ714 SIN 17:30 - 19:00 BKK",
+    days: [
+      {
+        theme: "กรุงเทพฯ (สุวรรณภูมิ) - สิงคโปร์ (ชางงี) - เมอร์ไลออนพาร์ค - ชมโชว์แสงสี Spectra Marina Bay Sands",
+        activities: [
+          {
+            time_period: "07.00 น.",
+            activity_title: "พร้อมกัน ณ สนามบินสุวรรณภูมิ",
+            location_name: "สนามบินสุวรรณภูมิ (BKK)",
+            description: "คณะพร้อมกัน ณ **สนามบินสุวรรณภูมิ** อาคารผู้โดยสารขาออก เช็คอินเคาน์เตอร์สายการบิน Singapore Airlines"
+          },
+          {
+            time_period: "09.40 น.",
+            activity_title: "ออกเดินทางบินตรงสู่ประเทศสิงคโปร์",
+            location_name: "สนามบินนานาชาติชางงี (SIN)",
+            description: "ออกเดินทางสู่สิงคโปร์ โดยเที่ยวบิน **SQ705** เดินทางถึงสนามบินชางงีเวลา 13.05 น."
+          },
+          {
+            time_period: "บ่าย",
+            activity_title: "ถ่ายรูปเช็คอินแลนด์มาร์ก เมอร์ไลออนพาร์ค (Merlion Park)",
+            location_name: "เมอร์ไลออนพาร์ค (Merlion Park)",
+            description: "นำท่านถ่ายรูปคู่กับ **รูปปั้นสิงโตพ่นน้ำ เมอร์ไลออน (Merlion)** สัญลักษณ์อันดับหนึ่งของสิงคโปร์ พร้อมชมวิวอ่าวมารีน่า",
+            is_highlight: true
+          },
+          {
+            time_period: "เย็น",
+            activity_title: "ชมโชว์ม่านน้ำแสงสีเสียง Spectra - A Light & Water Show ณ Marina Bay Sands",
+            location_name: "Marina Bay Sands Event Plaza",
+            description: "ชมการแสดงน้ำพุ เลเซอร์ และแสงสีเสียงสุดอลังการริมอ่าวมารีน่า **Spectra Light & Water Show**",
+            is_highlight: true
+          }
+        ]
+      },
+      {
+        theme: "สิงคโปร์ - การ์เด้นส์บายเดอะเบย์ (Gardens by the Bay) - วัดพระเขี้ยวแก้ว ไชน่าทาวน์ - ย่านคลาร์กคีย์",
+        activities: [
+          {
+            time_period: "เช้า",
+            activity_title: "เข้าชมเรือนกระจกระดับโลก Gardens by the Bay (Flower Dome & Cloud Forest)",
+            location_name: "การ์เด้นส์บายเดอะเบย์ (Gardens by the Bay)",
+            description: "นำท่านเข้าชม **Gardens by the Bay** ชมน้ำตกในร่มยักษ์ Cloud Forest และพรรณไม้เมืองหนาวใน Flower Dome พร้อมถ่ายรูปกับ Supertree Grove",
+            is_highlight: true
+          },
+          {
+            time_period: "กลางวัน",
+            activity_title: "รับประทานอาหารกลางวัน เมนูข้าวมันไก่สิงคโปร์ Boon Tong Kee",
+            location_name: "ร้านข้าวมันไก่ชื่อดังสิงคโปร์",
+            description: "ลิ้มลอง **ข้าวมันไก่ไหหลำสิงคโปร์** เนื้อไก่นุ่มฉ่ำ ข้าวมันหอมกรุ่น เสิร์ฟพร้อมน้ำจิ้มสูตรเด็ด"
+          },
+          {
+            time_period: "บ่าย",
+            activity_title: "สักการะขอพร วัดพระเขี้ยวแก้ว (Buddha Tooth Relic Temple) ย่านไชน่าทาวน์",
+            location_name: "วัดพระเขี้ยวแก้ว & ไชน่าทาวน์ (Chinatown)",
+            description: "นำท่านกราบสักการะพระบรมสารีริกธาตุ ณ **วัดพระเขี้ยวแก้ว** วัดสถาปัตยกรรมราชวงศ์ถังอันงดงาม และเดินเล่นชมย่านช็อปปิ้งไชน่าทาวน์",
+            is_highlight: true
+          },
+          {
+            time_period: "เย็น",
+            activity_title: "ล่องเรือบัมโบ๊ท ชมวิวแม่น้ำสิงคโปร์ & ย่านแสงสียามค่ำคืน คลาร์กคีย์ (Clarke Quay)",
+            location_name: "คลาร์กคีย์ (Clarke Quay)",
+            description: "นั่งเรือ **Singapore River Cruise** ชมสถาปัตยกรรมตึกเก่าและตึกสูงระฟ้า และเพลิดเพลินกับบรรยากาศริมน้ำย่านคลาร์กคีย์",
+            is_highlight: true
+          }
+        ]
+      },
+      {
+        theme: "สิงคโปร์ - น้ำตก Jewel Changi - สนามบินชางงี - กรุงเทพฯ (สนามบินสุวรรณภูมิ)",
+        activities: [
+          {
+            time_period: "10.00 น.",
+            activity_title: "รับประทานอาหารเช้า & เช็คเอาท์โรงแรม",
+            location_name: "โรงแรมที่พักในสิงคโปร์",
+            description: "รับประทานอาหารเช้า ณ โรงแรมที่พัก จัดเก็บสัมภาระและเช็คเอาท์"
+          },
+          {
+            time_period: "12.30 น.",
+            activity_title: "ชมความมหัศจรรย์น้ำตกยักษ์ในร่ม Jewel Changi (Rain Vortex)",
+            location_name: "Jewel Changi Airport (HSBC Rain Vortex)",
+            description: "ชม **HSBC Rain Vortex** น้ำตกในร่มที่สูงที่สุดในโลก ณ ห้าง Jewel Changi พร้อมอิสระช้อปปิ้งของฝากแบรนด์ดังระดับโลก",
+            is_highlight: true
+          },
+          {
+            time_period: "17.30 น.",
+            activity_title: "ออกเดินทางบินตรงกลับสู่กรุงเทพฯ",
+            location_name: "สนามบินสุวรรณภูมิ (BKK)",
+            description: "ออกเดินทางกลับกรุงเทพฯ โดยเที่ยวบิน **SQ714** ถึงสนามบินสุวรรณภูมิ เวลา 19.00 น. โดยสวัสดิภาพ"
+          }
+        ]
+      }
+    ]
+  },
   chengdu: {
     tourName: "ชิค & คูล เฉิงตู ฉงชิ่ง เช็คอินหมีแพนด้ายักษ์ IFS เมืองไซเบอร์พังก์ & คาเฟ่สุดฮิต",
     hotel: "Chengdu Shangri-La / Grand Hyatt หรือเทียบเท่า 4 ดาว",
@@ -998,9 +1444,13 @@ export function buildFallbackPlan(
     cityInput.includes(k) || 
     (k === "kunming" && (cityInput.includes("คุนหมิง") || cityInput.includes("คุณหมิง") || cityInput.includes("ลี่เจียง") || cityInput.includes("kunming"))) ||
     (k === "chengdu" && (cityInput.includes("เฉิงตู") || cityInput.includes("ฉงชิ่ง") || cityInput.includes("chengdu"))) ||
-    (k === "macao" && (cityInput.includes("มาเก๊า") || cityInput.includes("ฮ่องกง") || cityInput.includes("macau") || cityInput.includes("macao"))) ||
+    (k === "beijing" && (cityInput.includes("ปักกิ่ง") || cityInput.includes("beijing") || cityInput.includes("peking"))) ||
+    (k === "guangzhou" && (cityInput.includes("กวางโจว") || cityInput.includes("guangzhou") || cityInput.includes("กวางเจา"))) ||
+    (k === "seoul" && (cityInput.includes("โซล") || cityInput.includes("เกาหลี") || cityInput.includes("seoul") || cityInput.includes("korea"))) ||
+    (k === "singapore" && (cityInput.includes("สิงคโปร์") || cityInput.includes("singapore"))) ||
+    (k === "macao" && (cityInput.includes("มาเก๊า") || cityInput.includes("ฮ่องกง") || cityInput.includes("macau") || cityInput.includes("macao") || cityInput.includes("hong kong"))) ||
     (k === "shenzhen" && (cityInput.includes("เซินเจิ้น") || cityInput.includes("shenzhen"))) ||
-    (k === "tokyo" && (cityInput.includes("โตเกียว") || cityInput.includes("ญี่ปุ่น") || cityInput.includes("tokyo") || cityInput.includes("japan")))
+    (k === "tokyo" && (cityInput.includes("โตเกียว") || cityInput.includes("ญี่ปุ่น") || cityInput.includes("tokyo") || cityInput.includes("japan") || cityInput.includes("โอซาก้า") || cityInput.includes("osaka")))
   );
 
   const selectedHotel = formatHotelByLevel(matchKey || mainCity, hotelLevel);
@@ -1070,7 +1520,7 @@ export function buildFallbackPlan(
     };
   }
 
-  // General dynamic fallback for other destinations
+  // General dynamic fallback for other destinations (strictly real structured content without placeholders)
   const city = mainCity || "เมืองท่องเที่ยว";
   const cntry = country || "";
   const destName = cntry ? `${city} (${cntry})` : city;
@@ -1085,7 +1535,7 @@ export function buildFallbackPlan(
         day_number: 1,
         date: date.toISOString().split("T")[0],
         daily_theme: `กรุงเทพฯ (สนามบินสุวรรณภูมิ) - เดินทางถึง ${city} - เช็คอินเข้าสู่โรงแรมที่พัก`,
-        hotel_name_suggestion: `โรงแรมระดับ 4 ดาว ใจกลางเมือง ${city}`,
+        hotel_name_suggestion: selectedHotel,
         breakfast_included: false,
         lunch_included: true,
         dinner_included: true,
@@ -1094,7 +1544,7 @@ export function buildFallbackPlan(
             time_period: "เช้า / บ่าย",
             activity_title: `พร้อมกัน ณ สนามบินสุวรรณภูมิ - เดินทางสู่ ${city}`,
             location_name: `สนามบินสุวรรณภูมิ - สนามบิน ${city}`,
-            description: `คณะพร้อมกัน ณ **สนามบินสุวรรณภูมิ** อาคารผู้โดยสารขาออก เช็คอินและออกเดินทางสู่ **เมือง ${city}**`
+            description: `คณะพร้อมกัน ณ **สนามบินสุวรรณภูมิ** อาคารผู้โดยสารขาออก เช็คอินเคาน์เตอร์สายการบินและออกเดินทางสู่ **เมือง ${city}**`
           },
           {
             time_period: "บ่าย / เย็น",
@@ -1110,7 +1560,7 @@ export function buildFallbackPlan(
         day_number: dayNo,
         date: date.toISOString().split("T")[0],
         daily_theme: `${city} - เช็คเอาท์โรงแรม - เดินทางสู่สนามบิน - กรุงเทพฯ (สนามบินสุวรรณภูมิ)`,
-        hotel_name_suggestion: `โรงแรมระดับ 4 ดาว ใจกลางเมือง ${city}`,
+        hotel_name_suggestion: selectedHotel,
         breakfast_included: true,
         lunch_included: false,
         dinner_included: false,
@@ -1125,47 +1575,43 @@ export function buildFallbackPlan(
             time_period: "บ่าย / เย็น",
             activity_title: `เช็คอินสัมภาระ & เดินทางกลับกรุงเทพฯ (สุวรรณภูมิ)`,
             location_name: `สนามบิน ${city} - สนามบินสุวรรณภูมิ`,
-            description: `เดินทางถึงสนามบิน เช็คอินสัมภาระและออกเดินทางกลับกรุงเทพฯ (สุวรรณภูมิ) โดยสวัสดิภาพพร้อมความประทับใจ`
+            description: `เดินทางถึงสนามบิน เช็คอินสัมภาระและออกเดินทางกลับกรุงเทพฯ (สุวรรณภูมิ) โดยสวัสดิภาพพร้อมความประทับใจตลอดการเดินทาง`
           }
         ]
       };
     } else {
+      const themes = [
+        {
+          themeTitle: `${city} - ชมสถาปัตยกรรมและวัฒนธรรมเมืองเก่า - ย่านถนนคนเดินโบราณ`,
+          act1: { time: "เช้า", title: `สักการะสิ่งศักดิ์สิทธิ์และชมสถาปัตยกรรมสำคัญเมือง ${city}`, loc: `วัดและโบราณสถานสำคัญเมือง ${city}`, desc: `นำท่านสัมผัสประวัติศาสตร์และวัฒนธรรมอันทรงคุณค่า ชมสถาปัตยกรรมดั้งเดิมอันงดงามและสักการะสิ่งศักดิ์สิทธิ์ประจำเมือง **${city}**` },
+          act2: { time: "กลางวัน", title: `รับประทานอาหารกลางวัน เมนูอาหารพื้นเมืองต้นตำรับ`, loc: `ภัตตาคารอาหารพื้นเมือง ${city}`, desc: `ลิ้มลองเมนูเด็ดขึ้นชื่อรสชาติต้นตำรับที่คัดสรรวัตถุดิบท้องถิ่นสดใหม่ ณ ร้านอาหารชื่อดังของเมือง **${city}**` },
+          act3: { time: "บ่าย", title: `เดินเล่นชมย่านเมืองเก่าและตึกสถาปัตยกรรมประวัติศาสตร์`, loc: `ย่านเมืองเก่า ${city}`, desc: `สัมผัสวิถีชีวิตดั้งเดิม เดินชมอาคารบ้านเรือนโบราณที่อนุรักษ์ไว้อย่างสมบูรณ์ พร้อมถ่ายภาพมุมสวยเป็นที่ระลึก` },
+          act4: { time: "เย็น", title: `ช้อปปิ้งตลาดไนท์มาร์เก็ตและลิ้มลองสตรีทฟู้ดยอดฮิต`, loc: `ถนนคนเดินและตลาดกลางคืน ${city}`, desc: `เพลิดเพลินกับบรรยากาศยามค่ำคืน อิสระเลือกซื้อสินค้าของฝาก ขนมพื้นเมือง และสตรีทฟู้ดเลิศรส` }
+        },
+        {
+          themeTitle: `${city} - สัมผัสทัศนียภาพธรรมชาติ - จุดชมวิวมุมสูงพานอรามา - ช้อปปิ้งย่านการค้า`,
+          act1: { time: "เช้า", title: `ชมทัศนียภาพสวนธรรมชาติและทิวทัศน์อันร่มรื่นเมือง ${city}`, loc: `สวนสาธารณะและอุทยานธรรมชาติ ${city}`, desc: `นำท่านสู่อุทยานธรรมชาติใจกลางเมือง สัมผัสอากาศบริสุทธิ์และทัศนียภาพพื้นที่สีเขียวอันงดงาม ถ่ายภาพคู่กับแลนด์มาร์กธรรมชาติ` },
+          act2: { time: "กลางวัน", title: `รับประทานอาหารกลางวัน เซ็ตเมนูพิเศษประจำภูมิภาค`, loc: `ภัตตาคารท้องถิ่น ${city}`, desc: `รับประทานอาหารกลางวันรสเลิศ พร้อมชมบรรยากาศสบายๆ ของเมือง **${city}**` },
+          act3: { time: "บ่าย", title: `ขึ้นชมทัศนียภาพพานอรามา ณ จุดชมวิวแลนด์มาร์กสำคัญ`, loc: `จุดชมวิวทัศนียภาพ ${city}`, desc: `ชมทัศนียภาพมุมสูงแบบกว้างไกลสุดสายตา บันทึกภาพมุมมองรอบทิศทางของเมือง **${city}**` },
+          act4: { time: "เย็น", title: `อิสระช้อปปิ้งสินค้าแฟชั่นและของที่ระลึก ณ ย่านการค้าชื่อดัง`, loc: `ย่านการค้าและศูนย์การค้า ${city}`, desc: `เพลิดเพลินกับการเลือกซื้อของฝาก สินค้าหัตถกรรมพื้นบ้าน และแบรนด์สินค้าแฟชั่นยอดนิยม` }
+        }
+      ];
+
+      const chosenTheme = themes[(dayNo - 2) % themes.length];
+
       return {
         day_number: dayNo,
         date: date.toISOString().split("T")[0],
-        daily_theme: `ไฮไลต์แลนด์มาร์กใหม่ & จุดเช็คอินถ่ายรูปยอดฮิต เมือง ${city} (วันที่ ${dayNo})`,
-        hotel_name_suggestion: `โรงแรมระดับ 4 ดาว ใจกลางเมือง ${city}`,
+        daily_theme: chosenTheme.themeTitle,
+        hotel_name_suggestion: selectedHotel,
         breakfast_included: true,
         lunch_included: true,
         dinner_included: true,
         activities: [
-          {
-            time_period: "เช้า",
-            activity_title: `เช็คอินแลนด์มาร์กอันดับ 1 & มุมถ่ายภาพ Aesthetic เมือง ${city}`,
-            location_name: `แลนด์มาร์กชื่อดังเมือง ${city}`,
-            description: `นำท่านชม **แลนด์มาร์กชื่อดังและสถาปัตยกรรมโดดเด่นประจำเมือง ${city}** ถ่ายรูปมุมไวรัลยอดนิยมบนแพลตฟอร์มโซเชียลมีเดีย`,
-            is_highlight: true
-          },
-          {
-            time_period: "กลางวัน",
-            activity_title: `รับประทานอาหารกลางวัน เมนูมิชลินไกด์ / ร้านดังประจำเมือง ${city}`,
-            location_name: `ร้านอาหารขึ้นชื่อเมือง ${city}`,
-            description: `ลิ้มลองอาหารจานเด็ดและเมนูรสเลิศขึ้นชื่อในย่าน **เมือง ${city}**`
-          },
-          {
-            time_period: "บ่าย",
-            activity_title: `เดินเล่นย่านศิลปะร่วมสมัย & คาเฟ่ฮอปปิ้งสุดชิค ${city}`,
-            location_name: `ย่านครีเอทีฟและคาเฟ่ ${city}`,
-            description: `นำท่านสู่ **ย่านครีเอทีฟและคาเฟ่ดีไซน์มินิมอลเมือง ${city}** พักผ่อนจิบเครื่องดื่มและถ่ายรูปมุมสวยสไตล์มินิมอล`,
-            is_highlight: true
-          },
-          {
-            time_period: "เย็น",
-            activity_title: `จุดชมวิวแสงสียามค่ำคืน & ถนนคนเดินคนเมือง ${city}`,
-            location_name: `จุดชมวิวและถนนคนเดิน ${city}`,
-            description: `ชมทัศนียภาพแสงสีไฟนีออนยามค่ำคืนใจกลาง **เมือง ${city}** และอิสระเลือกซื้อของฝากสินค้าแฟชั่น`,
-            is_highlight: true
-          }
+          { time_period: chosenTheme.act1.time, activity_title: chosenTheme.act1.title, location_name: chosenTheme.act1.loc, description: chosenTheme.act1.desc, is_highlight: true },
+          { time_period: chosenTheme.act2.time, activity_title: chosenTheme.act2.title, location_name: chosenTheme.act2.loc, description: chosenTheme.act2.desc, is_highlight: false },
+          { time_period: chosenTheme.act3.time, activity_title: chosenTheme.act3.title, location_name: chosenTheme.act3.loc, description: chosenTheme.act3.desc, is_highlight: true },
+          { time_period: chosenTheme.act4.time, activity_title: chosenTheme.act4.title, location_name: chosenTheme.act4.loc, description: chosenTheme.act4.desc, is_highlight: true }
         ]
       };
     }

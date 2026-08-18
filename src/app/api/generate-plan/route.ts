@@ -62,15 +62,25 @@ export async function POST(req: Request) {
 - ประเภททริป: ${data.tripType || "Private Tour"}
 - ระดับโรงแรมที่ต้องการ: ${data.hotelLevel || "3 ดาว"}
 ${userPromptContent}
-[กฎและหลักการประมวลผลข้อมูล (สำคัญสูงสุด)]
-1. ช่อง "USER PROMPT DIRECTIVE (คำสั่งและข้อมูลตั้งต้นหลัก)" ด้านบนเปรียบเสมือน Master Prompt จากผู้ใช้:
+[กฎเหล็กและมาตรฐานคุณภาพโปรแกรมทัวร์ (CRITICAL TOUR ARCHITECTURE RULES)]
+1. ระบุชื่อสถานที่จริง 100% (REAL & VERIFIABLE POIS ONLY):
+   - ห้ามใช้คำกว้างๆ หรือ placeholder เด็ดขาด เช่น ห้ามเขียน "เช็คอินแลนด์มาร์กอันดับ 1", "แลนด์มาร์กชื่อดัง", "ร้านดังประจำเมือง", "ย่านครีเอทีฟและคาเฟ่", "จุดชมวิวเมือง"
+   - ทุกกิจกรรมต้องระบุชื่อสถานที่ท่องเที่ยวจริง พร้อมชื่อภาษาไทยและชื่อภาษาอังกฤษ/ท้องถิ่นในวงเล็บเสมอ เช่น "วัดเซ็นโซจิ (Sensoji Temple)", "ตึกปิงอัน (Ping An Finance Centre)", "ถนนคนเดินตงเหมิน (Dongmen Pedestrian Street)", "สวนสนุกหน้าต่างสู่โลกกว้าง (Window of the World)", "ย่านศิลปะ OCT-LOFT Creative Culture Park"
+2. ห้ามทำเนื้อหาหรือสถานที่ซ้ำกันเด็ดขาด (ZERO DUPLICATE CONTENT):
+   - สถานที่ท่องเที่ยว ร้านอาหาร และกิจกรรมในแต่ละวันต้องไม่ซ้ำกัน
+   - คำบรรยายของแต่ละกิจกรรม (description) ต้องให้ข้อมูลที่เป็นเอกลักษณ์ของสถานที่นั้นจริง (ประวัติสั้นๆ จุดเด่น กิจกรรมที่ทำ มุมถ่ายรูป สิ่งที่น่าสนใจ) ห้ามก็อปปี้ประโยคซ้ำกัน
+3. เส้นทางเดินทางสมจริง เที่ยวได้จริงในชีวิตจริง (REALISTIC ROUTE PLANNING):
+   - จัดลำดับสถานที่ในแต่ละวันให้อยู่ในโซนหรือเส้นทางเดียวกัน เพื่อให้เดินทางได้จริง ไม่กระโดดไปมาข้ามเมือง
+   - จัดเวลาเที่ยวและพักผ่อนให้เหมาะสม สอดคล้องกับเวลาเที่ยวบิน (หากถึงเช้า/บ่ายให้จัดเที่ยวตามเวลาจริง หากบินไฟลท์ดึกให้จัดเที่ยวช่วงกลางวัน)
+4. ดึงข้อมูลจากหมายเหตุ (USER PROMPT DIRECTIVE) ครบถ้วน:
    - หากมีการระบุไฟลท์บิน (สายการบิน, เวลาบิน, หมายเลขเที่ยวบิน) คุณต้องสกัดมาใส่ในวันแรกและวันสุดท้ายให้ครบถ้วน 100%
-   - หากมีการระบุสถานที่ท่องเที่ยว โรงแรม หรือเงื่อนไขเฉพาะ คุณต้องนำมารวมในแผนการเดินทางทั้งหมด
-2. โครงสร้าง JSON ที่ส่งกลับต้องครอบคลุม:
-   - tour_name: ชื่อโปรแกรมทัวร์ภาษาไทยน่าดึงดูด
-   - airline, flight_route, outbound_flight, return_flight
-   - itinerary: อาร์เรย์ของวัน (${duration} วัน) แต่ละวันมี daily_theme, hotel_name_suggestion, breakfast_included, lunch_included, dinner_included, และ activities (อาร์เรย์ของกิจกรรม มี time_period, location_name, activity_title, description, is_highlight)
-ตอบกลับเฉพาะ JSON บริสุทธิ์เท่านั้น (ไม่มี markdown code block หรือคำอธิบายอื่น)`;
+   - หากมีการระบุสถานที่ท่องเที่ยว โรงแรม หรือเงื่อนไขเฉพาะ คุณต้องนำมารวมในแผนการเดินทางทั้งหมดตามความเหมาะสม
+
+[โครงสร้าง JSON ที่ส่งกลับ]
+ตอบกลับเฉพาะ JSON บริสุทธิ์เท่านั้น (ไม่มี markdown code block หรือคำอธิบายอื่น) ครอบคลุม:
+- tour_name: ชื่อโปรแกรมทัวร์ภาษาไทยน่าดึงดูด
+- airline, flight_route, outbound_flight, return_flight
+- itinerary: อาร์เรย์ของวัน (${duration} วัน) แต่ละวันมี daily_theme, hotel_name_suggestion, breakfast_included, lunch_included, dinner_included, และ activities (อาร์เรย์ของกิจกรรม มี time_period, location_name, activity_title, description, is_highlight)`;
 
     let aiPlan: any = null;
 
