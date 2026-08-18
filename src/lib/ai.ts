@@ -678,6 +678,16 @@ export function sanitizeHotelName(hotelName: string | undefined, hotelLevelInput
   return hotelName;
 }
 
+function cleanMarkdownText(str: string): string {
+  if (!str) return "";
+  return str
+    .replace(/^#+\s*/, "")
+    .replace(/^[\*\-\•\d\.]+\s*/, "")
+    .replace(/\*\*/g, "")
+    .replace(/__/g, "")
+    .trim();
+}
+
 export function parseCustomerNoteToItinerary(
   customerNote: string,
   mainCity: string,
@@ -696,59 +706,134 @@ export function parseCustomerNoteToItinerary(
   if (!customerNote || !customerNote.trim()) return null;
   const note = customerNote.trim();
 
-  // Check if note has DAY 1 / Day 1 markers
-  const dayPattern = /(?:DAY|Day|วัน(?:ที่)?)\s*(\d+)[\s—\-\|:]*([^\n]*)/gi;
-  const matches = [...note.matchAll(dayPattern)];
+  const thaiNumMap: Record<string, number> = {
+    "แรก": 1, "หนึ่ง": 1, "สอง": 2, "สาม": 3, "สี่": 4, "ห้า": 5, "หก": 6, "เจ็ด": 7, "แปด": 8, "เก้า": 9, "สิบ": 10
+  };
+
+  const dayHeaderRegex = /^(?:#+\s*)?(?:DAY|Day|วัน(?!จันทร์|อังคาร|พุธ|พฤหัส|ศุกร์|เสาร์|อาทิตย์)(?:ที่)?)\s*(\d+|แรก|หนึ่ง|สอง|สาม|สี่|ห้า|หก|เจ็ด|แปด|เก้า|สิบ)(?:[\s\:\-\—\|]*)(.*)$/gim;
+  const rawMatches = [...note.matchAll(dayHeaderRegex)];
+  if (rawMatches.length === 0) return null;
+
+  const monthRegex = /มกราคม|กุมภาพันธ์|มีนาคม|เมษายน|พฤษภาคม|มิถุนายน|กรกฎาคม|สิงหาคม|กันยายน|ตุลาคม|พฤศจิกายน|ธันวาคม/i;
+
+  const matches = rawMatches.filter(m => {
+    const fullLine = m[0];
+    if (/\d+\s*[\-\—\–]\s*\d+/.test(fullLine) && monthRegex.test(fullLine)) return false;
+    return true;
+  });
+
   if (matches.length === 0) return null;
 
   const days: any[] = [];
-  const hotel = formatHotelByLevel(mainCity, hotelLevel);
+  const defaultHotel = formatHotelByLevel(mainCity, hotelLevel);
+  const startMs = new Date(startDate && !isNaN(new Date(startDate).getTime()) ? startDate : new Date().toISOString()).getTime();
 
   for (let i = 0; i < matches.length; i++) {
     const match = matches[i];
-    const dayNo = parseInt(match[1]) || (i + 1);
-    const dayTitle = match[2]?.trim() || `ท่องเที่ยวเมือง ${mainCity} วันที่ ${dayNo}`;
-    
+    const numRaw = match[1];
+    const dayNo = parseInt(numRaw) || thaiNumMap[numRaw] || (i + 1);
+
     const startIndex = match.index! + match[0].length;
     const nextMatch = matches[i + 1];
     const endIndex = nextMatch ? nextMatch.index! : note.length;
     const dayBody = note.slice(startIndex, endIndex).trim();
 
-    // Extract bullet points or non-empty lines
-    const rawLines = dayBody.split('\n')
-      .map(l => l.replace(/^[\*\-\•\d\.]+\s*/, '').trim())
-      .filter(l => l.length > 0);
+    const lines = dayBody
+      .split("\n")
+      .map(l => l.trim())
+      .filter(l => l && !l.startsWith("---") && !l.startsWith("***") && !l.startsWith("___"));
 
-    const activities = rawLines.map((line, idx) => {
-      const timeMatch = line.match(/^(\d{1,2}[\.:]\d{2}\s*(?:น\.|AM|PM)?)/i);
-      const timePeriod = timeMatch ? timeMatch[1] : (idx === 0 ? "เช้า" : idx === 1 ? "กลางวัน" : idx === rawLines.length - 1 ? "เย็น" : "บ่าย");
-      const title = line.replace(/^(\d{1,2}[\.:]\d{2}\s*(?:น\.|AM|PM)?[\s\-—]*)/i, '').trim() || line;
-      
-      return {
-        time_period: timePeriod,
-        activity_title: title.slice(0, 60),
-        location_name: title.slice(0, 40),
-        description: line.startsWith("**") ? line : `นำท่าน **${title}**`,
-        is_highlight: idx === 0 || idx === 1 || title.includes("UNESCO") || title.includes("ไฮไลท์")
-      };
-    });
+    let dayTitle = "";
+    let breakfast = dayNo > 1;
+    let lunch = true;
+    let dinner = true;
+    let hotelName = defaultHotel;
 
-    const date = new Date(new Date(startDate).getTime() + (dayNo - 1) * 24 * 60 * 60 * 1000);
+    const rawTitleMatch = match[2];
+    if (rawTitleMatch && !rawTitleMatch.includes("ตุลาคม") && !rawTitleMatch.includes("2569") && !rawTitleMatch.includes("2026") && !rawTitleMatch.includes("พฤหัสบดี") && !rawTitleMatch.includes("ศุกร์") && !rawTitleMatch.includes("เสาร์") && !rawTitleMatch.includes("อาทิตย์")) {
+      dayTitle = cleanMarkdownText(rawTitleMatch);
+    }
+
+    const activities: any[] = [];
+
+    for (let j = 0; j < lines.length; j++) {
+      const line = lines[j];
+      const cleanLine = cleanMarkdownText(line);
+
+      if (/^(?:ที่พัก|โรงแรม)\s*:/i.test(cleanLine)) {
+        const hVal = cleanLine.replace(/^(?:ที่พัก|โรงแรม)\s*:\s*/i, "").trim();
+        if (hVal) hotelName = hVal;
+        continue;
+      }
+      if (/^อาหาร\s*:/i.test(cleanLine)) {
+        breakfast = cleanLine.includes("เช้า");
+        lunch = cleanLine.includes("กลางวัน");
+        dinner = cleanLine.includes("เย็น");
+        continue;
+      }
+
+      if (/^#+\s*/.test(line)) {
+        if (!dayTitle) dayTitle = cleanLine;
+        continue;
+      }
+
+      const timeMatch = line.match(/(?:\*\*)?(\d{1,2}[\.:]\d{2}\s*(?:น\.|AM|PM)?)(?:\*\*)?(?:[\s\|—\-]*)(.*)/i);
+      if (timeMatch) {
+        const timePeriod = timeMatch[1].trim();
+        let titlePart = cleanMarkdownText(timeMatch[2]);
+
+        let desc = "";
+        if (
+          j + 1 < lines.length &&
+          !lines[j + 1].match(/(?:\*\*)?(\d{1,2}[\.:]\d{2}\s*(?:น\.|AM|PM)?)/i) &&
+          !lines[j + 1].startsWith("#") &&
+          !lines[j + 1].includes("อาหาร:") &&
+          !lines[j + 1].includes("ที่พัก:")
+        ) {
+          desc = cleanMarkdownText(lines[j + 1]);
+          j++;
+        }
+
+        if (!titlePart && desc) {
+          titlePart = desc.slice(0, 60);
+        }
+
+        if (titlePart) {
+          activities.push({
+            time_period: timePeriod,
+            activity_title: titlePart,
+            location_name: titlePart.slice(0, 40),
+            description: desc || titlePart,
+            is_highlight: true
+          });
+        }
+      } else if (cleanLine && !cleanLine.startsWith("#")) {
+        activities.push({
+          time_period: activities.length === 0 ? "เช้า" : "บ่าย",
+          activity_title: cleanLine.slice(0, 60),
+          location_name: cleanLine.slice(0, 40),
+          description: cleanLine,
+          is_highlight: false
+        });
+      }
+    }
+
+    const dateStr = new Date(startMs + i * 24 * 60 * 60 * 1000).toISOString().split("T")[0];
 
     days.push({
-      day_number: dayNo,
-      date: date.toISOString().split('T')[0],
-      daily_theme: dayTitle,
-      hotel_name_suggestion: hotel,
-      breakfast_included: dayNo > 1,
-      lunch_included: true,
-      dinner_included: true,
+      day_number: i + 1,
+      date: dateStr,
+      daily_theme: dayTitle || `ท่องเที่ยวเมือง ${mainCity} วันที่ ${i + 1}`,
+      hotel_name_suggestion: hotelName,
+      breakfast_included: breakfast,
+      lunch_included: lunch,
+      dinner_included: dinner,
       activities: activities.length > 0 ? activities : [
         {
           time_period: "ตลอดวัน",
-          activity_title: dayTitle,
+          activity_title: dayTitle || `ท่องเที่ยวเมือง ${mainCity}`,
           location_name: mainCity,
-          description: `ท่องเที่ยว **${dayTitle}** ตามหมายเหตุที่กำหนด`,
+          description: `ท่องเที่ยวเมือง ${mainCity}`,
           is_highlight: true
         }
       ]
