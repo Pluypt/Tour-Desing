@@ -1254,10 +1254,62 @@ function cleanMarkdownText(str: string): string {
   if (!str) return "";
   return str
     .replace(/^#+\s*/, "")
-    .replace(/^[\*\-\•\d\.]+\s*/, "")
+    .replace(/^(?:->|→|–|-|\*|•|\d+\.)\s*/, "")
     .replace(/\*\*/g, "")
     .replace(/__/g, "")
     .trim();
+}
+
+function detectTimePeriod(text: string, defaultPeriod: string = "เช้า"): string {
+  const lower = text.toLowerCase();
+  const hourMatch = lower.match(/(\d{1,2})[\.:](\d{2})/);
+  if (hourMatch) {
+    const hr = parseInt(hourMatch[1]);
+    if (hr >= 0 && hr < 11) return "เช้า";
+    if (hr >= 11 && hr < 14) return "กลางวัน";
+    if (hr >= 14 && hr < 17) return "บ่าย";
+    if (hr >= 17) return "เย็น";
+  }
+  if (lower.includes("เช้ามืด") || lower.includes("ช่วงเช้า") || lower.includes("เช้า") || lower.includes("morning")) return "เช้า";
+  if (lower.includes("กลางวัน") || lower.includes("เที่ยง") || lower.includes("noon") || lower.includes("lunch")) return "กลางวัน";
+  if (lower.includes("ช่วงบ่าย") || lower.includes("บ่าย") || lower.includes("afternoon")) return "บ่าย";
+  if (lower.includes("ช่วงเย็น") || lower.includes("เย็น") || lower.includes("ค่ำ") || lower.includes("ดึก") || lower.includes("evening")) return "เย็น";
+  return defaultPeriod;
+}
+
+function generateDescriptiveDetail(title: string, city: string): string {
+  const t = title.toLowerCase();
+  if (t.includes("ออกเดินทาง") && (t.includes("กรุงเทพ") || t.includes("สุวรรณภูมิ"))) {
+    return `คณะพร้อมกัน ณ ท่าอากาศยานสุวรรณภูมิ ออกเดินทางสู่เมือง ${city} โดยสวัสดิภาพ`;
+  }
+  if (t.includes("ถึง") && (t.includes("สนามบิน") || t.includes(city.toLowerCase()) || t.includes("เฉิงตู") || t.includes("โตเกียว"))) {
+    return `เดินทางถึงสนามบินปลายทาง ผ่านขั้นตอนการตรวจคนเข้าเมืองและรับสัมภาระ เจ้าหน้าที่และรถส่วนตัวรอต้อนรับนำท่านเดินทางเข้าสู่ที่พักเพื่อฝากสัมภาระและเตรียมพร้อมท่องเที่ยว`;
+  }
+  if (t.includes("เช็กเอาต์") || t.includes("เช็คเอาท์")) {
+    return `รับประทานอาหารเช้า ณ โรงแรมที่พัก จากนั้นจัดเก็บสัมภาระและเช็คเอาต์เพื่อเตรียมตัวเดินทาง`;
+  }
+  if (t.includes("บินกลับ") || t.includes("เดินทางกลับกรุงเทพ") || t.includes("สนามบิน")) {
+    return `นำท่านเดินทางสู่สนามบิน ดำเนินการเช็คอินสัมภาระและออกเดินทางบินตรงกลับสู่กรุงเทพฯ โดยสวัสดิภาพพร้อมความประทับใจตลอดการเดินทาง`;
+  }
+  if (t.includes("kuanzhai") || t.includes("ตรอกกว้าง") || t.includes("ถนนโบราณ")) {
+    return `นำท่านเดินเล่นชม ตรอกกว้างตรอกแคบ (Kuanzhai Alley) ย่านถนนคนเดินโบราณสมัยราชวงศ์ชิง สัมผัสวัฒนธรรมโรงน้ำชา คาเฟ่เก๋ๆ และมุมถ่ายรูปสุดคลาสสิก`;
+  }
+  if (t.includes("bipenggou") || t.includes("ปี้เผิงโกว")) {
+    return `นำท่านนั่งรถ Shuttle Bus เที่ยวชมอุทยานปี้เผิงโกว (Bipenggou) สัมผัสความงามของยอดเขาหิมะ ผืนป่าสน และทะเลสาบสีมรกต เช่น ทะเลสาบหลงหวังไห่ (Longwanghai) และซ่างไห่จื่อ (Shanghaizi)`;
+  }
+  if (t.includes("chunxi") || t.includes("taikoo") || t.includes("ifs") || t.includes("ช้อปปิ้ง")) {
+    return `อิสระช้อปปิ้งย่านการค้าใจกลางเมือง ถ่ายรูปเช็คอินกับแลนด์มาร์กชื่อดัง และลิ้มลองสตรีทฟู้ดและร้านอาหารท้องถิ่นตามอัธยาศัย`;
+  }
+  return `นำท่านเที่ยวชมและสัมผัสบรรยากาศอันงดงาม ณ **${title}** ถ่ายภาพเป็นที่ระลึกและเพลิดเพลินกับไฮไลต์ประจำสถานที่`;
+}
+
+function isNewAttractionOrEvent(line: string): boolean {
+  const c = cleanMarkdownText(line).toLowerCase();
+  if (c.includes("alley") || c.includes("road") || c.includes("park") || c.includes("temple") || c.includes("monastery") || c.includes("bipenggou")) return true;
+  if (c.includes("taikoo") || c.includes("ifs") || c.includes("chunxi") || c.includes("kuanzhai") || c.includes("longwanghai") || c.includes("ปี้เผิงโกว")) return true;
+  if (c.includes("ออกเดินทาง") || c.includes("เดินทางถึง") || c.includes("บินกลับ") || c.includes("เช็กเอาต์") || c.includes("เช็คเอาท์")) return true;
+  if (c.includes("ชมภูเขา") || c.includes("จุดหลัก") || c.includes("เดินเล่น") || c.includes("ท่องเที่ยว") || c.includes("ช้อปปิ้ง")) return true;
+  return false;
 }
 
 export function parseCustomerNoteToItinerary(
@@ -1287,12 +1339,7 @@ export function parseCustomerNoteToItinerary(
   if (rawMatches.length === 0) return null;
 
   const monthRegex = /มกราคม|กุมภาพันธ์|มีนาคม|เมษายน|พฤษภาคม|มิถุนายน|กรกฎาคม|สิงหาคม|กันยายน|ตุลาคม|พฤศจิกายน|ธันวาคม/i;
-
-  const matches = rawMatches.filter(m => {
-    const fullLine = m[0];
-    if (/\d+\s*[\-\—\–]\s*\d+/.test(fullLine) && monthRegex.test(fullLine)) return false;
-    return true;
-  });
+  const matches = rawMatches.filter(m => !( /\d+\s*[\-\—\–]\s*\d+/.test(m[0]) && monthRegex.test(m[0]) ));
 
   if (matches.length === 0) return null;
 
@@ -1310,83 +1357,161 @@ export function parseCustomerNoteToItinerary(
     const endIndex = nextMatch ? nextMatch.index! : note.length;
     const dayBody = note.slice(startIndex, endIndex).trim();
 
+    let dayTitle = cleanMarkdownText(match[2] || "");
+    dayTitle = dayTitle.replace(/^\d{1,2}\s*[ก-ฮ\.]+\s*(?:\||\—|\-)\s*/i, "").trim();
+
+    const isFreeDay = /free\s*day|วันอิสระ/i.test(dayTitle);
+
     const lines = dayBody
       .split("\n")
       .map(l => l.trim())
       .filter(l => l && !l.startsWith("---") && !l.startsWith("***") && !l.startsWith("___"));
 
-    let dayTitle = "";
-    let breakfast = dayNo > 1;
-    let lunch = true;
-    let dinner = true;
+    let breakfast = !isFreeDay && dayNo > 1;
+    let lunch = !isFreeDay;
+    let dinner = !isFreeDay;
     let hotelName = defaultHotel;
 
-    const rawTitleMatch = match[2];
-    if (rawTitleMatch && !rawTitleMatch.includes("ตุลาคม") && !rawTitleMatch.includes("2569") && !rawTitleMatch.includes("2026") && !rawTitleMatch.includes("พฤหัสบดี") && !rawTitleMatch.includes("ศุกร์") && !rawTitleMatch.includes("เสาร์") && !rawTitleMatch.includes("อาทิตย์")) {
-      dayTitle = cleanMarkdownText(rawTitleMatch);
-    }
+    const isMetaLine = (l: string) => {
+      const c = cleanMarkdownText(l);
+      return /^(?:ไม่มีรถทัวร์|ลูกค้าเที่ยวเอง|แนะนำสถานที่|ไม่รวมอาหาร|ไม่รวมค่าเดินทาง|ปัจจุบันบัตร|ราคาอ้างอิง|หมายเหตุ)/i.test(c);
+    };
 
     const activities: any[] = [];
 
-    for (let j = 0; j < lines.length; j++) {
-      const line = lines[j];
-      const cleanLine = cleanMarkdownText(line);
+    if (isFreeDay) {
+      const spots = lines
+        .filter(l => !isMetaLine(l))
+        .map(cleanMarkdownText)
+        .filter(l => l.length > 1);
 
-      if (/^(?:ที่พัก|โรงแรม)\s*:/i.test(cleanLine)) {
-        const hVal = cleanLine.replace(/^(?:ที่พัก|โรงแรม)\s*:\s*/i, "").trim();
-        if (hVal) hotelName = hVal;
-        continue;
-      }
-      if (/^อาหาร\s*:/i.test(cleanLine)) {
-        breakfast = cleanLine.includes("เช้า");
-        lunch = cleanLine.includes("กลางวัน");
-        dinner = cleanLine.includes("เย็น");
-        continue;
-      }
+      activities.push({
+        time_period: "เช้า",
+        activity_title: "อิสระท่องเที่ยวเต็มวันตามอัธยาศัย (FREE DAY)",
+        location_name: `ตัวเมือง ${mainCity}`,
+        description: `เปิดประสบการณ์ท่องเที่ยวเมือง **${mainCity}** ตามอัธยาศัยอย่างอิสระ สัมผัสวิถีชีวิต วัฒนธรรมท้องถิ่น และจุดเช็คอินยอดนิยม (ไม่รวมค่าอาหารและค่าเดินทางในวันอิสระ)`,
+        is_highlight: true
+      });
 
-      if (/^#+\s*/.test(line)) {
-        if (!dayTitle) dayTitle = cleanLine;
-        continue;
-      }
-
-      const timeMatch = line.match(/(?:\*\*)?(\d{1,2}[\.:]\d{2}\s*(?:น\.|AM|PM)?)(?:\*\*)?(?:[\s\|—\-]*)(.*)/i);
-      if (timeMatch) {
-        const timePeriod = timeMatch[1].trim();
-        let titlePart = cleanMarkdownText(timeMatch[2]);
-
-        let desc = "";
-        if (
-          j + 1 < lines.length &&
-          !lines[j + 1].match(/(?:\*\*)?(\d{1,2}[\.:]\d{2}\s*(?:น\.|AM|PM)?)/i) &&
-          !lines[j + 1].startsWith("#") &&
-          !lines[j + 1].includes("อาหาร:") &&
-          !lines[j + 1].includes("ที่พัก:")
-        ) {
-          desc = cleanMarkdownText(lines[j + 1]);
-          j++;
-        }
-
-        if (!titlePart && desc) {
-          titlePart = desc.slice(0, 60);
-        }
-
-        if (titlePart) {
-          activities.push({
-            time_period: timePeriod,
-            activity_title: titlePart,
-            location_name: titlePart.slice(0, 40),
-            description: desc || titlePart,
-            is_highlight: true
-          });
-        }
-      } else if (cleanLine && !cleanLine.startsWith("#")) {
+      if (spots.length > 0) {
+        const spotNames = spots.join(" • ");
         activities.push({
-          time_period: activities.length === 0 ? "เช้า" : "บ่าย",
-          activity_title: cleanLine.slice(0, 60),
-          location_name: cleanLine.slice(0, 40),
-          description: cleanLine,
-          is_highlight: false
+          time_period: "บ่าย / เย็น",
+          activity_title: "แนะนำแลนด์มาร์กยอดนิยม & ย่านช้อปปิ้งสตรีทฟู้ด",
+          location_name: spots.slice(0, 3).join(" & "),
+          description: `สถานที่แนะนำสำหรับวันอิสระ: **${spotNames}** อิสระช้อปปิ้ง ชิมอาหารพื้นเมือง และถ่ายรูปมุมสวยตามอัธยาศัย`,
+          is_highlight: true
         });
+      }
+    } else {
+      const periods = ["เช้า", "กลางวัน", "บ่าย", "เย็น"];
+      let periodIdx = 0;
+      let currentAct: any = null;
+
+      for (let j = 0; j < lines.length; j++) {
+        const rawLine = lines[j];
+        if (isMetaLine(rawLine)) continue;
+
+        const clean = cleanMarkdownText(rawLine);
+        if (!clean) continue;
+
+        if (/^(?:ที่พัก|โรงแรม)\s*:/i.test(clean)) {
+          const hVal = clean.replace(/^(?:ที่พัก|โรงแรม)\s*:\s*/i, "").trim();
+          if (hVal) hotelName = hVal;
+          continue;
+        }
+        if (/^อาหาร\s*:/i.test(clean)) {
+          breakfast = clean.includes("เช้า");
+          lunch = clean.includes("กลางวัน");
+          dinner = clean.includes("เย็น");
+          continue;
+        }
+
+        const timeMatch = rawLine.match(/(?:ประมาณ\s*)?(\d{1,2}[\.:]\d{2}(?:\s*[\–\-]\s*\d{1,2}[\.:]\d{2})?\s*(?:น\.|AM|PM)?)/i);
+        const isBullet = /^(?:->|→|–|-|\*|•)/.test(rawLine);
+        const isNewPOI = isNewAttractionOrEvent(rawLine);
+
+        if (timeMatch) {
+          // Check if previous activity was outbound/return flight and this is arrival time (e.g. 15:05 departed, 17:20 arrived)
+          if (currentAct && (currentAct.activity_title.includes("บินกลับ") || currentAct.activity_title.includes("ออกเดินทาง")) && (clean.includes("ถึงกรุงเทพ") || clean.includes("ถึง"))) {
+            currentAct.time_period = `${currentAct.time_period} - ${timeMatch[1].trim()}`;
+            currentAct.description += ` ${clean}`;
+            continue;
+          }
+
+          if (currentAct) activities.push(currentAct);
+          const timeText = timeMatch[1].trim();
+          let rest = cleanMarkdownText(rawLine.replace(timeMatch[0], "").replace(/^ประมาณ\s*/i, ""));
+          const period = detectTimePeriod(timeText, periods[periodIdx % 4]);
+          periodIdx++;
+
+          currentAct = {
+            time_period: timeText || period,
+            activity_title: rest || `กิจกรรมช่วง ${period}`,
+            location_name: rest.slice(0, 40) || mainCity,
+            description: "",
+            is_highlight: true
+          };
+        } else if (isNewPOI && !isBullet) {
+          if (currentAct) activities.push(currentAct);
+          const period = detectTimePeriod(clean, periods[periodIdx % 4]);
+          periodIdx++;
+
+          currentAct = {
+            time_period: period,
+            activity_title: clean,
+            location_name: clean.slice(0, 40),
+            description: "",
+            is_highlight: true
+          };
+        } else if (isBullet && isNewPOI) {
+          if (currentAct && (!currentAct.activity_title || currentAct.activity_title.includes("กิจกรรม") || currentAct.activity_title.includes("ถึง"))) {
+            if (clean.includes("รับคณะ") || clean.includes("ฝากกระเป๋า") || clean.includes("เข้าที่พัก")) {
+              currentAct.description = (currentAct.description ? currentAct.description + " " : "") + clean;
+              continue;
+            }
+          }
+          if (currentAct) activities.push(currentAct);
+          const period = detectTimePeriod(clean, periods[periodIdx % 4]);
+          periodIdx++;
+
+          currentAct = {
+            time_period: period,
+            activity_title: clean,
+            location_name: clean.slice(0, 40),
+            description: "",
+            is_highlight: true
+          };
+        } else {
+          if (currentAct) {
+            currentAct.description = (currentAct.description ? currentAct.description + " " : "") + clean;
+          } else {
+            const period = detectTimePeriod(clean, periods[periodIdx % 4]);
+            periodIdx++;
+
+            currentAct = {
+              time_period: period,
+              activity_title: clean,
+              location_name: clean.slice(0, 40),
+              description: "",
+              is_highlight: true
+            };
+          }
+        }
+      }
+
+      if (currentAct) activities.push(currentAct);
+
+      // Enhance descriptions so they are never blank or duplicates
+      for (const act of activities) {
+        if (!act.description || act.description.trim() === act.activity_title.trim()) {
+          act.description = generateDescriptiveDetail(act.activity_title, mainCity);
+        } else {
+          act.description = cleanMarkdownText(act.description);
+          if (act.description.length < 30) {
+            act.description = `นำท่านสู่ **${act.activity_title}** ${act.description}`;
+          }
+        }
       }
     }
 
@@ -1405,7 +1530,7 @@ export function parseCustomerNoteToItinerary(
           time_period: "ตลอดวัน",
           activity_title: dayTitle || `ท่องเที่ยวเมือง ${mainCity}`,
           location_name: mainCity,
-          description: `ท่องเที่ยวเมือง ${mainCity}`,
+          description: `นำท่านท่องเที่ยวไฮไลต์เมือง ${mainCity}`,
           is_highlight: true
         }
       ]
