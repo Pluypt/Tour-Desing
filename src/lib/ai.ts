@@ -246,6 +246,132 @@ const DESTINATION_DATA: Record<string, {
       }
     ]
   },
+  shenzhen: {
+    tourName: "โปรแกรมท่องเที่ยวสุดอินเทรนด์ เซินเจิ้น (จีน) 4 วัน 3 คืน",
+    hotel: "Shenzhen Marco Polo Hotel / Grand Skylight Hotel หรือเทียบเท่า 4 ดาว",
+    airline: "Shenzhen Airlines (ZH) / China Southern Airlines (CZ)",
+    flightRoute: "BKK - SZX - BKK",
+    outboundFlight: "ZH9004 BKK 11:25 - 15:15 SZX",
+    returnFlight: "ZH9003 SZX 16:40 - 18:35 BKK",
+    days: [
+      {
+        theme: "กรุงเทพฯ (สนามบินสุวรรณภูมิ) - เมืองเซินเจิ้น - ตึกตระหง่าน Ping An Finance Centre - ถนนคนเดิน Dongmen Pedestrian Street",
+        activities: [
+          {
+            time_period: "09.00 น.",
+            activity_title: "พร้อมกัน ณ สนามบินสุวรรณภูมิ",
+            location_name: "สนามบินสุวรรณภูมิ (BKK)",
+            description: "คณะพร้อมกัน ณ **สนามบินสุวรรณภูมิ** อาคารผู้โดยสารขาออก เช็คอินเคาน์เตอร์สายการบิน Shenzhen Airlines เจ้าหน้าที่คอยอำนวยความสะดวกเรื่องสัมภาระ"
+          },
+          {
+            time_period: "11.25 น.",
+            activity_title: "ออกเดินทางบินตรงสู่มหานครเซินเจิ้น",
+            location_name: "สนามบินนานาชาติเซินเจิ้นเป่าอัน (SZX)",
+            description: "ออกเดินทางสู่ **มหานครเซินเจิ้น** โดยเที่ยวบิน **ZH9004** สัมผัสมหานครแห่งนวัตกรรมและเทคโนโลยีระดับโลก"
+          },
+          {
+            time_period: "15.15 น.",
+            activity_title: "เดินทางถึงเซินเจิ้น - ผ่านพิธีการตรวจคนเข้าเมือง",
+            location_name: "สนามบินนานาชาติเซินเจิ้นเป่าอัน (SZX)",
+            description: "เดินทางถึง **สนามบินนานาชาติเซินเจิ้นเป่าอัน** ผ่านพิธีการตรวจคนเข้าเมืองและศุลกากร นำท่านเข้าสู่โรงแรมที่พัก"
+          },
+          {
+            time_period: "เย็น",
+            activity_title: "ชมตึกสูงปิงอัน Ping An Finance Centre & ช้อปปิ้งถนนคนเดิน Dongmen Pedestrian Street",
+            location_name: "ตึกปิงอัน & ถนนคนเดินตงเหมิน",
+            description: "ชมความอลังการของ **ตึกปิงอัน (Ping An Finance Centre)** แลนด์มาร์กที่สูงที่สุดในเซินเจิ้น และอิสระช้อปปิ้งย่าน **ถนนคนเดินตงเหมิน (Dongmen Pedestrian Street)** แหล่งรวมแฟชั่น สตรีทฟู้ด และร้านค้าชื่อดัง",
+            is_highlight: true
+          }
+        ]
+      },
+      {
+        theme: "เซินเจิ้น - ท่องโลกสิ่งมหัศจรรย์ Window of the World - ย่านศิลปะ OCT-LOFT - โชว์น้ำพุเริงระบำ Sea World Shekou",
+        activities: [
+          {
+            time_period: "เช้า",
+            activity_title: "เข้าชมอุทยานจำลองระดับโลก Window of the World (หน้าต่างสู่โลกกว้าง)",
+            location_name: "Window of the World (หน้าต่างสู่โลกกว้าง)",
+            description: "นำท่านเข้าชม **Window of the World (หน้าต่างสู่โลกกว้าง)** สวนสนุกและเมืองจำลองแลนด์มาร์กระดับโลกกว่า 130 แห่งทั่วโลก เช่น หอไอเฟล พีระมิด หอเอนปิซา และเทพีเสรีภาพ",
+            is_highlight: true
+          },
+          {
+            time_period: "กลางวัน",
+            activity_title: "รับประทานอาหารกลางวัน เมนูพิเศษเป็ดปักกิ่งเซินเจิ้น",
+            location_name: "ร้านอาหารขึ้นชื่อเมืองเซินเจิ้น",
+            description: "ลิ้มลองเมนูเด็ด **เป็ดปักกิ่งหนังกรอบ** และอาหารจีนกวางตุ้งรสเลิศ ณ ร้านอาหารชื่อดัง"
+          },
+          {
+            time_period: "บ่าย",
+            activity_title: "เดินเล่นย่านครีเอทีฟสุดฮิป OCT-LOFT Creative Culture Park",
+            location_name: "OCT-LOFT Creative Culture Park",
+            description: "นำท่านสัมผัสย่านศิลปะ **OCT-LOFT Creative Culture Park** ดัดแปลงจากย่านโรงงานเก่าเป็นศูนย์รวมสตูดิโอศิลปะ ร้านหนังสือ คาเฟ่ฮิปๆ และดีไซน์แกลเลอรี",
+            is_highlight: true
+          },
+          {
+            time_period: "เย็น",
+            activity_title: "เช็คอินไลฟ์สไตล์ริมทะเล Sea World Shekou & ชมโชว์การแสดงน้ำพุแสงสีเสียง",
+            location_name: "Sea World Shekou",
+            description: "นำท่านสู่ **Sea World Shekou** ย่านความบันเทิงริมทะเล ถ่ายรูปคู่กับเรือสำราญโบราณ Minghua และชมโชว์น้ำพุเริงระบำตระการตายามค่ำคืน",
+            is_highlight: true
+          }
+        ]
+      },
+      {
+        theme: "เซินเจิ้น - ชมวิวเมือง ณ สวนสาธารณะเลียนฮวาซาน (Lianhuashan Park) - ช้อปปิ้งตลาดไอที Huaqiangbei",
+        activities: [
+          {
+            time_period: "เช้า",
+            activity_title: "ชมทัศนียภาพเมือง ณ สวนสาธารณะเลียนฮวาซาน (Lianhuashan Park) & อนุสาวรีย์เติ้งเสี่ยวผิง",
+            location_name: "สวนสาธารณะเลียนฮวาซาน (Lianhuashan Park)",
+            description: "นำท่านขึ้นสู่ยอดเขา **สวนสาธารณะเลียนฮวาซาน (Lianhuashan Park)** ถ่ายรูปคู่กับอนุสาวรีย์ทองสัมฤทธิ์ของเติ้งเสี่ยวผิง และชมทัศนียภาพพานอรามาของเซินเจิ้น",
+            is_highlight: true
+          },
+          {
+            time_period: "กลางวัน",
+            activity_title: "รับประทานอาหารกลางวัน เมนูติ่มซำกวางตุ้งขนานแท้",
+            location_name: "ภัตตาคารติ่มซำเซินเจิ้น",
+            description: "รับประทาน **ติ่มซำกวางตุ้ง** ขนมจีบ ฮะเก๋ากุ้งสด ซาลาเปาไส้ไหล และเมนูอบกรอบรสเลิศ"
+          },
+          {
+            time_period: "บ่าย",
+            activity_title: "ท่องโลกไอทีและแกดเจ็ต Huaqiangbei (ฮัวเฉียงเป่ย)",
+            location_name: "ตลาดไอทีฮัวเฉียงเป่ย (Huaqiangbei)",
+            description: "นำท่านสู่ **ตลาดฮัวเฉียงเป่ย (Huaqiangbei)** ศูนย์กลางการค้าอิเล็กทรอนิกส์ ไอที แกดเจ็ต และนวัตกรรมเทคโนโลยีที่ใหญ่ที่สุดในโลก",
+            is_highlight: true
+          },
+          {
+            time_period: "เย็น",
+            activity_title: "ชมแสงสีไฟนีออน & อาหารเย็น ณ ย่านศูนย์การค้าการบินพลาซ่า",
+            location_name: "ย่านการค้าช็อปปิ้งมอลล์เซินเจิ้น",
+            description: "เพลิดเพลินกับบรรยากาศยามค่ำคืน รับประทานอาหารเย็น และเลือกซื้อของฝากก่อนกลับ"
+          }
+        ]
+      },
+      {
+        theme: "เซินเจิ้น - พิพิธภัณฑ์เมืองเซินเจิ้น (Shenzhen Museum) - สนามบินนานาชาติเซินเจิ้น - กรุงเทพฯ",
+        activities: [
+          {
+            time_period: "เช้า",
+            activity_title: "เข้าชมพิพิธภัณฑ์เมืองเซินเจิ้น (Shenzhen Museum)",
+            location_name: "พิพิธภัณฑ์เมืองเซินเจิ้น (Shenzhen Museum)",
+            description: "นำท่านเข้าชม **พิพิธภัณฑ์เมืองเซินเจิ้น (Shenzhen Museum)** เรียนรู้ประวัติศาสตร์การพัฒนาจากหมู่บ้านประมงเล็กๆ สู่มหานครเทคโนโลยีระดับโลก"
+          },
+          {
+            time_period: "13.30 น.",
+            activity_title: "เดินทางสู่สนามบินนานาชาติเซินเจิ้นเป่าอัน",
+            location_name: "สนามบินนานาชาติเซินเจิ้นเป่าอัน (SZX)",
+            description: "นำท่านเดินทางสู่สนามบิน ดำเนินการเช็คอินสัมภาระและผ่านขั้นตอนตรวจคนเข้าเมือง"
+          },
+          {
+            time_period: "16.40 น.",
+            activity_title: "ออกเดินทางบินตรงกลับสู่กรุงเทพฯ",
+            location_name: "สนามบินสุวรรณภูมิ (BKK)",
+            description: "ออกเดินทางกลับสู่กรุงเทพฯ โดยเที่ยวบิน **ZH9003** เดินทางถึงสนามบินสุวรรณภูมิ โดยสวัสดิภาพพร้อมความประทับใจ"
+          }
+        ]
+      }
+    ]
+  },
   macao: {
     tourName: "ฮิตติดเทรนด์ มาเก๊า & ฮ่องกง เช็คอินแลนด์มาร์กใหม่ ไหว้พระเสริมเฮง ถ่ายรูปมุมสวยยอดฮิต",
     hotel: "The Venetian Macao / The Kowloon Hotel หรือเทียบเท่า 4 ดาว",
@@ -873,6 +999,7 @@ export function buildFallbackPlan(
     (k === "kunming" && (cityInput.includes("คุนหมิง") || cityInput.includes("คุณหมิง") || cityInput.includes("ลี่เจียง") || cityInput.includes("kunming"))) ||
     (k === "chengdu" && (cityInput.includes("เฉิงตู") || cityInput.includes("ฉงชิ่ง") || cityInput.includes("chengdu"))) ||
     (k === "macao" && (cityInput.includes("มาเก๊า") || cityInput.includes("ฮ่องกง") || cityInput.includes("macau") || cityInput.includes("macao"))) ||
+    (k === "shenzhen" && (cityInput.includes("เซินเจิ้น") || cityInput.includes("shenzhen"))) ||
     (k === "tokyo" && (cityInput.includes("โตเกียว") || cityInput.includes("ญี่ปุ่น") || cityInput.includes("tokyo") || cityInput.includes("japan")))
   );
 
@@ -931,8 +1058,9 @@ export function buildFallbackPlan(
       };
     });
 
+    const cleanPresetName = preset.tourName.replace(/\s*\d+\s*วัน\s*\d+\s*คืน.*/g, '').trim();
     return {
-      tour_name: `${preset.tourName} ${totalDays} วัน ${totalDays - 1} คืน`,
+      tour_name: `${cleanPresetName} ${totalDays} วัน ${totalDays - 1} คืน`,
       summary: `โปรแกรมท่องเที่ยวสุดอินเทรนด์ สัมผัสแลนด์มาร์กใหม่และมุมถ่ายรูปสุดฮิต เมือง ${mainCity} ${totalDays} วัน`,
       airline: preset.airline,
       flight_route: preset.flightRoute,
