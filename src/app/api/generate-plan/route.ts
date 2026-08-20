@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { adminDb } from "@/lib/firebaseAdmin";
 import { ai, safeJsonParse, validateAIPlan, buildFallbackPlan, sanitizeHotelName } from "@/lib/ai";
 import { estimateMarketPrice } from "@/lib/pricing";
+import { formatTourPlanTitle } from "@/lib/titleHelper";
 
 export const maxDuration = 60;
 export const dynamic = "force-dynamic";
@@ -78,7 +79,7 @@ ${userPromptContent}
 
 [โครงสร้าง JSON ที่ส่งกลับ]
 ตอบกลับเฉพาะ JSON บริสุทธิ์เท่านั้น (ไม่มี markdown code block หรือคำอธิบายอื่น) ครอบคลุม:
-- tour_name: ชื่อโปรแกรมทัวร์ภาษาไทยน่าดึงดูด
+- tour_name: ชื่อโปรแกรมทัวร์ตามมาตรฐาน คือ "ชื่อเมือง (ประเทศ) วันที่เดินทาง ชื่อลูกค้า" (เช่น "${data.mainCity} (${data.country}) ${data.startDate || ""} ${data.customerName || ""}")
 - airline, flight_route, outbound_flight, return_flight
 - itinerary: อาร์เรย์ของวัน (${duration} วัน) แต่ละวันมี daily_theme, hotel_name_suggestion, breakfast_included, lunch_included, dinner_included, และ activities (อาร์เรย์ของกิจกรรม มี time_period, location_name, activity_title, description, is_highlight)`;
 
@@ -96,7 +97,7 @@ ${userPromptContent}
     }
 
     if (!aiPlan || !validateAIPlan(aiPlan, duration)) {
-      aiPlan = buildFallbackPlan(data.mainCity, data.country, duration, data.startDate || new Date().toISOString(), data.hotelLevel, data.customerNote);
+      aiPlan = buildFallbackPlan(data.mainCity, data.country, duration, data.startDate || new Date().toISOString(), data.hotelLevel, data.customerNote, data.customerName);
     }
 
     // 4. Hero image fallback
@@ -117,13 +118,22 @@ ${userPromptContent}
     const planId = planRef.id;
 
     const startDateObj = data.startDate && !isNaN(new Date(data.startDate).getTime()) ? new Date(data.startDate) : new Date();
-    const endDateObj = data.endDate && !isNaN(new Date(data.endDate).getTime()) ? new Date(data.endDate) : new Date(startDateObj.getTime() + duration * 86400000);
+    const endDateObj = data.endDate && !isNaN(new Date(data.endDate).getTime()) ? new Date(data.endDate) : new Date(startDateObj.getTime() + (duration - 1) * 86400000);
+
+    const standardTitle = formatTourPlanTitle({
+      city: data.mainCity,
+      country: data.country,
+      startDate: startDateObj,
+      endDate: endDateObj,
+      duration: duration,
+      customerName: data.customerName,
+    });
 
     batch.set(planRef, {
       id: planId,
       customer_id: customerId,
       tour_code: tourCode,
-      title: aiPlan.tour_name || `${data.mainCity} Tour ${duration}D${duration - 1}N`,
+      title: standardTitle,
       country: data.country || "",
       main_city: data.mainCity || "",
       secondary_city: data.secondaryCity || "",

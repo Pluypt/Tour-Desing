@@ -1,16 +1,18 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { ai, safeJsonParse, validateAIPlan, buildFallbackPlan, sanitizeHotelName } from "@/lib/ai";
+import { formatTourPlanTitle } from "@/lib/titleHelper";
 
 export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
-    const plan = await prisma.tourPlan.findUnique({ where: { id } });
+    const plan = await prisma.tourPlan.findUnique({ where: { id }, include: { customer: true } });
     if (!plan) return NextResponse.json({ success: false, error: "Plan not found" }, { status: 404 });
 
     const mainCity = plan.main_city || "คุนหมิง";
     const country = plan.country || "จีน";
     const duration = plan.duration || 4;
+    const customerName = plan.customer?.name || "";
     const startDateStr = plan.start_date ? new Date(plan.start_date).toISOString().split('T')[0] : new Date().toISOString().split('T')[0];
 
     // 1. Try Gemini AI with strict rules (Day 1 & Last Day pure travel, Middle days landmark highlights)
@@ -93,14 +95,23 @@ ${userPromptContent}
     }
 
     if (!aiPlan) {
-      aiPlan = buildFallbackPlan(mainCity, country, duration, startDateStr, plan.hotel_level, plan.customer_note || undefined);
+      aiPlan = buildFallbackPlan(mainCity, country, duration, startDateStr, plan.hotel_level, plan.customer_note || undefined, customerName);
     }
+
+    const standardTitle = formatTourPlanTitle({
+      city: mainCity,
+      country: country,
+      startDate: plan.start_date,
+      endDate: plan.end_date,
+      duration: duration,
+      customerName: customerName,
+    });
 
     // 2. Update Plan metadata
     await prisma.tourPlan.update({
       where: { id },
       data: {
-        title: aiPlan.tour_name || plan.title,
+        title: standardTitle,
         airline: aiPlan.airline || plan.airline,
         flight_route: aiPlan.flight_route || plan.flight_route,
         outbound_flight: aiPlan.outbound_flight || plan.outbound_flight,

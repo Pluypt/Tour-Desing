@@ -1,4 +1,5 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { formatTourPlanTitle } from "./titleHelper";
 
 let cachedInstance: GoogleGenerativeAI | null = null;
 let cachedKey: string | undefined = undefined;
@@ -1546,14 +1547,23 @@ export function buildFallbackPlan(
   duration: number,
   startDate: string,
   hotelLevel?: string,
-  customerNote?: string
+  customerNote?: string,
+  customerName?: string
 ): AIPlan {
+  const standardTitle = formatTourPlanTitle({
+    city: mainCity,
+    country: country,
+    startDate: startDate,
+    duration: duration,
+    customerName: customerName,
+  });
+
   if (customerNote) {
     const parsedDays = parseCustomerNoteToItinerary(customerNote, mainCity, startDate, hotelLevel);
     if (parsedDays && parsedDays.length > 0) {
       return {
-        tour_name: `โปรแกรมท่องเที่ยว ${mainCity} (${country}) ${parsedDays.length} วัน ${parsedDays.length - 1} คืน (ตามความต้องการลูกค้า)`,
-        summary: `โปรแกรมท่องเที่ยวสร้างขึ้นตามหมายเหตุและความต้องการพิเศษของลูกค้า เมือง ${mainCity} ${parsedDays.length} วัน`,
+        tour_name: standardTitle,
+        summary: `โปรแกรมท่องเที่ยว เมือง ${mainCity} (${country}) จำนวน ${parsedDays.length} วัน`,
         airline: "China Eastern Airlines / Thai Airways",
         flight_route: `BKK - ${mainCity} - BKK`,
         outbound_flight: `ออกเดินทางจากกรุงเทพฯ สู่ ${mainCity}`,
@@ -1633,10 +1643,9 @@ export function buildFallbackPlan(
       };
     });
 
-    const cleanPresetName = preset.tourName.replace(/\s*\d+\s*วัน\s*\d+\s*คืน.*/g, '').trim();
     return {
-      tour_name: `${cleanPresetName} ${totalDays} วัน ${totalDays - 1} คืน`,
-      summary: `โปรแกรมท่องเที่ยวสุดอินเทรนด์ สัมผัสแลนด์มาร์กใหม่และมุมถ่ายรูปสุดฮิต เมือง ${mainCity} ${totalDays} วัน`,
+      tour_name: standardTitle,
+      summary: `โปรแกรมท่องเที่ยวสัมผัสแลนด์มาร์กใหม่ เมือง ${mainCity} ${totalDays} วัน`,
       airline: preset.airline,
       flight_route: preset.flightRoute,
       outbound_flight: preset.outboundFlight,
@@ -1648,7 +1657,6 @@ export function buildFallbackPlan(
   // General dynamic fallback for other destinations (strictly real structured content without placeholders)
   const city = mainCity || "เมืองท่องเที่ยว";
   const cntry = country || "";
-  const destName = cntry ? `${city} (${cntry})` : city;
   const totalDays = Math.max(2, duration);
 
   const itinerary = Array.from({ length: totalDays }, (_, i) => {
@@ -1743,8 +1751,8 @@ export function buildFallbackPlan(
   });
 
   return {
-    tour_name: `โปรแกรมท่องเที่ยวสุดอินเทรนด์ ${destName} ${totalDays} วัน ${totalDays - 1} คืน`,
-    summary: `แพลนท่องเที่ยวสัมผัสไฮไลต์ใหม่และจุดถ่ายรูปยอดฮิตเมือง ${city} ระยะเวลา ${totalDays} วัน`,
+    tour_name: standardTitle,
+    summary: `แพลนท่องเที่ยวเมือง ${city} (${cntry}) ระยะเวลา ${totalDays} วัน`,
     airline: `สายการบินบินตรงสู่ ${city}`,
     flight_route: `BKK - ${city} - BKK`,
     outbound_flight: `ออกเดินทางจากสนามบินสุวรรณภูมิ สู่สนามบิน ${city}`,
