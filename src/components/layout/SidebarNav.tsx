@@ -27,6 +27,7 @@ export default function SidebarNav() {
             <li key={item.href} style={{ marginBottom: "4px" }}>
               <Link
                 href={item.href}
+                prefetch={true}
                 className="sidebar-link"
                 style={{
                   display: "flex",

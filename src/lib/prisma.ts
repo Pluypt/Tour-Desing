@@ -63,19 +63,41 @@ const customerAdapter = {
         q = q.limit(args.take);
       }
       const snapshot = await q.get();
-      const customers = snapshot.docs.map((doc: any) => ({ id: doc.id, ...asObject(doc.data()) }));
+      let customers = snapshot.docs.map((doc: any) => ({ id: doc.id, ...asObject(doc.data()) }));
 
-      if (args?.include?._count?.select?.TourPlans) {
-        for (const customer of customers) {
-          const planSnap = await adminDb.collection('tour_plans').where('customer_id', '==', customer.id).get();
-          customer._count = { TourPlans: planSnap.size };
-        }
+      if (args?.orderBy?.updated_at === 'desc') {
+        customers.sort((a: any, b: any) => new Date(b.updated_at || 0).getTime() - new Date(a.updated_at || 0).getTime());
       }
 
-      if (args?.include?.TourPlans) {
+      if (args?.include?.TourPlans || args?.include?._count?.select?.TourPlans) {
+        // Fetch all tour plans ONCE in a single query and group by customer_id in memory
+        const plansSnap = await adminDb.collection('tour_plans').get();
+        const plansByCustomer = new Map<string, any[]>();
+        for (const pDoc of plansSnap.docs) {
+          const planData: any = { id: pDoc.id, ...asObject(pDoc.data()) };
+          const cid = planData.customer_id;
+          if (cid) {
+            if (!plansByCustomer.has(cid)) {
+              plansByCustomer.set(cid, []);
+            }
+            plansByCustomer.get(cid)!.push(planData);
+          }
+        }
+
+        // Sort plans per customer by created_at desc
+        for (const cPlans of plansByCustomer.values()) {
+          cPlans.sort((a, b) => new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime());
+        }
+
         for (const customer of customers) {
-          const planSnap = await adminDb.collection('tour_plans').where('customer_id', '==', customer.id).get();
-          customer.TourPlans = planSnap.docs.map((d: any) => ({ id: d.id, ...asObject(d.data()) }));
+          const cPlans = plansByCustomer.get(customer.id) || [];
+          if (args?.include?._count?.select?.TourPlans) {
+            customer._count = { TourPlans: cPlans.length };
+          }
+          if (args?.include?.TourPlans) {
+            const take = args.include.TourPlans?.take;
+            customer.TourPlans = take ? cPlans.slice(0, take) : cPlans;
+          }
         }
       }
 
@@ -135,89 +157,123 @@ const customerAdapter = {
 };
 
 // ----------------------------------------------------
-// Helper: Load full relations for a TourPlan
+// Helper: Load full relations for a TourPlan in parallel
 // ----------------------------------------------------
 async function populateTourPlanRelations(plan: any, include?: any) {
   if (!plan) return plan;
 
-  if (include?.customer || include?.Customer || plan.customer_id) {
-    if (plan.customer_id) {
-      const custDoc = await adminDb.collection('customers').doc(plan.customer_id).get();
-      if (custDoc.exists) {
-        plan.customer = { id: custDoc.id, ...asObject(custDoc.data()) };
-      }
-    }
+  const tasks: Promise<any>[] = [];
+
+  if ((include?.customer || include?.Customer || plan.customer_id) && plan.customer_id) {
+    tasks.push(
+      adminDb.collection('customers').doc(plan.customer_id).get().then(custDoc => {
+        if (custDoc.exists) {
+          plan.customer = { id: custDoc.id, ...asObject(custDoc.data()) };
+        }
+      })
+    );
   }
 
   if (include?.TourDays || include?.tour_days) {
-    const daysSnap = await adminDb.collection('tour_plans').doc(plan.id).collection('days').orderBy('day_number', 'asc').get();
-    const days = [];
-    for (const dDoc of daysSnap.docs) {
-      const day: any = { id: dDoc.id, ...asObject(dDoc.data()) };
+    tasks.push(
+      (async () => {
+        const daysSnap = await adminDb.collection('tour_plans').doc(plan.id).collection('days').orderBy('day_number', 'asc').get();
+        const dayPromises = daysSnap.docs.map(async (dDoc: any) => {
+          const day: any = { id: dDoc.id, ...asObject(dDoc.data()) };
+          const subTasks: Promise<any>[] = [];
 
-      if (include?.TourDays?.include?.TourActivities || include?.tour_days?.include?.TourActivities) {
-        const actSnap = await dDoc.ref.collection('activities').orderBy('sort_order', 'asc').get();
-        day.TourActivities = actSnap.docs.map((a: any) => ({ id: a.id, ...asObject(a.data()) }));
-      } else {
-        day.TourActivities = day.TourActivities || [];
-      }
+          if (include?.TourDays?.include?.TourActivities || include?.tour_days?.include?.TourActivities) {
+            subTasks.push(
+              dDoc.ref.collection('activities').orderBy('sort_order', 'asc').get().then((actSnap: any) => {
+                day.TourActivities = actSnap.docs.map((a: any) => ({ id: a.id, ...asObject(a.data()) }));
+              })
+            );
+          } else {
+            day.TourActivities = day.TourActivities || [];
+          }
 
-      if (include?.TourDays?.include?.TourDayImages || include?.tour_days?.include?.TourDayImages) {
-        const imgSnap = await dDoc.ref.collection('images').orderBy('sort_order', 'asc').get();
-        day.TourDayImages = imgSnap.docs.map((i: any) => ({ id: i.id, ...asObject(i.data()) }));
-      } else {
-        day.TourDayImages = day.TourDayImages || [];
-      }
+          if (include?.TourDays?.include?.TourDayImages || include?.tour_days?.include?.TourDayImages) {
+            subTasks.push(
+              dDoc.ref.collection('images').orderBy('sort_order', 'asc').get().then((imgSnap: any) => {
+                day.TourDayImages = imgSnap.docs.map((i: any) => ({ id: i.id, ...asObject(i.data()) }));
+              })
+            );
+          } else {
+            day.TourDayImages = day.TourDayImages || [];
+          }
 
-      days.push(day);
-    }
-    plan.TourDays = days;
+          await Promise.all(subTasks);
+          return day;
+        });
+
+        plan.TourDays = await Promise.all(dayPromises);
+      })()
+    );
   } else {
     plan.TourDays = plan.TourDays || [];
   }
 
   if (include?.Hotels) {
-    const snap = await adminDb.collection('tour_plans').doc(plan.id).collection('hotels').get();
-    plan.Hotels = snap.docs.map((d: any) => ({ id: d.id, ...asObject(d.data()) }));
+    tasks.push(
+      adminDb.collection('tour_plans').doc(plan.id).collection('hotels').get().then(snap => {
+        plan.Hotels = snap.docs.map((d: any) => ({ id: d.id, ...asObject(d.data()) }));
+      })
+    );
   } else {
     plan.Hotels = plan.Hotels || [];
   }
 
   if (include?.Inclusions) {
-    const snap = await adminDb.collection('tour_plans').doc(plan.id).collection('inclusions').orderBy('sort_order', 'asc').get();
-    plan.Inclusions = snap.docs.map((d: any) => ({ id: d.id, ...asObject(d.data()) }));
+    tasks.push(
+      adminDb.collection('tour_plans').doc(plan.id).collection('inclusions').orderBy('sort_order', 'asc').get().then(snap => {
+        plan.Inclusions = snap.docs.map((d: any) => ({ id: d.id, ...asObject(d.data()) }));
+      })
+    );
   } else {
     plan.Inclusions = plan.Inclusions || [];
   }
 
   if (include?.Exclusions) {
-    const snap = await adminDb.collection('tour_plans').doc(plan.id).collection('exclusions').orderBy('sort_order', 'asc').get();
-    plan.Exclusions = snap.docs.map((d: any) => ({ id: d.id, ...asObject(d.data()) }));
+    tasks.push(
+      adminDb.collection('tour_plans').doc(plan.id).collection('exclusions').orderBy('sort_order', 'asc').get().then(snap => {
+        plan.Exclusions = snap.docs.map((d: any) => ({ id: d.id, ...asObject(d.data()) }));
+      })
+    );
   } else {
     plan.Exclusions = plan.Exclusions || [];
   }
 
   if (include?.CostItems) {
-    const snap = await adminDb.collection('tour_plans').doc(plan.id).collection('cost_items').orderBy('sort_order', 'asc').get();
-    plan.CostItems = snap.docs.map((d: any) => ({ id: d.id, ...asObject(d.data()) }));
+    tasks.push(
+      adminDb.collection('tour_plans').doc(plan.id).collection('cost_items').orderBy('sort_order', 'asc').get().then(snap => {
+        plan.CostItems = snap.docs.map((d: any) => ({ id: d.id, ...asObject(d.data()) }));
+      })
+    );
   } else {
     plan.CostItems = plan.CostItems || [];
   }
 
   if (include?.CoverDesigns) {
-    const snap = await adminDb.collection('tour_plans').doc(plan.id).collection('covers').get();
-    plan.CoverDesigns = snap.docs.map((d: any) => ({ id: d.id, ...asObject(d.data()) }));
+    tasks.push(
+      adminDb.collection('tour_plans').doc(plan.id).collection('covers').get().then(snap => {
+        plan.CoverDesigns = snap.docs.map((d: any) => ({ id: d.id, ...asObject(d.data()) }));
+      })
+    );
   } else {
     plan.CoverDesigns = plan.CoverDesigns || [];
   }
 
   if (include?.TourVersions) {
-    const snap = await adminDb.collection('tour_plans').doc(plan.id).collection('versions').orderBy('version_no', 'desc').get();
-    plan.TourVersions = snap.docs.map((d: any) => ({ id: d.id, ...asObject(d.data()) }));
+    tasks.push(
+      adminDb.collection('tour_plans').doc(plan.id).collection('versions').orderBy('version_no', 'desc').get().then(snap => {
+        plan.TourVersions = snap.docs.map((d: any) => ({ id: d.id, ...asObject(d.data()) }));
+      })
+    );
   } else {
     plan.TourVersions = plan.TourVersions || [];
   }
 
+  await Promise.all(tasks);
   return plan;
 }
 
@@ -262,8 +318,22 @@ const tourPlanAdapter = {
       }
 
       if (args?.include) {
-        for (let i = 0; i < plans.length; i++) {
-          plans[i] = await populateTourPlanRelations(plans[i], args.include);
+        // Fast path: if only customer is requested, do a single batch lookup
+        const onlyCustomer = Object.keys(args.include).every(k => k === 'customer' || k === 'Customer');
+        if (onlyCustomer) {
+          const custSnap = await adminDb.collection('customers').get();
+          const customerMap = new Map<string, any>();
+          for (const cDoc of custSnap.docs) {
+            customerMap.set(cDoc.id, { id: cDoc.id, ...asObject(cDoc.data()) });
+          }
+          for (const plan of plans) {
+            if (plan.customer_id && customerMap.has(plan.customer_id)) {
+              plan.customer = customerMap.get(plan.customer_id);
+            }
+          }
+        } else {
+          // Parallelize full population
+          plans = await Promise.all(plans.map((p: any) => populateTourPlanRelations(p, args.include)));
         }
       }
 
