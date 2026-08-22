@@ -72,12 +72,22 @@ export default function TourBuilderClient({ initialPlan }: { initialPlan: any })
   const handleSave = async () => {
     setSaving(true);
     try {
+      const price = parseFloat(plan.selling_price_per_person) || 0;
+      const pax = parseInt(plan.traveler_count) || 1;
+      const total = price * pax;
+      const updatedPlan = {
+        ...plan,
+        selling_price_per_person: price,
+        traveler_count: pax,
+        total_selling_price: total
+      };
       const res = await fetch(`/api/tour-plans/${plan.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(plan),
+        body: JSON.stringify(updatedPlan),
       });
       if (res.ok) {
+        setPlan(updatedPlan);
         alert("บันทึกข้อมูลเรียบร้อยแล้ว!");
         router.refresh();
       } else {
@@ -94,14 +104,21 @@ export default function TourBuilderClient({ initialPlan }: { initialPlan: any })
   const handleNavigatePreview = async () => {
     setSaving(true);
     try {
-      const res = await fetch(`/api/tour-plans/${plan.id}`, {
+      const price = parseFloat(plan.selling_price_per_person) || 0;
+      const pax = parseInt(plan.traveler_count) || 1;
+      const total = price * pax;
+      const updatedPlan = {
+        ...plan,
+        selling_price_per_person: price,
+        traveler_count: pax,
+        total_selling_price: total
+      };
+      await fetch(`/api/tour-plans/${plan.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(plan),
+        body: JSON.stringify(updatedPlan),
       });
-      if (res.ok) {
-        router.refresh();
-      }
+      router.refresh();
       router.push(`/preview/${plan.id}`);
     } catch (e) {
       console.error(e);
@@ -223,7 +240,39 @@ export default function TourBuilderClient({ initialPlan }: { initialPlan: any })
             
             <div>
               <label className="form-label" style={{ fontSize: "0.85rem", color: "var(--pr-text-muted)", marginBottom: "6px", display: "block" }}>จำนวนผู้เดินทาง (ท่าน)</label>
-              <input type="number" className="form-control" value={plan.traveler_count || ""} onChange={e => setPlan({...plan, traveler_count: parseInt(e.target.value) || null})} placeholder="จำนวนคน" />
+              <input
+                type="number"
+                className="form-control"
+                value={plan.traveler_count || ""}
+                onChange={e => {
+                  const count = parseInt(e.target.value) || null;
+                  const price = parseFloat(plan.selling_price_per_person) || 0;
+                  const total = price * (count || 1);
+                  setPlan({ ...plan, traveler_count: count, total_selling_price: total });
+                }}
+                placeholder="จำนวนคน"
+              />
+            </div>
+
+            <div>
+              <label className="form-label" style={{ fontSize: "0.85rem", color: "var(--pr-text-muted)", marginBottom: "6px", display: "block" }}>ราคาขายต่อท่าน (บาท)</label>
+              <input
+                type="number"
+                className="form-control"
+                value={plan.selling_price_per_person || ""}
+                onChange={e => {
+                  const price = parseFloat(e.target.value) || 0;
+                  const count = parseInt(plan.traveler_count) || 1;
+                  const total = price * count;
+                  setPlan({ ...plan, selling_price_per_person: price, total_selling_price: total });
+                }}
+                placeholder="เช่น 75900"
+              />
+              {plan.selling_price_per_person > 0 && (
+                <div style={{ fontSize: "0.78rem", color: "var(--pr-red)", marginTop: "4px", fontWeight: 600 }}>
+                  ราคารวม {plan.traveler_count || 1} ท่าน = {(((parseFloat(plan.selling_price_per_person) || 0) * (parseInt(plan.traveler_count) || 1))).toLocaleString()} บาท
+                </div>
+              )}
             </div>
 
             <div>

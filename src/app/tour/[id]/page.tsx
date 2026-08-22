@@ -112,11 +112,9 @@ export default async function CustomerTourPage({ params }: { params: Promise<{ i
               ฿{plan.selling_price_per_person.toLocaleString()}{" "}
               <span style={{ fontSize: "14px", fontWeight: 400, color: "#555" }}>/ ท่าน</span>
             </div>
-            {plan.total_selling_price && (
-              <div style={{ fontSize: "12px", color: "#666" }}>
-                ราคารวมทั้งคณะ ({plan.traveler_count} ท่าน): ฿{plan.total_selling_price.toLocaleString()} บาท
-              </div>
-            )}
+            <div style={{ fontSize: "12px", color: "#666" }}>
+              ราคารวมทั้งคณะ ({plan.traveler_count || 1} ท่าน): ฿{((plan.selling_price_per_person || 0) * (plan.traveler_count || 1)).toLocaleString()} บาท
+            </div>
           </div>
         )}
 

@@ -15,6 +15,9 @@ export default function PackagePriceSection({
 }: PackagePriceSectionProps) {
   if (!sellingPricePerPerson && !totalSellingPrice) return null;
 
+  const pax = travelerCount || 1;
+  const effectiveTotal = sellingPricePerPerson != null ? sellingPricePerPerson * pax : (totalSellingPrice || 0);
+
   const fmt = (n: number | null) =>
     n != null ? n.toLocaleString("th-TH") + " บาท" : "-";
 
@@ -31,13 +34,11 @@ export default function PackagePriceSection({
             <div style={{ fontSize: "11px", color: "#888" }}>บาท / ท่าน</div>
           </div>
         )}
-        {totalSellingPrice != null && (
-          <div style={{ border: "1px solid #e0e0e0", borderRadius: "8px", padding: "14px 18px", textAlign: "center" }}>
-            <div style={{ fontSize: "11px", color: "#888", marginBottom: "4px" }}>ราคารวม {travelerCount} ท่าน</div>
-            <div style={{ fontSize: "18px", fontWeight: 700, color: "#333" }}>{totalSellingPrice.toLocaleString("th-TH")}</div>
-            <div style={{ fontSize: "11px", color: "#888" }}>บาท</div>
-          </div>
-        )}
+        <div style={{ border: "1px solid #e0e0e0", borderRadius: "8px", padding: "14px 18px", textAlign: "center" }}>
+          <div style={{ fontSize: "11px", color: "#888", marginBottom: "4px" }}>ราคารวม {pax} ท่าน</div>
+          <div style={{ fontSize: "18px", fontWeight: 700, color: "#333" }}>{effectiveTotal.toLocaleString("th-TH")}</div>
+          <div style={{ fontSize: "11px", color: "#888" }}>บาท</div>
+        </div>
         {depositAmount != null && depositAmount > 0 && (
           <div style={{ border: "1px solid #e0e0e0", borderRadius: "8px", padding: "14px 18px", textAlign: "center" }}>
             <div style={{ fontSize: "11px", color: "#888", marginBottom: "4px" }}>มัดจำ 30%</div>

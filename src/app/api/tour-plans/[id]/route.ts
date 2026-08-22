@@ -9,13 +9,20 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
 
     const planRef = adminDb.collection("tour_plans").doc(id);
 
+    const travelerCount = body.traveler_count !== undefined && body.traveler_count !== null && body.traveler_count !== ""
+      ? parseInt(body.traveler_count)
+      : undefined;
+
     const sellingPricePerPerson = body.selling_price_per_person !== undefined && body.selling_price_per_person !== null && body.selling_price_per_person !== ""
       ? parseFloat(body.selling_price_per_person)
       : undefined;
 
-    const totalSellingPrice = body.total_selling_price !== undefined && body.total_selling_price !== null && body.total_selling_price !== ""
-      ? parseFloat(body.total_selling_price)
-      : (sellingPricePerPerson && body.traveler_count ? sellingPricePerPerson * parseInt(body.traveler_count) : undefined);
+    let totalSellingPrice: number | undefined = undefined;
+    if (sellingPricePerPerson !== undefined && travelerCount !== undefined) {
+      totalSellingPrice = sellingPricePerPerson * travelerCount;
+    } else if (body.total_selling_price !== undefined && body.total_selling_price !== null && body.total_selling_price !== "") {
+      totalSellingPrice = parseFloat(body.total_selling_price);
+    }
 
     const planUpdateData: Record<string, any> = {
       updated_at: new Date()
